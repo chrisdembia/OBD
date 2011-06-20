@@ -71,6 +71,7 @@ void hc_fdf(double q2, void * params, double * f, double * df)
 
 void Whipple::printState(void) const
 {
+	/*Doxygen Test*/
   std::cout.precision(16);
   std::cout << "q0 = " << q0 << " (ignorable)\n"
        << "q1 = " << q1 << '\n'

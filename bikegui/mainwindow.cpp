@@ -1,8 +1,15 @@
+#include <cstdlib>
 #include <QtGui>
 #include "parameters.h"
+#include "button.h"
 #include "mainwindow.h"
 #include "OBDConfig.h"
 #include "whipple.h"
+#include <getopt.h>
+#include "gslVecUtils.h"
+#include "whippleutils.h"
+
+using namespace std;
 
 MainWindow::MainWindow()
 {
@@ -26,6 +33,7 @@ MainWindow::MainWindow()
   createDockWindows();
   createStatusBar();
   createTabs();
+  createUprightStabilityTab();
 }
 
 void MainWindow::about(void)
@@ -88,7 +96,7 @@ void MainWindow::createDockWindows(void)
   addDockWidget(Qt::LeftDockWidgetArea, dock);
   paramWidget = new WhippleParameter(dock);
   dock->setWidget(paramWidget);
-
+  
 }
 
 void MainWindow::createMenus(void)
@@ -115,9 +123,119 @@ void MainWindow::createStatusBar(void)
 }
 void MainWindow::createTabs(void)
 {
-  tabWidget = new QTabWidget;
-  tabWidget->addTab(new QWidget, tr("Upright stability"));
-  tabWidget->addTab(new QWidget, tr("Steady turning"));
-  tabWidget->addTab(new QWidget, tr("Motion visualization"));
+
+  uprightStabilityWidget = new QWidget;
+  steadyTurningWidget = new QWidget;
+  motionVisualizationWidget = new QWidget;
+  
+  tabWidget = new QTabWidget();
+  tabWidget->addTab( uprightStabilityWidget, tr("Upright stability"));
+  tabWidget->addTab( steadyTurningWidget, tr("Steady turning"));
+  tabWidget->addTab( motionVisualizationWidget, tr("Motion visualization"));
+  /*
+  uprightStabilityWidget->setParent(tabWidget);
+  steadyTurningWidget->setParent(tabWidget);
+  motionVisualizationWidget->setParent(tabWidget);
+  */
+  
   setCentralWidget(tabWidget);
+}
+/*
+Button *MainWindow::createButton(const QString &text, const char *member)
+{
+   //  Button *button = new Button(text);
+   // connect(button, SIGNAL(clicked()), this, member);
+     return void; //button;
+}
+*/
+
+void MainWindow::createUprightStabilityTab(void)
+{
+  QGridLayout *uprightStabilityLayout = new QGridLayout;
+  uprightStabilityLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
+  
+  QToolButton * updateEigButton = new QToolButton(uprightStabilityWidget);
+  updateEigButton->setText( tr("Update eigenvalue plot") );
+//  Button * updateEigButton = createButton(tr("Update eigenvalue plot"), SLOT(updateEigPlot()));
+  connect(updateEigButton, SIGNAL(clicked()), this, SLOT(updateEigPlot()) );
+
+  uprightStabilityLayout->addWidget(updateEigButton,0,0);
+  
+  // manage options
+  
+  uprightStabilityLayout->addWidget(new QLabel( tr("Save eigenvalue data"),0,0 ) );
+  
+  // i want to right-justify this button
+  QToolButton * saveEigButton = new QToolButton(uprightStabilityWidget);
+  saveEigButton->setText( tr("Save") );
+  uprightStabilityLayout->addWidget(saveEigButton,0,1,Qt::AlignRight);
+  
+  QLineEdit *saveEigFilenameEdit = new QLineEdit( tr("filename") );
+  saveEigFilenameEdit->setAlignment(Qt::AlignRight);
+  uprightStabilityLayout->addWidget(saveEigFilenameEdit,1,0,1,2);
+  
+  uprightStabilityLayout->addWidget(new QLabel( tr("pitch guess (rad) (blank for default)") ),2,0);
+  QLineEdit *pitchGuessEdit = new QLineEdit("0.0");
+  pitchGuessEdit->setAlignment(Qt::AlignRight);
+  uprightStabilityLayout->addWidget(pitchGuessEdit,2,1);
+  
+  uprightStabilityLayout->addWidget(new QLabel( tr("number of evaluation points") ),3,0);
+  QLineEdit *nEvalPointsEdit = new QLineEdit("201");
+  nEvalPointsEdit->setAlignment(Qt::AlignRight);
+  uprightStabilityLayout->addWidget(nEvalPointsEdit,3,1);
+  
+  uprightStabilityLayout->addWidget(new QLabel( tr("initial speed v_i (m/s)") ), 4,0);
+  QLineEdit *initSpeedEdit = new QLineEdit("0.0"); // THESE FIELDS NEED TO BE ACTUAL NUMBERS, NEED TO STORE DEFAULTS SOMEWHERE.
+  initSpeedEdit->setAlignment(Qt::AlignRight);
+  uprightStabilityLayout->addWidget(initSpeedEdit,4,1);
+  
+  uprightStabilityLayout->addWidget(new QLabel( tr("final speed v_f (m/s)") ), 5,0);
+  QLineEdit *finalSpeedEdit = new QLineEdit("10.0");
+  finalSpeedEdit->setAlignment(Qt::AlignRight);
+  uprightStabilityLayout->addWidget(finalSpeedEdit,5,1);
+
+//  evalOptions * opt = new evalOptions;
+//  processOptions(argc, argv, opt, bb);
+  /*
+ //     MJWhippleParams * mjbike = new MJWhippleParams;
+      WhippleParams * b = new WhippleParams;
+      readMJWhippleParams(mjbike, optarg);
+      convertParameters(b, mjbike);
+      bike->setParameters(b);
+      bike->evalConstants();
+      bike->eoms();
+      bike->computeOutputs();
+      delete mjbike;
+      delete b;
+      
+  // Vector to store range of speeds to calculate eigenvalues
+  gsl_vector * speed = linspaceN(opt->vi, opt->vf, opt->N);
+
+  bb->u1 = 0.0;
+  bb->u3 = 0.0;
+  bb->evalConstants();
+
+  for (int i = 0; i < opt->N; ++i) {
+    bb->u5 = -gsl_vector_get(speed, i)/(bb->rf+bb->rft);
+    bb->calcEvals();
+    OutputFile.write((char *) gsl_vector_ptr(speed, i), sizeof(double));
+    OutputFile.write((char *) bb->fourValues, 4*sizeof(double));
+  } // for i
+  std::cout << "Eigenvalue data written to " << opt->outfolder << '\n';
+
+  // Close files and free memory
+  OutputFile.close();
+  delete bb;
+  delete opt;
+  gsl_vector_free(speed);
+  return 0;
+ */ 
+  
+  
+  uprightStabilityWidget->setLayout(uprightStabilityLayout);
+}
+void MainWindow::updateEigPlot(void)
+{
+	cout << "STOP PRESSING ME!" << endl;
+	// do something
 }
