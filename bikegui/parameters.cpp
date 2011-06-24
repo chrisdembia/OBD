@@ -1,16 +1,17 @@
 #include <string>
 #include <QtGui>
+#include "whipple.h"
+#include "whippleutils.h"
 #include "parameters.h"
 
-using namespace std;
 
-WhippleParameter::WhippleParameter(QWidget *parent)
+WhippleParameter::WhippleParameter( Whipple *bike, QWidget *parent)
   : QWidget(parent)
 {
   comboBox = new QComboBox(this);
   comboBox->addItem(tr("Gyrostat parameters"));
   comboBox->addItem(tr("Franke parameters"));
-  comboBox->addItem(tr("Benchmark parameters"));
+  comboBox->addItem(tr("MJ (benchmark) parameters"));
 
   paramBox = new QGroupBox( tr("Set parameter values"), this);
   
@@ -22,11 +23,168 @@ WhippleParameter::WhippleParameter(QWidget *parent)
   QGridLayout *benchParamLayout = new QGridLayout;
   benchParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
   
-  const int NbenchParams = 29;
+  // struct from whipple.h, to hold the parambox values
+  mjwp = new MJWhippleParams;
+
+//  NbenchParams = 29;
+/*  
   QLabel * benchParamLabels[NbenchParams];
   QLineEdit * benchParamEdits[NbenchParams];
-  string benchParamStrings[NbenchParams];
-  string benchParamValues[NbenchParams];
+  std::string benchParamStrings[NbenchParams];
+*/
+  // BENCHMARK MODEL PARAMETERS
+    
+  benchParamStrings[0] = "w (m)";
+  benchParamStrings[1] = "c (m)";
+  benchParamStrings[2] = "lambda (rad)";
+  benchParamStrings[3] = "g (m/s^2)";
+  benchParamStrings[4] = "v (m/s)";
+  benchParamStrings[5] = "t_{R} (m)";
+  benchParamStrings[6] = "t_{F} (m)";
+  benchParamStrings[7] = "r_R (m)";
+  benchParamStrings[8] = "m_R (kg)";
+  benchParamStrings[9] = "I_{Rxx} (kg m^2)";
+  benchParamStrings[10] = "I_{Ryy} (kg m^2)";
+  benchParamStrings[11] = "x_B (m)";
+  benchParamStrings[12] = "z_B (m)";
+  benchParamStrings[13] = "m_B (kg)";
+  benchParamStrings[14] = "I_{Bxx} (kg m^2)";
+  benchParamStrings[15] = "I_{Byy} (kg m^2)";
+  benchParamStrings[16] = "I_{Bzz} (kg m^2)";
+  benchParamStrings[17] = "I_{Bxz} (kg m^2)";
+  benchParamStrings[18] = "x_H (m)";
+  benchParamStrings[19] = "z_H (m)";
+  benchParamStrings[20] = "m_H (m)";
+  benchParamStrings[21] = "I_{Hxx} (kg m^2)";
+  benchParamStrings[22] = "I_{Hyy} (kg m^2)";
+  benchParamStrings[23] = "I_{Hzz} (kg m^2)";
+  benchParamStrings[24] = "I_{Hxz} (kg m^2)";
+  benchParamStrings[25] = "r_F (m)";
+  benchParamStrings[26] = "m_F (kg)";
+  benchParamStrings[27] = "I_{Fxx} (kg m^2)";
+  benchParamStrings[28] = "I_{Fyy} (kg m^2)";
+  
+  QLabel * benchLoadLabel = new QLabel("Load parameter file");
+  QToolButton * benchLoadButton = new QToolButton;
+  benchLoadButton->setText("Load");
+  QToolButton * benchSaveButton = new QToolButton;
+  benchSaveButton->setText("Save");
+  QLineEdit * benchLoadEdit = new QLineEdit("put dialogbox here");
+  
+  QToolButton * benchBenchParamsButton = new QToolButton;
+  benchBenchParamsButton->setText("Use (default) benchmark parameters");
+  connect(benchBenchParamsButton, SIGNAL(clicked()), this, SLOT(setBenchmarkParametersSlot()) );
+  
+  benchParamLayout->addWidget(benchLoadLabel,0,0);
+  benchParamLayout->addWidget(benchLoadButton,0,1);
+  benchParamLayout->addWidget(benchSaveButton,0,2);
+  benchParamLayout->addWidget(benchLoadEdit,1,0,1,3);
+  benchParamLayout->addWidget(benchBenchParamsButton,2,0,1,3);
+  
+  QString lineEditValue;
+  // add a horizontal rule
+  for (int i = 0; i < NbenchParams; i++)
+  {
+  	benchParamLabels[i] = new QLabel( tr(benchParamStrings[i].c_str()) ); // dont need to save these
+
+  	benchParamEdits[i] = new QLineEdit( tr("=p") );
+	benchParamEdits[i]->setAlignment(Qt::AlignRight);
+
+	benchParamLayout->addWidget(benchParamLabels[i],i+3,0);
+	benchParamLayout->addWidget(benchParamEdits[i],i+3,1,1,2);
+  }
+
+  paramBox->setLayout(benchParamLayout);
+       
+  layout = new QVBoxLayout(this);
+  layout->addWidget(comboBox);
+  layout->addWidget(paramBox);
+}
+
+void WhippleParameter::updateBenchParams(void)
+{
+  // BENCHMARK MODEL PARAMETERS
+  benchParamValues[0] = mjwp->w;
+  benchParamValues[1] = mjwp->c;
+  benchParamValues[2] = mjwp->lambda;
+  benchParamValues[3] = mjwp->g;
+  benchParamValues[4] = 1337;
+  benchParamValues[5] = mjwp->rrt;
+  benchParamValues[6] = mjwp->rft;
+  benchParamValues[7] = mjwp->rr;
+  benchParamValues[8] = mjwp->mr;
+  benchParamValues[9] = mjwp->IRxx;
+  benchParamValues[10] = mjwp->IRyy;
+  benchParamValues[11] = mjwp->xb;
+  benchParamValues[12] = mjwp->zb;
+  benchParamValues[13] = mjwp->mb;
+  benchParamValues[14] = mjwp->IBxx;
+  benchParamValues[15] = mjwp->IByy;
+  benchParamValues[16] = mjwp->IBzz;
+  benchParamValues[17] = mjwp->IBxz;
+  benchParamValues[18] = mjwp->xh;
+  benchParamValues[19] = mjwp->zh;
+  benchParamValues[20] = mjwp->mh;
+  benchParamValues[21] = mjwp->IHxx;
+  benchParamValues[22] = mjwp->IHyy;
+  benchParamValues[23] = mjwp->IHzz;
+  benchParamValues[24] = mjwp->IHxz;
+  benchParamValues[25] = mjwp->rf;
+  benchParamValues[26] = mjwp->mf;
+  benchParamValues[27] = mjwp->IFxx;
+  benchParamValues[28] = mjwp->IFyy;
+  
+  QString lineEditValue;
+  // add a horizontal rule
+  for (int i = 0; i < NbenchParams; i++)
+  {
+  	lineEditValue.setNum(benchParamValues[i], 'g', 5 ); // 2nd arg: format, 3rd arg: precision
+    benchParamEdits[i]->setText( tr(lineEditValue.toStdString().c_str()) );
+  }
+}
+
+void WhippleParameter::setBenchmarkParametersSlot()
+{
+  // in whippleutils.h
+  setBenchmarkParameters(mjwp);
+  // somehow update the display
+  updateBenchParams();
+}
+
+void WhippleParameter::setBenchParams(Whipple * bike)
+{
+// interact with Whipple object
+}
+/*
+  benchParamStrings[0] = "w (m)"; benchParamValues[0] = mjwp->w;
+  benchParamStrings[1] = "c (m)"; benchParamValues[1] = mjwp->c;
+  benchParamStrings[2] = "lambda (rad)"; benchParamValues[2] = mjwp->lambda;
+  benchParamStrings[3] = "g (m/s^2)"; benchParamValues[3] = mjwp->g;
+  benchParamStrings[4] = "v (m/s)"; benchParamValues[4] = 1337;
+  benchParamStrings[5] = "t_{R} (m)"; benchParamValues[5] = mjwp->rrt;
+  benchParamStrings[6] = "t_{F} (m)"; benchParamValues[6] = mjwp->rft;
+  benchParamStrings[7] = "r_R (m)"; benchParamValues[7] = mjwp->rr;
+  benchParamStrings[8] = "m_R (kg)"; benchParamValues[8] = mjwp->mr;
+  benchParamStrings[9] = "I_{Rxx} (kg m^2)"; benchParamValues[9] = mjwp->IRxx;
+  benchParamStrings[10] = "I_{Ryy} (kg m^2)"; benchParamValues[10] = mjwp->IRyy;
+  benchParamStrings[11] = "x_B (m)"; benchParamValues[11] = mjwp->xb;
+  benchParamStrings[12] = "z_B (m)"; benchParamValues[12] = mjwp->zb;
+  benchParamStrings[13] = "m_B (kg)"; benchParamValues[13] = mjwp->mb;
+  benchParamStrings[14] = "I_{Bxx} (kg m^2)"; benchParamValues[14] = mjwp->IBxx;
+  benchParamStrings[15] = "I_{Byy} (kg m^2)"; benchParamValues[15] = mjwp->IByy;
+  benchParamStrings[16] = "I_{Bzz} (kg m^2)"; benchParamValues[16] = mjwp->IBzz;
+  benchParamStrings[17] = "I_{Bxz} (kg m^2)"; benchParamValues[17] = mjwp->IBxz;
+  benchParamStrings[18] = "x_H (m)"; benchParamValues[18] = mjwp->xh;
+  benchParamStrings[19] = "z_H (m)"; benchParamValues[19] = mjwp->zh;
+  benchParamStrings[20] = "m_H (m)"; benchParamValues[20] = mjwp->mh;
+  benchParamStrings[21] = "I_{Hxx} (kg m^2)"; benchParamValues[21] = mjwp->IHxx;
+  benchParamStrings[22] = "I_{Hyy} (kg m^2)"; benchParamValues[22] = mjwp->IHyy;
+  benchParamStrings[23] = "I_{Hzz} (kg m^2)"; benchParamValues[23] = mjwp->IHzz;
+  benchParamStrings[24] = "I_{Hxz} (kg m^2)"; benchParamValues[24] = mjwp->IHxz;
+  benchParamStrings[25] = "r_F (m)"; benchParamValues[25] = mjwp->rf;
+  benchParamStrings[26] = "m_F (kg)"; benchParamValues[26] = mjwp->mf;
+  benchParamStrings[27] = "I_{Fxx} (kg m^2)"; benchParamValues[27] = mjwp->IFxx;
+  benchParamStrings[28] = "I_{Fyy} (kg m^2)"; benchParamValues[28] = mjwp->IFyy;
   
   benchParamStrings[0] = "w (m)"; benchParamValues[0] = "1.02";
   benchParamStrings[1] = "c (m)"; benchParamValues[1] = "0.08";
@@ -57,37 +215,6 @@ WhippleParameter::WhippleParameter(QWidget *parent)
   benchParamStrings[26] = "m_F (kg)"; benchParamValues[26] = "3.0";
   benchParamStrings[27] = "I_{Fxx} (kg m^2)"; benchParamValues[27] = "0.1405";
   benchParamStrings[28] = "I_{Fyy} (kg m^2)"; benchParamValues[28] = "0.28";
-  
-  QLabel * benchLoadLabel = new QLabel("Load parameter file");
-  QToolButton * benchLoadButton = new QToolButton;
-  benchLoadButton->setText("Load");
-  QToolButton * benchSaveButton = new QToolButton;
-  benchSaveButton->setText("Save");
-  QLineEdit * benchLoadEdit = new QLineEdit("put dialogbox here");
-
-  benchParamLayout->addWidget(benchLoadLabel,0,0);
-  benchParamLayout->addWidget(benchLoadButton,0,1);
-  benchParamLayout->addWidget(benchSaveButton,0,2);
-  benchParamLayout->addWidget(benchLoadEdit,1,0,1,3);
-  // add a horizontal rule
-  for (int i = 0; i < NbenchParams; i++)
-  {
-  	benchParamLabels[i] = new QLabel( tr(benchParamStrings[i].c_str()) );
-  	benchParamEdits[i] = new QLineEdit( tr(benchParamValues[i].c_str()) );
-	benchParamEdits[i]->setAlignment(Qt::AlignRight);
-	
-	benchParamLayout->addWidget(benchParamLabels[i],i+2,0);
-	benchParamLayout->addWidget(benchParamEdits[i],i+2,1,1,2);
-  }
-  
-  paramBox->setLayout(benchParamLayout);
-       
-  layout = new QVBoxLayout(this);
-  layout->addWidget(comboBox);
-  layout->addWidget(paramBox);
-}
-
-/*
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
 

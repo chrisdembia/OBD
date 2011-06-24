@@ -16,7 +16,8 @@ class MainWindow : public QMainWindow
 
 public:
   MainWindow();
-
+  // need the destructor too
+  
 private slots:
   void about(void);
   void updateEigPlot(void);

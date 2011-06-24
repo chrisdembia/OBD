@@ -9,8 +9,7 @@
 #include "gslVecUtils.h"
 #include "whippleutils.h"
 
-using namespace std;
-
+// constructor
 MainWindow::MainWindow()
 {
   // Set MainWindow parameters
@@ -94,7 +93,7 @@ void MainWindow::createDockWindows(void)
   QDockWidget *dock = new QDockWidget(tr("Parameters"));
   dock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
   addDockWidget(Qt::LeftDockWidgetArea, dock);
-  paramWidget = new WhippleParameter(dock);
+  paramWidget = new WhippleParameter(bike, dock);
   dock->setWidget(paramWidget);
   
 }
@@ -194,6 +193,69 @@ void MainWindow::createUprightStabilityTab(void)
   finalSpeedEdit->setAlignment(Qt::AlignRight);
   uprightStabilityLayout->addWidget(finalSpeedEdit,5,1);
 
+ 
+  
+  uprightStabilityWidget->setLayout(uprightStabilityLayout);
+//    return 0; for errors?
+}
+void MainWindow::updateEigPlot(void)
+{
+  std::cout << "STOP PRESSING ME!" << std::endl;
+	// do something
+  // tHIS STUFF BELOW IS MOSTLY COPIED
+  std::string filename;
+  char outfolder[512]; // pOSSIBLY LET USER SET THIS
+  outfolder[0] = '\0';
+  int N = 201;
+  double vi = 0.0, vf = 10.0;
+  
+  MJWhippleParams * mjwp = new MJWhippleParams;
+  WhippleParams * b = new WhippleParams;
+  
+  // if ( paramset = "MJ/benchmark" )
+  readMJWhippleParams(mjwp, "benchmark.txt"); // THIS FILE NEEDS TO BE MANAGED BY THE PARAMETERS GUI: or it can just save a file that is then picked up on this side of the table.
+  convertParameters(b, mjwp);
+  bike->setParameters(b);
+  bike->evalConstants();
+  bike->eoms();
+  bike->computeOutputs();
+  delete mjwp;
+  delete b;
+    
+  // Write parameters
+  filename = outfolder; filename += "eigenvalue_parameters.txt";
+  bike->writeParameters(filename.c_str());
+  // Write data record file. the function is orphaned from whipple.h currently
+//  filename = outfolder; filename += "eval_record.py";
+//  writeEvalRecord_dt(filename.c_str());
+  // Open data file
+  filename = outfolder; filename += "eigenvalues.dat";
+  std::ofstream OutputFile(filename.c_str(), std::ios::binary);
+  
+
+  // Vector to store range of speeds to calculate eigenvalues
+  gsl_vector * speed = linspaceN(vi, vf, N);
+
+  bike->u1 = 0.0;
+  bike->u3 = 0.0;
+  bike->evalConstants();
+  
+  for (int i = 0; i < N; ++i) {
+    bike->u5 = -gsl_vector_get(speed, i)/(bike->rf+bike->rft);
+    bike->calcEvals();
+    OutputFile.write((char *) gsl_vector_ptr(speed, i), sizeof(double));
+    OutputFile.write((char *) bike->fourValues, 4*sizeof(double));
+  } // for i
+  std::cout << "Eigenvalue data written to " << outfolder << std::endl;
+
+  // Close files and free memory
+  OutputFile.close();
+//  delete bb;
+//  delete opt;
+  gsl_vector_free(speed);
+
+  // SHOULD MAKE DESTRUCTORS
+  
 //  evalOptions * opt = new evalOptions;
 //  processOptions(argc, argv, opt, bb);
   /*
@@ -230,12 +292,4 @@ void MainWindow::createUprightStabilityTab(void)
   gsl_vector_free(speed);
   return 0;
  */ 
-  
-  
-  uprightStabilityWidget->setLayout(uprightStabilityLayout);
-}
-void MainWindow::updateEigPlot(void)
-{
-	cout << "STOP PRESSING ME!" << endl;
-	// do something
 }

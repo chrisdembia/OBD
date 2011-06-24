@@ -24,12 +24,12 @@
 #include <gsl/gsl_odeiv.h>
 #include "whipple.h"
 
-  /** Convert Meijaard Bike Parameters to OBD model parameters
+  /** Convert Meijaard Bike Parameters to OBD model parameters.
    *  
    * */
 void convertParameters(WhippleParams *bout, const MJWhippleParams * bin);
 
-/** Initialize all parameters to those presented in benchmark paper
+/** Initialize all parameters to those presented in benchmark paper.
  *
  * */
 void setBenchmarkParameters(MJWhippleParams * bike);
