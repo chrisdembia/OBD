@@ -1,7 +1,7 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#define NBENCHPARAMS 29
+#define NMEIJPARAMS 29
 #include <QtGui>
 #include "whipple.h"
 
@@ -17,23 +17,23 @@ public:
   /**
    * Constructor for the GUI's left panel for parameter inputs.
    * */
-  WhippleParameter(Whipple * bike, QWidget *parent = 0);
+  WhippleParameter(Whipple * b, QWidget *parent = 0);
 
 private slots:
   /**
-   * Called when a user clicks the button "Use (default) benchmark parameters".
+   * Called when a user clicks the button "Use benchmark parameters".
    * */
   void setBenchmarkParametersSlot(void);
 
   /**
    * Chris should really rename this method, assigns updated values from mjwp to the Whipple bike.
    * */
-  void setBenchParams(Whipple * bike);
+  void setMeijaardParams(Whipple * bike);
 
   /**
-   * Update the display to the gui with updated MJ/benchmark parameter values.
+   * Update the display to the gui with updated Meijaard parameter values.
    * */
-  void updateBenchParams(void);
+  void updateMeijaardParamEdits(void);
 
 private:
   /**
@@ -51,35 +51,45 @@ private:
    * */
   QGroupBox *paramBox;
 
-  // MJ/benchmark parameter stuffs
+  // Whipple bicycle stuffs
+  
   /**
-   * Structure, declared in Whipple.h, to hold the input parameters if MJ/Benchmark parmeters are selected from the QtComboBox.
+   * Pointer to a whipple bike created in the MainWindow class. We have a pointer here so that we can modify the parameters that the bicycle(s) use(s).
+   * */
+  Whipple * bike;
+  /**
+   * Structure, declared in Whipple.h, to hold the default (Gyrostat) parameters for Whipple objects.
+   * */
+  WhippleParams * gswp;
+
+  // Meijaard parameter stuffs
+  /**
+   * Structure, declared in Whipple.h, to hold the input parameters if Meijaard parmeters are selected from the QtComboBox.
    * */
   MJWhippleParams * mjwp;
+  /**
+   * The number of Meijaard parameters.
+   * */
+  const static int NmeijParams = NMEIJPARAMS; // static?
   
   /**
-   * The number of MJ/benchmark parameters.
+   * Holds the QLabel objects used for the GUI input of Meijaard parameters.
    * */
-  const static int NbenchParams = NBENCHPARAMS; // static?
-  
-  /**
-   * Holds the QLabel objects used for the GUI input of MJ/benchmark parameters.
-   * */
-  QLabel * benchParamLabels[NBENCHPARAMS];
+  QLabel * meijParamLabels[NMEIJPARAMS];
 
   /**
-   * Holds the QLineEdit objects used for the GUI input of MJ/benchmark parameters.
+   * Holds the QLineEdit objects used for the GUI input of Meijaard parameters.
    * */
-  QLineEdit * benchParamEdits[NBENCHPARAMS];
+  QLineEdit * meijParamEdits[NMEIJPARAMS];
   
   /**
-   * Holds the string names for use with QLabel objects for the GUI input of MJ/benchmark parameters.
+   * Holds the string names for use with QLabel objects for the GUI input of Meijaard parameters.
    * */
-  std::string benchParamStrings[NBENCHPARAMS];
+  std::string meijParamStrings[NMEIJPARAMS];
 
   /**
-   * Holds the values, ripped from struct MJWhippleParams mjwp, for use with the GUI input of MJ/benchmark parameters.
+   * Holds the values, ripped from struct MJWhippleParams mjwp, for use with the GUI input of Meijaard parameters.
    * */
-  double benchParamValues[NBENCHPARAMS];
+  double meijParamValues[NMEIJPARAMS];
 };
 #endif

@@ -8,11 +8,11 @@
 #include <getopt.h>
 #include "gslVecUtils.h"
 #include "whippleutils.h"
-
+#include "QVTKWidget.h"
 // constructor
 MainWindow::MainWindow()
 {
-  // Set MainWindow parameters
+  // Set MainWindow parameterss
   setAnimated(true);
   setDockNestingEnabled(true);
   setWindowTitle(tr("Open Bicycle Dynamics"));
@@ -137,6 +137,13 @@ void MainWindow::createTabs(void)
   motionVisualizationWidget->setParent(tabWidget);
   */
   
+  tabWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+  QScrollArea *  scrollArea = new QScrollArea;
+  scrollArea->setBackgroundRole(QPalette::Dark);
+  scrollArea->setWidget(tabWidget);
+  scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  tabWidget->setMinimumSize(200,200);
   setCentralWidget(tabWidget);
 }
 /*
@@ -150,146 +157,161 @@ Button *MainWindow::createButton(const QString &text, const char *member)
 
 void MainWindow::createUprightStabilityTab(void)
 {
-  QGridLayout *uprightStabilityLayout = new QGridLayout;
-  uprightStabilityLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
+
+  // upOpts is a structure for run parameters for upright stability eigenvalue plots
+  upOpts.outfolder[0] = '\0';
+  upOpts.N = 201;
+  upOpts.pitchguess = 0.0;
+  upOpts.vi = 0.0;
+  upOpts.vf = 10.0;  
+  
+  QGridLayout *uprightSetLayout = new QGridLayout;
+  uprightSetLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
   
   QToolButton * updateEigButton = new QToolButton(uprightStabilityWidget);
   updateEigButton->setText( tr("Update eigenvalue plot") );
 //  Button * updateEigButton = createButton(tr("Update eigenvalue plot"), SLOT(updateEigPlot()));
-  connect(updateEigButton, SIGNAL(clicked()), this, SLOT(updateEigPlot()) );
-
-  uprightStabilityLayout->addWidget(updateEigButton,0,0);
+  connect(updateEigButton, SIGNAL(clicked()), this, SLOT(updateEigPlotSlot()) );
+  uprightSetLayout->addWidget(updateEigButton,0,0);
   
   // manage options
   
-  uprightStabilityLayout->addWidget(new QLabel( tr("Save eigenvalue data"),0,0 ) );
+  uprightSetLayout->addWidget(new QLabel( tr("Save eigenvalue data"),0,0 ) );
   
-  // i want to right-justify this button
-  QToolButton * saveEigButton = new QToolButton(uprightStabilityWidget);
-  saveEigButton->setText( tr("Save") );
-  uprightStabilityLayout->addWidget(saveEigButton,0,1,Qt::AlignRight);
-  
-  QLineEdit *saveEigFilenameEdit = new QLineEdit( tr("filename") );
-  saveEigFilenameEdit->setAlignment(Qt::AlignRight);
-  uprightStabilityLayout->addWidget(saveEigFilenameEdit,1,0,1,2);
-  
-  uprightStabilityLayout->addWidget(new QLabel( tr("pitch guess (rad) (blank for default)") ),2,0);
-  QLineEdit *pitchGuessEdit = new QLineEdit("0.0");
-  pitchGuessEdit->setAlignment(Qt::AlignRight);
-  uprightStabilityLayout->addWidget(pitchGuessEdit,2,1);
-  
-  uprightStabilityLayout->addWidget(new QLabel( tr("number of evaluation points") ),3,0);
-  QLineEdit *nEvalPointsEdit = new QLineEdit("201");
-  nEvalPointsEdit->setAlignment(Qt::AlignRight);
-  uprightStabilityLayout->addWidget(nEvalPointsEdit,3,1);
-  
-  uprightStabilityLayout->addWidget(new QLabel( tr("initial speed v_i (m/s)") ), 4,0);
-  QLineEdit *initSpeedEdit = new QLineEdit("0.0"); // THESE FIELDS NEED TO BE ACTUAL NUMBERS, NEED TO STORE DEFAULTS SOMEWHERE.
-  initSpeedEdit->setAlignment(Qt::AlignRight);
-  uprightStabilityLayout->addWidget(initSpeedEdit,4,1);
-  
-  uprightStabilityLayout->addWidget(new QLabel( tr("final speed v_f (m/s)") ), 5,0);
-  QLineEdit *finalSpeedEdit = new QLineEdit("10.0");
-  finalSpeedEdit->setAlignment(Qt::AlignRight);
-  uprightStabilityLayout->addWidget(finalSpeedEdit,5,1);
+  QString lineEditValue; // to help with the conversion of numbers
 
- 
+  // Save button
+  QToolButton * saveEigButton = new QToolButton(uprightStabilityWidget);
+  saveEigButton->setText( tr("Save Plot") );
+  connect(saveEigButton, SIGNAL(clicked()), this, SLOT(saveEigSlot() ) );
+  uprightSetLayout->addWidget(saveEigButton,0,1,Qt::AlignRight);
   
-  uprightStabilityWidget->setLayout(uprightStabilityLayout);
+  // Edit filename for saving plot
+  saveEigFilenameEdit = new QLineEdit( tr( upOpts.outfolder.c_str() ) );
+  saveEigFilenameEdit->setAlignment(Qt::AlignRight);
+  uprightSetLayout->addWidget(saveEigFilenameEdit,1,0,1,2);
+  
+  // Number of evaluation points
+  uprightSetLayout->addWidget(new QLabel( tr("number of evaluation points") ),3,0);
+  nEvalPointsEdit = new QLineEdit;
+  lineEditValue.setNum(upOpts.N); // 2nd arg: format, 3rd arg: precision
+  nEvalPointsEdit->setText( tr(lineEditValue.toStdString().c_str()) );
+  nEvalPointsEdit->setAlignment(Qt::AlignRight);
+  uprightSetLayout->addWidget(nEvalPointsEdit,3,1);
+  
+  // Pitch guess
+  uprightSetLayout->addWidget(new QLabel( tr("pitch guess (rad) (blank for default)") ),2,0);
+  pitchGuessEdit = new QLineEdit;
+  lineEditValue.setNum(upOpts.pitchguess, 'g', 5 ); // 2nd arg: format, 3rd arg: precision
+  pitchGuessEdit->setText( tr(lineEditValue.toStdString().c_str()) );
+  pitchGuessEdit->setAlignment(Qt::AlignRight);
+  uprightSetLayout->addWidget(pitchGuessEdit,2,1);
+  
+  // Initial speed
+  uprightSetLayout->addWidget(new QLabel( tr("initial speed v_i (m/s)") ), 4,0);
+  initSpeedEdit = new QLineEdit;
+  lineEditValue.setNum(upOpts.vi, 'g', 5 ); // 2nd arg: format, 3rd arg: precision
+  initSpeedEdit->setText( tr(lineEditValue.toStdString().c_str()) );
+  initSpeedEdit->setAlignment(Qt::AlignRight);
+  uprightSetLayout->addWidget(initSpeedEdit,4,1);
+  
+  // Final speed
+  uprightSetLayout->addWidget(new QLabel( tr("final speed v_f (m/s)") ), 5,0);
+  finalSpeedEdit = new QLineEdit;
+  lineEditValue.setNum(upOpts.vf, 'g', 5 ); // 2nd arg: format, 3rd arg: precision
+  finalSpeedEdit->setText( tr(lineEditValue.toStdString().c_str()) );
+  finalSpeedEdit->setAlignment(Qt::AlignRight);
+  uprightSetLayout->addWidget(finalSpeedEdit,5,1);
+  
+  QHBoxLayout *eigPlotLayout = new QHBoxLayout(this);
+  
+  eigPlotLayout->addWidget(eigPlot);
+  //QGraphicsView
+  //QCanvas
+  
+  uprightStabilityWidget->setLayout(uprightSetLayout);
 //    return 0; for errors?
 }
-void MainWindow::updateEigPlot(void)
+
+void MainWindow::saveEigSlot(void)
+{
+  /*QFileDialog *saveEigDirDial = new QFileDialog(uprightStabilityWidget);
+  saveEigDirDial->setFileMode(QFileDialog::Directory);
+  saveEigDirDial->setViewMode(QFileDialog::List);
+  */
+  QString dir = QFileDialog::getExistingDirectory(this,tr("OpenDirectiry"),"/home",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+}
+
+void MainWindow::updateEigPlotSlot(void)
 {
   std::cout << "STOP PRESSING ME!" << std::endl;
-	// do something
-  // tHIS STUFF BELOW IS MOSTLY COPIED
+
+  // THIS STUFF BELOW IS MOSTLY COPIED
   std::string filename;
-  char outfolder[512]; // pOSSIBLY LET USER SET THIS
-  outfolder[0] = '\0';
-  int N = 201;
-  double vi = 0.0, vf = 10.0;
-  
+  upOpts.outfolder = saveEigFilenameEdit->text().toStdString();
+  upOpts.N = nEvalPointsEdit->text().toInt();
+  upOpts.pitchguess = pitchGuessEdit->text().toDouble();
+  upOpts.vi = initSpeedEdit->text().toDouble();
+  upOpts.vf = finalSpeedEdit->text().toDouble();  
+
+/*  
   MJWhippleParams * mjwp = new MJWhippleParams;
   WhippleParams * b = new WhippleParams;
-  
+//  delete mjwp;
+//  delete b; // to go later on  
   // if ( paramset = "MJ/benchmark" )
   readMJWhippleParams(mjwp, "benchmark.txt"); // THIS FILE NEEDS TO BE MANAGED BY THE PARAMETERS GUI: or it can just save a file that is then picked up on this side of the table.
+  
+  	// NEED TO DO SOMETHING IF THE PARAMETERS AHVE NOT BEEN SET BY PARAMETERS.
   convertParameters(b, mjwp);
-  bike->setParameters(b);
+  bike->setParameters(b); // parameters are already set
+  */
+
   bike->evalConstants();
   bike->eoms();
   bike->computeOutputs();
-  delete mjwp;
-  delete b;
-    
+
   // Write parameters
-  filename = outfolder; filename += "eigenvalue_parameters.txt";
+  filename = upOpts.outfolder; filename += "eigenvalue_parameters.txt";
   bike->writeParameters(filename.c_str());
   // Write data record file. the function is orphaned from whipple.h currently
-//  filename = outfolder; filename += "eval_record.py";
+  // allows the evaluation of data by python
+//  filename = upOpts.outfolder; filename += "eval_record.py";
 //  writeEvalRecord_dt(filename.c_str());
   // Open data file
-  filename = outfolder; filename += "eigenvalues.dat";
+  filename = upOpts.outfolder; filename += "eigenvalues.dat";
   std::ofstream OutputFile(filename.c_str(), std::ios::binary);
   
-
   // Vector to store range of speeds to calculate eigenvalues
-  gsl_vector * speed = linspaceN(vi, vf, N);
+  gsl_vector * speed = linspaceN( upOpts.vi, upOpts.vf, upOpts.N);
 
   bike->u1 = 0.0;
   bike->u3 = 0.0;
   bike->evalConstants();
-  
-  for (int i = 0; i < N; ++i) {
+
+  for (int i = 0; i < upOpts.N; ++i) {
     bike->u5 = -gsl_vector_get(speed, i)/(bike->rf+bike->rft);
     bike->calcEvals();
-    OutputFile.write((char *) gsl_vector_ptr(speed, i), sizeof(double));
-    OutputFile.write((char *) bike->fourValues, 4*sizeof(double));
-  } // for i
-  std::cout << "Eigenvalue data written to " << outfolder << std::endl;
+
+      OutputFile.write((char *) gsl_vector_ptr(speed, i), sizeof(double));
+    OutputFile.write((char *) bike->fourValues, 4*sizeof(double));  
+    } // for i
+
+  std::cout << "Eigenvalue data written to ";
+  if ( upOpts.outfolder.empty() )
+  { // this isn't working as I intended...
+  	std::cout << "current directory." << std::endl;
+  }
+  else
+  {
+  	std::cout << upOpts.outfolder << std::endl;
+  }
 
   // Close files and free memory
   OutputFile.close();
-//  delete bb;
-//  delete opt;
   gsl_vector_free(speed);
 
   // SHOULD MAKE DESTRUCTORS
-  
-//  evalOptions * opt = new evalOptions;
-//  processOptions(argc, argv, opt, bb);
-  /*
- //     MJWhippleParams * mjbike = new MJWhippleParams;
-      WhippleParams * b = new WhippleParams;
-      readMJWhippleParams(mjbike, optarg);
-      convertParameters(b, mjbike);
-      bike->setParameters(b);
-      bike->evalConstants();
-      bike->eoms();
-      bike->computeOutputs();
-      delete mjbike;
-      delete b;
-      
-  // Vector to store range of speeds to calculate eigenvalues
-  gsl_vector * speed = linspaceN(opt->vi, opt->vf, opt->N);
 
-  bb->u1 = 0.0;
-  bb->u3 = 0.0;
-  bb->evalConstants();
-
-  for (int i = 0; i < opt->N; ++i) {
-    bb->u5 = -gsl_vector_get(speed, i)/(bb->rf+bb->rft);
-    bb->calcEvals();
-    OutputFile.write((char *) gsl_vector_ptr(speed, i), sizeof(double));
-    OutputFile.write((char *) bb->fourValues, 4*sizeof(double));
-  } // for i
-  std::cout << "Eigenvalue data written to " << opt->outfolder << '\n';
-
-  // Close files and free memory
-  OutputFile.close();
-  delete bb;
-  delete opt;
-  gsl_vector_free(speed);
-  return 0;
- */ 
 }
