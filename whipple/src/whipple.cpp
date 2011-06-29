@@ -224,39 +224,51 @@ Whipple::~Whipple()
   gsl_eigen_nonsymmv_free(w);
 } // destructor
 
-bool Whipple::setParameters(WhippleParams * p)
+bool Whipple::setParameters(WhippleParams * p, bool throwExceptions)
 {
   bool validparameters = true;
 
   // Check that distances are non-negative
   if (p->rr < 0.0) {
     std::cerr << "rr must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+      throw  "rr must be greater than or equal to zero.";
     validparameters = false;
   }
   if (p->rf < 0.0) {
     std::cerr << "rf must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+      throw "rf must be greater than or equal to zero.\n";
     validparameters = false;
   }
   if (p->rrt < 0.0) {
     std::cerr << "rrt must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+    throw "rrt must be greater than or equal to zero.\n";
     validparameters = false;
   }
   if (p->rft < 0.0) {
     std::cerr << "rft must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+    throw "rft must be greater than or equal to zero.\n";
     validparameters = false;
   }
   if (p->lr < 0.0) {
     std::cerr << "lr must be greater than or equal to zero.\n";
-    throw "lr must be greater than or equal to zero.";
+    if (throwExceptions == true)
+      throw  "lr must be greater than or equal to zero.";
     validparameters = false;
   }
   if (p->ls < 0.0) {
     std::cerr << "ls must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+      throw "ls must be greater than or equal to zero.\n";
     validparameters = false;
   }
   if (p->lf < 0.0) {
     std::cerr << "lf must be greater than or equal to zero.\n";
-    throw "lf must be greater than or equal to zero.";
+    if (throwExceptions == true)
+      throw "lf must be greater than or equal to zero.\n";
     validparameters = false;
   }
 
@@ -269,12 +281,16 @@ bool Whipple::setParameters(WhippleParams * p)
     if (d_zero < minimumAxleOffset) {
       overlap[0] = true;
       std::cerr << "Tire overlap will occur when steer = 0\n";
+      if (throwExceptions == true)
+        throw "Tire overlap will occur when steer = 0\n";
     } else {
       overlap[0] = false;
     }
     if (d_pi < minimumAxleOffset) {
       overlap[1] = true;
       std::cerr << "Tire overlap will occur when steer = pi\n";
+      if (throwExceptions == true)
+        throw "Tire overlap will occur when steer = pi\n";
     } else {
       overlap[1] = false;
     }
@@ -282,16 +298,22 @@ bool Whipple::setParameters(WhippleParams * p)
       validparameters = false;
       std::cerr << "Tire overlap occurs for steer = 0 and steer = pi,"
               "non realistic model.\n";
-    }
+      if (throwExceptions == true)
+        throw "Tire overlap occurs for steer = 0 and steer = pi, non realistic model.\n";
+      }
   }
 
   // Check that masses are non-negative
   if (p->mr < 0.0) {
     std::cerr << "mr must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+      throw "mr must be greater than or equal to zero.\n";
     validparameters = false;
   }
   if (p->mf < 0.0) {
     std::cerr << "mf must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+      throw "mf must be greater than or equal to zero.\n";
     validparameters = false;
   }
 
@@ -301,21 +323,29 @@ bool Whipple::setParameters(WhippleParams * p)
   // Rear wheel
   if (p->ICyy < 0.0) {
     std::cerr << "Rear wheel spin inertia must be non-negative.\n";
+    if (throwExceptions == true)
+      throw "Rear wheel spin inertia must be non-negative.\n";
     validparameters = false;
   }
   // Front wheel
   if (p->IFyy < 0.0) {
     std::cerr << "Front wheel spin inertia must be non-negative.\n";
+    if (throwExceptions == true)
+      throw "Front wheel spin inertia must be non-negative.\n";
     validparameters = false;
   }
   // Rear assembly
   if (!validInertia(p->IDxx, p->IDyy, p->IDzz, p->IDxz)) {
     std::cerr << "Rear assembly inertia invalid.\n";
+    if (throwExceptions == true)
+      throw "Rear assembly inertia invalid.\n";
     validparameters = false;
   }
   // Front assembly
   if (!validInertia(p->IDxx, p->IDyy, p->IDzz, p->IDxz)) {
     std::cerr << "Rear assembly inertia invalid.\n";
+    if (throwExceptions == true)
+      throw "Rear assembly inertia invalid.\n";
     validparameters = false;
   }
 

@@ -2,6 +2,7 @@
 #define PARAMETERS_H
 
 #define NMEIJPARAMS 29
+#define NGYROPARAMS 24
 #include <QtGui>
 #include "whipple.h"
 
@@ -21,24 +22,14 @@ public:
 
 private slots:
   /**
-   * Called when a user clicks the button "Use benchmark parameters".
-   * */
-  void setBenchmarkParametersSlot(void);
-
-  /**
    *
    * */
   void paramBoxSlot(int index);
 
   /**
-   * Update the display to the gui with updated Gyrostat parameter values.
-   * */
-  void updateGyroParamEdits(void);
-
-  /**
    *
    * */
-  void gyroAsteriskSlot();
+  void gyroAsteriskSlot(const QString&);
 
   /**
    *
@@ -54,16 +45,16 @@ private slots:
    *
    * */
   void gyroSaveAsSlot();  
-  
-  /**
-   * Update the display to the gui with updated Meijaard parameter values.
-   * */
-  void updateMeijParamEdits(void);
 
   /**
    *
    * */
-  void meijAsteriskSlot();
+  void setGyroBenchParametersSlot();
+  
+  /**
+   *
+   * */
+  void meijAsteriskSlot(const QString&);
 
   /**
    *
@@ -79,6 +70,11 @@ private slots:
    *
    * */
   void meijSaveAsSlot();  
+
+  /**
+   * Called when a user clicks the button "Use benchmark parameters".
+   * */
+  void setMeijBenchParametersSlot(void);
 
 private:
   /**
@@ -110,7 +106,13 @@ private:
   
 
   // Gyrostat parameter stuffs
-/**
+
+  /**
+   *
+   * */
+  bool wasGyroSelectedBefore;
+
+  /**
    * Structure, declared in Whipple.h, to hold the default (Gyrostat) parameters for Whipple objects.
    * */
   WhippleParams * gswp;
@@ -123,6 +125,21 @@ private:
   /**
    *
    * */
+  void defineGyroStrings();
+
+  /**
+   * Update the display to the gui with updated Gyrostat parameter values.
+   * */
+  void updateGyroParamEdits(void);
+
+  /**
+   *
+   * */
+  void sendGyroParamToBike();
+
+  /**
+   *
+   * */
   QLabel * gyroFileLabel;
   
   /**
@@ -130,9 +147,38 @@ private:
    * */
   QString gyrofdirname;
 
-  // Meijaard parameter stuffs
-  
+  /**
+   *
+   * */
+  const static int NgyroParams = NGYROPARAMS;
 
+  /**
+   *
+   * */
+  QLabel * gyroParamLabels[NGYROPARAMS];
+
+  /**
+   *
+   * */
+  QLineEdit * gyroParamEdits[NGYROPARAMS];
+
+  /**
+   *
+   * */
+  std::string gyroParamStrings[NGYROPARAMS];
+
+  /**
+   *
+   * */
+  std::string gyroParamToolTips[NGYROPARAMS];
+
+  /**
+   *
+   * */
+  double gyroParamValues[NGYROPARAMS];
+
+
+  // Meijaard parameter stuffs
   /**
    * This is the first time that the user has chosen Meijaard parameters from the dropdown.
    * */
@@ -142,7 +188,22 @@ private:
    *
    * */
   void drawMeijParamBox();
+
+  /**
+   *
+   * */
+  void defineMeijStrings();  
   
+  /**
+   * Update the display to the gui with updated Meijaard parameter values.
+   * */
+  void updateMeijParamEdits(void);
+
+  /**
+   *
+   * */
+  void sendMeijParamToBike();
+
   /**
    * 
    * */
@@ -151,14 +212,14 @@ private:
   /**
    *
    * */
-
   QString meijfdirname;
+
   /**
    * Structure, declared in Whipple.h, to hold the input parameters if Meijaard parmeters are selected from the QtComboBox.
 zo
    * */
-
   MJWhippleParams * mjwp;
+
   /**
    * The number of Meijaard parameters.
 
@@ -184,11 +245,6 @@ zo
    *
    * */
   std::string meijParamToolTips[NMEIJPARAMS];
-
-  /**
-   *
-   * */
-  void defineMeijStrings();  
 
   /**
    * Holds the values, ripped from struct MJWhippleParams mjwp, for use with the GUI input of Meijaard parameters.

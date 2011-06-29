@@ -143,7 +143,7 @@ class Whipple {
     void initODESolver(void);
     void setBenchmarkParameters(void);
     void setBenchmarkState(void);
-    bool setParameters(WhippleParams * p);
+    bool setParameters(WhippleParams * p, bool throwExceptions = false);
     void setState(const double state[10]);
 
     // Steady turning related functions

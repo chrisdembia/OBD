@@ -14,7 +14,8 @@ WhippleParameter::WhippleParameter( Whipple *b, QWidget *parent)
   // struct from whipple.h, to hold the parambox values
   gswp = new WhippleParams; // gyrostat whipple parameters
   mjwp = new MJWhippleParams; // Meijaard whipple parameters
-  
+ 
+  wasGyroSelectedBefore = false; 
   wasMeijSelectedBefore = false;
 
   comboBox = new QComboBox(this);
@@ -26,11 +27,9 @@ WhippleParameter::WhippleParameter( Whipple *b, QWidget *parent)
   layout->addWidget(comboBox);
 
   initParamBox();
+  drawGyroParamBox();
     
   connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT( paramBoxSlot(int)) );
-
-//  bike->writeParameters(const_cast<char*>("whipple_workingparams.txt"));
-
 }
 
 void WhippleParameter::initParamBox()
@@ -47,15 +46,17 @@ void WhippleParameter::paramBoxSlot(int index)
 {
   delete paramBox;
   initParamBox();
+  
   if (index == 0)
   {
-  
+    drawGyroParamBox();  
   }
   else if (index == 1)
   { // Franke parameters
-    QGridLayout * frankeParamLayout = new QGridLayout;
+/*    QGridLayout * frankeParamLayout = new QGridLayout;
     frankeParamLayout->addWidget(new QLabel( tr("Not available. Bug the developers!") ),0,0);
-    paramBox->setLayout(frankeParamLayout);
+    paramBox->setLayout(frankeParamLayout);*/
+//    drawGyroParamBox();
   }
   else if (index == 2)
   { // Meijaard parameters
@@ -67,9 +68,78 @@ void WhippleParameter::paramBoxSlot(int index)
 
 void WhippleParameter::drawGyroParamBox()
 {
+  // putting gyrostat parameter widgets into a QGridLayout
   QGridLayout *gyroParamLayout = new QGridLayout;
-//  gyroParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
+  gyroParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
+  
+  defineGyroStrings();
+  
+  // load parameters label
+  QLabel * gyroLoadLabel = new QLabel("current file:");
 
+  // load parameters button
+  QToolButton * gyroLoadButton = new QToolButton;
+  gyroLoadButton->setText("Load");
+  connect(gyroLoadButton,SIGNAL(clicked()),this,SLOT(gyroLoadSlot()));
+  
+  // save parameters button
+  QToolButton * gyroSaveButton = new QToolButton;
+  gyroSaveButton->setText("Save");
+  connect(gyroSaveButton,SIGNAL(clicked()),this,SLOT(gyroSaveSlot()));
+
+  // line edit to show open file
+  gyroFileLabel = new QLabel;
+  gyroFileLabel->setTextFormat(Qt::RichText);
+  // the value for the file label is set further down 
+  
+  // use benchmark parameters button
+  QToolButton * gyroBenchParamsButton = new QToolButton;
+  gyroBenchParamsButton->setText("Use benchmark parameters");
+  connect(gyroBenchParamsButton, SIGNAL(clicked()), this, SLOT(setGyroBenchParametersSlot()) );
+  
+  // error message box
+  QTextEdit * gyroErrorText = new QTextEdit("Parameters are okay.");
+
+ 
+  gyroParamLayout->addWidget(gyroLoadLabel,0,0);
+  gyroParamLayout->addWidget(gyroLoadButton,0,1);
+  gyroParamLayout->addWidget(gyroSaveButton,0,2);
+  gyroParamLayout->addWidget(gyroFileLabel,1,0,1,3);
+  gyroParamLayout->addWidget(gyroBenchParamsButton,2,0,1,3);
+  gyroParamLayout->addWidget(gyroErrorText,4,0,3,3);  
+  
+  for (int i = 0; i < NgyroParams; i++)
+  {
+    gyroParamLabels[i] = new QLabel( tr(gyroParamStrings[i].c_str()), paramBox ); // dont need to save these
+    gyroParamLabels[i]->setToolTip( tr(gyroParamToolTips[i].c_str() ) );
+
+    gyroParamEdits[i] = new QLineEdit( paramBox);
+    gyroParamEdits[i]->setAlignment(Qt::AlignRight);
+    gyroParamEdits[i]->setValidator(new QDoubleValidator(-999.0, 999.0, 5, gyroParamEdits[i]));
+
+    gyroParamLayout->addWidget(gyroParamLabels[i],i+7,0);
+    gyroParamLayout->addWidget(gyroParamEdits[i],i+7,1,1,2);
+  }
+  
+// initialize parameters to the benchmark bicycle.
+  if (!wasGyroSelectedBefore)
+  {
+    setGyroBenchParametersSlot();
+    wasGyroSelectedBefore = true;
+  }
+  else
+  {
+    gyroFileLabel->setText("<b>" + gyrofdirname + "</b>");
+
+    updateGyroParamEdits();
+  }
+
+  for (int i = 0; i < NgyroParams; i++)
+  {
+    connect(gyroParamEdits[i], SIGNAL(textEdited(const QString&)),this,SLOT(gyroAsteriskSlot(const QString&)));
+  }
+
+  paramBox->setLayout(gyroParamLayout);
 }
 
 void WhippleParameter::drawMeijParamBox()
@@ -78,6 +148,7 @@ void WhippleParameter::drawMeijParamBox()
   QGridLayout *meijParamLayout = new QGridLayout;
   meijParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
   // DO I NEED THE ABOVE?
+ 
   defineMeijStrings();
   
   // load parameters label
@@ -101,7 +172,7 @@ void WhippleParameter::drawMeijParamBox()
   // use benchmark parameters button
   QToolButton * meijBenchParamsButton = new QToolButton;
   meijBenchParamsButton->setText("Use benchmark parameters");
-  connect(meijBenchParamsButton, SIGNAL(clicked()), this, SLOT(setBenchmarkParametersSlot()) );
+  connect(meijBenchParamsButton, SIGNAL(clicked()), this, SLOT(setMeijBenchParametersSlot()) );
  
   // convert Meijaard parameters to Gyrostat parameters
   QToolButton * meijToGyroButton = new QToolButton;
@@ -120,10 +191,10 @@ void WhippleParameter::drawMeijParamBox()
   meijParamLayout->addWidget(meijErrorText,4,0,3,3);  
   for (int i = 0; i < NmeijParams; i++)
   {
-    meijParamLabels[i] = new QLabel( tr(meijParamStrings[i].c_str()) ); // dont need to save these
+    meijParamLabels[i] = new QLabel( tr(meijParamStrings[i].c_str()), paramBox ); // dont need to save these
     meijParamLabels[i]->setToolTip( tr(meijParamToolTips[i].c_str() ) );
 
-    meijParamEdits[i] = new QLineEdit;
+    meijParamEdits[i] = new QLineEdit( paramBox);
     meijParamEdits[i]->setAlignment(Qt::AlignRight);
     meijParamEdits[i]->setValidator(new QDoubleValidator(-999.0, 999.0, 5, meijParamEdits[i]));
 
@@ -134,7 +205,7 @@ void WhippleParameter::drawMeijParamBox()
   // initialize parameters to the benchmark bicycle.
   if (!wasMeijSelectedBefore)
   {
-    setBenchmarkParametersSlot();
+    setMeijBenchParametersSlot();
     wasMeijSelectedBefore = true;
   }
   else
@@ -145,7 +216,7 @@ void WhippleParameter::drawMeijParamBox()
 
   for (int i = 0; i < NmeijParams; i++)
   {
-    connect(meijParamEdits[i], SIGNAL(editingFinished()),this,SLOT(meijAsteriskSlot()));
+    connect(meijParamEdits[i], SIGNAL(textEdited(const QString&)),this,SLOT(meijAsteriskSlot(const QString&)));
   }
 
 
@@ -190,22 +261,10 @@ void WhippleParameter::updateMeijParamEdits(void)
     meijParamEdits[k]->setText( QString("%1").arg(meijParamValues[k]) );
   }
 
-  // from whippleutils.h
-  convertParameters( gswp, mjwp);
-
-    bool validparams = bike->setParameters( gswp);
-  // set the parameters to be used by the Whipple bike object.
-  try
-  {  // NOTE: QT WILL NOT CATCH EXCEPTIONS FOR US, SO ALL EXCEPTION-THROWING CODE MUST BE IN MY OWN TRY..CATCH
-    bool validparams = bike->setParameters( gswp);
-  }
-  catch (const char* errmsg)
-  {
-    std::cout << errmsg << std::endl;
-  }
+  sendMeijParamToBike();
 }
 
-void WhippleParameter::meijAsteriskSlot()
+void WhippleParameter::meijAsteriskSlot(const QString& ss)
 {
   // add an asterisk to the dialog box
   if ( !meijFileLabel->text().endsWith("*</b>") )
@@ -244,7 +303,26 @@ void WhippleParameter::meijAsteriskSlot()
   mjwp->IFxx = meijParamEdits[27]->text().toDouble();
   mjwp->IFyy = meijParamEdits[28]->text().toDouble();
   
-  updateMeijParamEdits();
+  sendMeijParamToBike();
+}
+
+void WhippleParameter::sendMeijParamToBike()
+{
+  // from whippleutils.h
+  WhippleParams *gswptemp = new WhippleParams;
+  convertParameters( gswptemp, mjwp);
+
+  // set the parameters to be used by the Whipple bike object.
+  try
+  {  // NOTE: QT WILL NOT CATCH EXCEPTIONS FOR US, SO ALL EXCEPTION-THROWING CODE MUST BE IN MY OWN TRY..CATCH
+    bike->setParameters( gswptemp);
+    delete gswptemp;
+  }
+  catch (const char* errmsg)
+  {
+    std::cout << errmsg << std::endl;
+  }
+
 }
 
 void WhippleParameter::meijLoadSlot()
@@ -275,7 +353,7 @@ void WhippleParameter::meijSaveAsSlot()
 {
 }
 
-void WhippleParameter::setBenchmarkParametersSlot()
+void WhippleParameter::setMeijBenchParametersSlot()
 {
   // in whippleutils.h
   setBenchmarkParameters(mjwp);
@@ -290,24 +368,137 @@ void WhippleParameter::setBenchmarkParametersSlot()
 
 void WhippleParameter::updateGyroParamEdits(void)
 {
+  gyroParamValues[0] = gswp->rr;
+  gyroParamValues[1] = gswp->rrt;
+  gyroParamValues[2] = gswp->rf;
+  gyroParamValues[3] = gswp->rft;
+  gyroParamValues[4] = gswp->lr;
+  gyroParamValues[5] = gswp->ls;
+  gyroParamValues[6] = gswp->lf;
+  gyroParamValues[7] = gswp->mr;
+  gyroParamValues[8] = gswp->mf;
+  gyroParamValues[9] = gswp->ICyy;
+  gyroParamValues[10] = gswp->IDxx;
+  gyroParamValues[11] = gswp->IDyy;
+  gyroParamValues[12] = gswp->IDzz;
+  gyroParamValues[13] = gswp->IDxz;
+  gyroParamValues[14] = gswp->IExx;
+  gyroParamValues[15] = gswp->IEyy;
+  gyroParamValues[16] = gswp->IEzz;
+  gyroParamValues[17] = gswp->IExz;
+  gyroParamValues[18] = gswp->IFyy;
+  gyroParamValues[19] = gswp->lrx;
+  gyroParamValues[20] = gswp->lrz;
+  gyroParamValues[21] = gswp->lfx;
+  gyroParamValues[22] = gswp->lfz;
+  gyroParamValues[23] = gswp->g;
+  
+  for (int k = 0; k < NgyroParams; k++)
+  {
+    gyroParamEdits[k]->setText( QString("%1").arg(gyroParamValues[k]) );
+  }
+  
+  sendGyroParamToBike();
 }
 
-void WhippleParameter::gyroAsteriskSlot()
+void WhippleParameter::gyroAsteriskSlot(const QString&)
 {
+  // add an asterisk to the dialog box
+  if ( !gyroFileLabel->text().endsWith("*</b>") )
+  {
+    QString qstr = gyroFileLabel->text();
+    gyroFileLabel->setText( qstr.insert( qstr.lastIndexOf("<"), "*") );
+  }
+
+  // revalidate and save the parameters  
+  gswp->rr =    gyroParamEdits[0]->text().toDouble();
+  gswp->rrt =   gyroParamEdits[1]->text().toDouble();   
+  gswp->rf =    gyroParamEdits[2]->text().toDouble(); 
+  gswp->rft =   gyroParamEdits[3]->text().toDouble(); 
+  gswp->lr =    gyroParamEdits[4]->text().toDouble(); 
+  gswp->ls =    gyroParamEdits[5]->text().toDouble(); 
+  gswp->lf =    gyroParamEdits[6]->text().toDouble(); 
+  gswp->mr =    gyroParamEdits[7]->text().toDouble(); 
+  gswp->mf =    gyroParamEdits[8]->text().toDouble(); 
+  gswp->ICyy =  gyroParamEdits[9]->text().toDouble(); 
+  gswp->IDxx =  gyroParamEdits[10]->text().toDouble();
+  gswp->IDyy =  gyroParamEdits[11]->text().toDouble();
+  gswp->IDzz =  gyroParamEdits[12]->text().toDouble();
+  gswp->IDxz =  gyroParamEdits[13]->text().toDouble();
+  gswp->IExx =  gyroParamEdits[14]->text().toDouble();
+  gswp->IEyy =  gyroParamEdits[15]->text().toDouble();
+  gswp->IEzz =  gyroParamEdits[16]->text().toDouble();
+  gswp->IExz =  gyroParamEdits[17]->text().toDouble();
+  gswp->IFyy =  gyroParamEdits[18]->text().toDouble();
+  gswp->lrx =   gyroParamEdits[19]->text().toDouble();
+  gswp->lrz =   gyroParamEdits[20]->text().toDouble();
+  gswp->lfx =   gyroParamEdits[21]->text().toDouble();
+  gswp->lfz =   gyroParamEdits[22]->text().toDouble();
+  gswp->g =     gyroParamEdits[23]->text().toDouble();
+
+  sendGyroParamToBike();  
+}
+
+void WhippleParameter::sendGyroParamToBike()
+{
+
+  // set the parameters to be used by the Whipple bike object.
+  try
+  {  // NOTE: QT WILL NOT CATCH EXCEPTIONS FOR US, SO ALL EXCEPTION-THROWING CODE MUST BE IN MY OWN TRY..CATCH
+    bike->setParameters( gswp);
+  }
+  catch (const char* errmsg)
+  {
+    std::cout << "caught: " << errmsg << std::endl;
+  }
+
 }
 
 void WhippleParameter::gyroLoadSlot()
 {
+  QString fdirname = QFileDialog::getOpenFileName(this, tr("Load file"), QDir::currentPath() );
+  if (!fdirname.isEmpty())
+  {
+    gyrofdirname = fdirname;
+    // from whippleutils.h
+std::cout << gswp->rr << std::endl;
+    readWhippleParams(gswp, gyrofdirname.toStdString().c_str() );
+std::cout << gswp->rr << std::endl;
+    updateGyroParamEdits(); 
+    gyroFileLabel->setText("<b>" + gyrofdirname + "</b>");
+  }
 }
 
 void WhippleParameter::gyroSaveSlot()
 {
+  QString fdirname = QFileDialog::getSaveFileName(this, tr("Save File"), QDir::currentPath(), tr("Text file (*, *.txt, *.dat,...);;Any file (*)") );
+  // from whippleutils.h
+  if (!fdirname.isEmpty())
+  {
+    gyrofdirname = fdirname;
+    bike->writeParameters( gyrofdirname.toStdString().c_str() );
+    gyroFileLabel->setText("<b>" + fdirname + "</b>");
+  }
 }
 
 void WhippleParameter::gyroSaveAsSlot()
 {
 }
 
+
+void WhippleParameter::setGyroBenchParametersSlot()
+{
+  // in whippleutils.h
+  MJWhippleParams *mjwptemp = new MJWhippleParams;
+  setBenchmarkParameters( mjwptemp);
+  convertParameters( gswp, mjwptemp);
+
+  updateGyroParamEdits();
+
+  gyrofdirname = QString("benchmark");
+  gyroFileLabel->setText("<b>" + gyrofdirname + "</b>");
+  
+} 
 
 void WhippleParameter::defineMeijStrings()
 {
@@ -317,8 +508,8 @@ void WhippleParameter::defineMeijStrings()
   meijParamStrings[2] = "lambda (rad)";
   meijParamStrings[3] = "g (m/s^2)";
   meijParamStrings[4] = "v (m/s)";
-  meijParamStrings[5] = "t_{R} (m)";
-  meijParamStrings[6] = "t_{F} (m)";
+  meijParamStrings[5] = "r_{Rt} (m)";
+  meijParamStrings[6] = "r_{Ft} (m)";
   meijParamStrings[7] = "r_R (m)";
   meijParamStrings[8] = "m_R (kg)";
   meijParamStrings[9] = "I_{Rxx} (kg m^2)";
@@ -347,4 +538,76 @@ void WhippleParameter::defineMeijStrings()
   {
   meijParamToolTips[i] = "EDIT";
   }
-}  
+} 
+
+void WhippleParameter::defineGyroStrings()
+{
+  // GYROSTAT PARAMETERS
+  gyroParamStrings[0] = "r_R (m)";
+  gyroParamStrings[1] = "r_{Rt} (m)";
+  gyroParamStrings[2] = "r_F (m)";
+  gyroParamStrings[3] = "r_{Ft} (m)";
+  gyroParamStrings[4] = "l_{R} (m)";
+  gyroParamStrings[5] = "l_{S} (m)";
+  gyroParamStrings[6] = "l_{F} (m)";
+  gyroParamStrings[7] = "m_{R} (kg)";
+  gyroParamStrings[8] = "m_{F} (kg)";
+  gyroParamStrings[9] = "I_{Cyy} (kg-m^2)";
+  gyroParamStrings[10] = "I_{Dxx} (kg-m^2)";
+  gyroParamStrings[11] = "I_{Dyy} (kg-m^2)";
+  gyroParamStrings[12] = "I_{Dzz} (kg-m^2)";
+  gyroParamStrings[13] = "I_{Dxz} (kg-m^2)";
+  gyroParamStrings[14] = "I_{Exx} (kg-m^2)";
+  gyroParamStrings[15] = "I_{Eyy} (kg-m^2)";
+  gyroParamStrings[16] = "I_{Ezz} (kg-m^2)";
+  gyroParamStrings[17] = "I_{Exz} (kg-m^2)";
+  gyroParamStrings[18] = "I_{Fyy} (kg-m^2)";
+  gyroParamStrings[19] = "l_{Rx} (m)";
+  gyroParamStrings[20] = "l_{Rz} (m)";
+  gyroParamStrings[21] = "l_{Fx} (m)";
+  gyroParamStrings[22] = "l_{Fz} (m)";
+  gyroParamStrings[23] = "g (m/s^2)";
+
+  gyroParamToolTips[0] = "rear wheel radius";
+  for (int i = 1; i < NgyroParams; i++)
+  {
+    gyroParamToolTips[i] = "EDIT";
+  }
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

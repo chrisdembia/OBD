@@ -159,13 +159,6 @@ Button *MainWindow::createButton(const QString &text, const char *member)
 }
 */
 
-void MainWindow::createMotionVisualizationTab(void)
-{
-	QLabel *l1 = new QLabel( tr("TESTING") );
-	QGridLayout *motionLayout = new QGridLayout;
-	motionLayout->addWidget(l1);
-	motionVisualizationTab->setLayout(motionLayout);
-}
 void MainWindow::createUprightStabilityTab(void)
 {
 
@@ -258,6 +251,14 @@ uprightTopLayout->addWidget(uprightSetBox);
 //    return 0; for errors?
 }
 
+void MainWindow::createMotionVisualizationTab(void)
+{
+	QLabel *l1 = new QLabel( tr("TESTING") );
+	QGridLayout *motionLayout = new QGridLayout;
+	motionLayout->addWidget(l1);
+	motionVisualizationTab->setLayout(motionLayout);
+}
+
 void MainWindow::saveEigSlot(void)
 {
   /*QFileDialog *saveEigDirDial = new QFileDialog(uprightStabilityTab);
@@ -270,8 +271,6 @@ void MainWindow::saveEigSlot(void)
 
 void MainWindow::updateEigPlotSlot(void)
 {
-  std::cout << "STOP PRESSING ME!" << std::endl;
-
   // THIS STUFF BELOW IS MOSTLY COPIED
   std::string filename;
   upOpts.outfolder = saveEigFilenameEdit->text().toStdString();
@@ -287,9 +286,9 @@ void MainWindow::updateEigPlotSlot(void)
   bike->computeOutputs();
 
   // Write parameters
-  /*
+  
   filename = upOpts.outfolder; filename += "eigenvalue_parameters.txt";
-  bike->writeParameters(filename.c_str());*/
+  bike->writeParameters(filename.c_str());
   // Write data record file. the function is orphaned from whipple.h currently
   // allows the evaluation of data by python
 //  filename = upOpts.outfolder; filename += "eval_record.py";

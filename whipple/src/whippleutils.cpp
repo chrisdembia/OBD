@@ -286,7 +286,6 @@ void readWhippleParams(WhippleParams * bike, const char *filename)
         exit(0);
       } // if
       val = atof(valc);  // Convert string to double
-
     if (strcmp(param, "rr") == 0)
       bike->rr = val;
     else if (strcmp(param, "rrt") == 0)
