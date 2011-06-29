@@ -213,6 +213,46 @@ void readMJWhippleParams(MJWhippleParams *mjbike, const char *filename)
   fp.close();
 } // readMJWhippleParams()
 
+void writeMJWhippleParams(MJWhippleParams *mjbike, const char * filename)
+{
+  std::ofstream fp(filename, std::ios::out);
+  fp.precision(16);
+  if (fp.is_open()) {
+  fp << "w=" << mjbike->w << '\n'
+     << "c=" << mjbike->c << '\n'
+     << "lambda=" << mjbike->lambda << '\n'
+     << "g=" << mjbike->g << '\n'
+     << "rrt=" << mjbike->rrt << '\n'
+     << "rft=" << mjbike->rft << '\n'
+     << "rr=" << mjbike->rr << '\n'
+     << "mr=" << mjbike->mr << '\n'
+     << "IRxx=" << mjbike->IRxx << '\n'
+     << "IRyy=" << mjbike->IRyy << '\n'
+     << "xb=" << mjbike->xb << '\n'
+     << "zb=" << mjbike->zb << '\n'
+     << "mb=" << mjbike->mb << '\n'
+     << "IBxx=" << mjbike->IBxx << '\n'
+     << "IByy=" << mjbike->IByy << '\n'
+     << "IBzz=" << mjbike->IBzz << '\n'
+     << "IBxz=" << mjbike->IBxz << '\n'
+     << "xh=" << mjbike->xh << '\n'
+     << "zh=" << mjbike->zh << '\n'
+     << "mh=" << mjbike->mh << '\n'
+     << "rf=" << mjbike->rf << '\n'
+     << "mf=" << mjbike->mf << '\n'
+     << "IFxx=" << mjbike->IFxx << '\n'
+     << "IFyy=" << mjbike->IFyy << '\n'
+     << "IHxx=" << mjbike->IHxx << '\n'
+     << "IHyy=" << mjbike->IHyy << '\n'
+     << "IHzz=" << mjbike->IHzz << '\n'
+     << "IHxz=" << mjbike->IHxz << '\n';
+  } else {
+    std::cerr << "Unable to open " << filename << "for writing." << '\n';
+    std::cerr << "Aborting." << '\n';
+    exit(0);
+  }
+} // writeParameters()
+
 void readWhippleParams(WhippleParams * bike, const char *filename)
 {
   std::ifstream fp(filename);

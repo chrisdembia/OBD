@@ -40,6 +40,7 @@ private:
   void createStatusBar(void);
   void createTabs(void);
   void createUprightStabilityTab(void);
+  void createMotionVisualizationTab(void);
   Button * createButton(const QString &text, const char *member);
   // Menus
   QMenu *fileMenu;
@@ -66,9 +67,9 @@ private:
   QTabWidget *tabWidget;
   
   // Tabs
-  QWidget *uprightStabilityWidget;
-  QWidget *steadyTurningWidget;
-  QWidget *motionVisualizationWidget;
+  QWidget *uprightStabilityTab;
+  QWidget *steadyTurningTab;
+  QWidget *motionVisualizationTab;
   
   // upright stability
   QLineEdit *saveEigFilenameEdit;

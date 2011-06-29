@@ -247,6 +247,7 @@ bool Whipple::setParameters(WhippleParams * p)
   }
   if (p->lr < 0.0) {
     std::cerr << "lr must be greater than or equal to zero.\n";
+    throw "lr must be greater than or equal to zero.";
     validparameters = false;
   }
   if (p->ls < 0.0) {
@@ -255,6 +256,7 @@ bool Whipple::setParameters(WhippleParams * p)
   }
   if (p->lf < 0.0) {
     std::cerr << "lf must be greater than or equal to zero.\n";
+    throw "lf must be greater than or equal to zero.";
     validparameters = false;
   }
 

@@ -8,7 +8,7 @@
 #include <getopt.h>
 #include "gslVecUtils.h"
 #include "whippleutils.h"
-#include "QVTKWidget.h"
+//#include "QVTKWidget.h"
 // constructor
 MainWindow::MainWindow()
 {
@@ -32,7 +32,7 @@ MainWindow::MainWindow()
   createDockWindows();
   createStatusBar();
   createTabs();
-  createUprightStabilityTab();
+
 }
 
 void MainWindow::about(void)
@@ -123,27 +123,31 @@ void MainWindow::createStatusBar(void)
 void MainWindow::createTabs(void)
 {
 
-  uprightStabilityWidget = new QWidget;
-  steadyTurningWidget = new QWidget;
-  motionVisualizationWidget = new QWidget;
+  uprightStabilityTab = new QWidget;
+  steadyTurningTab = new QWidget;
+  motionVisualizationTab = new QWidget;
   
   tabWidget = new QTabWidget();
-  tabWidget->addTab( uprightStabilityWidget, tr("Upright stability"));
-  tabWidget->addTab( steadyTurningWidget, tr("Steady turning"));
-  tabWidget->addTab( motionVisualizationWidget, tr("Motion visualization"));
+  tabWidget->addTab( uprightStabilityTab, tr("Upright stability"));
+  tabWidget->addTab( steadyTurningTab, tr("Steady turning"));
+  tabWidget->addTab( motionVisualizationTab, tr("Motion visualization"));
   /*
-  uprightStabilityWidget->setParent(tabWidget);
+  uprightStabilityTab->setParent(tabWidget);
   steadyTurningWidget->setParent(tabWidget);
   motionVisualizationWidget->setParent(tabWidget);
   */
   
-  tabWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-  QScrollArea *  scrollArea = new QScrollArea;
+//  tabWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+/*  QScrollArea *  scrollArea = new QScrollArea;
   scrollArea->setBackgroundRole(QPalette::Dark);
   scrollArea->setWidget(tabWidget);
   scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  tabWidget->setMinimumSize(200,200);
+  tabWidget->setMinimumSize(200,200);*/
+
+  createUprightStabilityTab();
+  createMotionVisualizationTab();
+  
   setCentralWidget(tabWidget);
 }
 /*
@@ -155,6 +159,13 @@ Button *MainWindow::createButton(const QString &text, const char *member)
 }
 */
 
+void MainWindow::createMotionVisualizationTab(void)
+{
+	QLabel *l1 = new QLabel( tr("TESTING") );
+	QGridLayout *motionLayout = new QGridLayout;
+	motionLayout->addWidget(l1);
+	motionVisualizationTab->setLayout(motionLayout);
+}
 void MainWindow::createUprightStabilityTab(void)
 {
 
@@ -168,7 +179,7 @@ void MainWindow::createUprightStabilityTab(void)
   QGridLayout *uprightSetLayout = new QGridLayout;
   uprightSetLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
   
-  QToolButton * updateEigButton = new QToolButton(uprightStabilityWidget);
+  QToolButton * updateEigButton = new QToolButton(uprightStabilityTab);
   updateEigButton->setText( tr("Update eigenvalue plot") );
 //  Button * updateEigButton = createButton(tr("Update eigenvalue plot"), SLOT(updateEigPlot()));
   connect(updateEigButton, SIGNAL(clicked()), this, SLOT(updateEigPlotSlot()) );
@@ -178,10 +189,8 @@ void MainWindow::createUprightStabilityTab(void)
   
   uprightSetLayout->addWidget(new QLabel( tr("Save eigenvalue data"),0,0 ) );
   
-  QString lineEditValue; // to help with the conversion of numbers
-
   // Save button
-  QToolButton * saveEigButton = new QToolButton(uprightStabilityWidget);
+  QToolButton * saveEigButton = new QToolButton(uprightStabilityTab);
   saveEigButton->setText( tr("Save Plot") );
   connect(saveEigButton, SIGNAL(clicked()), this, SLOT(saveEigSlot() ) );
   uprightSetLayout->addWidget(saveEigButton,0,1,Qt::AlignRight);
@@ -194,52 +203,68 @@ void MainWindow::createUprightStabilityTab(void)
   // Number of evaluation points
   uprightSetLayout->addWidget(new QLabel( tr("number of evaluation points") ),3,0);
   nEvalPointsEdit = new QLineEdit;
-  lineEditValue.setNum(upOpts.N); // 2nd arg: format, 3rd arg: precision
-  nEvalPointsEdit->setText( tr(lineEditValue.toStdString().c_str()) );
+  nEvalPointsEdit->setText( QString("%1").arg(upOpts.N) );
   nEvalPointsEdit->setAlignment(Qt::AlignRight);
   uprightSetLayout->addWidget(nEvalPointsEdit,3,1);
   
   // Pitch guess
   uprightSetLayout->addWidget(new QLabel( tr("pitch guess (rad) (blank for default)") ),2,0);
   pitchGuessEdit = new QLineEdit;
-  lineEditValue.setNum(upOpts.pitchguess, 'g', 5 ); // 2nd arg: format, 3rd arg: precision
-  pitchGuessEdit->setText( tr(lineEditValue.toStdString().c_str()) );
+  pitchGuessEdit->setText( QString("%1").arg(upOpts.pitchguess) );
   pitchGuessEdit->setAlignment(Qt::AlignRight);
   uprightSetLayout->addWidget(pitchGuessEdit,2,1);
   
   // Initial speed
   uprightSetLayout->addWidget(new QLabel( tr("initial speed v_i (m/s)") ), 4,0);
   initSpeedEdit = new QLineEdit;
-  lineEditValue.setNum(upOpts.vi, 'g', 5 ); // 2nd arg: format, 3rd arg: precision
-  initSpeedEdit->setText( tr(lineEditValue.toStdString().c_str()) );
+  initSpeedEdit->setText( QString("%1").arg(upOpts.vi) );
   initSpeedEdit->setAlignment(Qt::AlignRight);
   uprightSetLayout->addWidget(initSpeedEdit,4,1);
   
   // Final speed
   uprightSetLayout->addWidget(new QLabel( tr("final speed v_f (m/s)") ), 5,0);
   finalSpeedEdit = new QLineEdit;
-  lineEditValue.setNum(upOpts.vf, 'g', 5 ); // 2nd arg: format, 3rd arg: precision
-  finalSpeedEdit->setText( tr(lineEditValue.toStdString().c_str()) );
+  finalSpeedEdit->setText( QString("%1").arg(upOpts.vf) );
   finalSpeedEdit->setAlignment(Qt::AlignRight);
   uprightSetLayout->addWidget(finalSpeedEdit,5,1);
   
-  QHBoxLayout *eigPlotLayout = new QHBoxLayout(this);
-  
-  eigPlotLayout->addWidget(eigPlot);
+  QHBoxLayout *uprightTopLayout = new QHBoxLayout;
+     QLabel * eigPlot = new QLabel("HELLO");
+     
+  QImage image("yellow.gif");
+  eigPlot->setPixmap(QPixmap::fromImage(image));
+         eigPlot->setMinimumSize(200,200);
+         /*
+    QGraphicsScene scene;
+    QGraphicsView view(&scene);
+    QGraphicsPixmapItem item(QPixmap("yellow.gif"));
+    scene.addItem(&item);
+    view.show();*/
+     //eigPlot->setBackgroundRole(QPalette::Base);
+     //eigPlot->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+     //eigPlot->setScaledContents(true);
   //QGraphicsView
   //QCanvas
+     
+QGroupBox *uprightSetBox = new QGroupBox( tr("Settings") );
+uprightSetBox->setLayout(uprightSetLayout);
   
-  uprightStabilityWidget->setLayout(uprightSetLayout);
+uprightTopLayout->addWidget(uprightSetBox);
+ uprightTopLayout->addWidget(eigPlot);
+
+
+  
+  uprightStabilityTab->setLayout(uprightTopLayout);
 //    return 0; for errors?
 }
 
 void MainWindow::saveEigSlot(void)
 {
-  /*QFileDialog *saveEigDirDial = new QFileDialog(uprightStabilityWidget);
+  /*QFileDialog *saveEigDirDial = new QFileDialog(uprightStabilityTab);
   saveEigDirDial->setFileMode(QFileDialog::Directory);
   saveEigDirDial->setViewMode(QFileDialog::List);
   */
-  QString dir = QFileDialog::getExistingDirectory(this,tr("OpenDirectiry"),"/home",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+  QString dir = QFileDialog::getExistingDirectory(this,tr("Choose Directory"),QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
 }
 
@@ -255,33 +280,23 @@ void MainWindow::updateEigPlotSlot(void)
   upOpts.vi = initSpeedEdit->text().toDouble();
   upOpts.vf = finalSpeedEdit->text().toDouble();  
 
-/*  
-  MJWhippleParams * mjwp = new MJWhippleParams;
-  WhippleParams * b = new WhippleParams;
-//  delete mjwp;
-//  delete b; // to go later on  
-  // if ( paramset = "MJ/benchmark" )
-  readMJWhippleParams(mjwp, "benchmark.txt"); // THIS FILE NEEDS TO BE MANAGED BY THE PARAMETERS GUI: or it can just save a file that is then picked up on this side of the table.
-  
-  	// NEED TO DO SOMETHING IF THE PARAMETERS AHVE NOT BEEN SET BY PARAMETERS.
-  convertParameters(b, mjwp);
-  bike->setParameters(b); // parameters are already set
-  */
+// TIME TO GRAB PARAMETERS FROM PARAMETER WIDGET!! must validate them, yo.
 
   bike->evalConstants();
   bike->eoms();
   bike->computeOutputs();
 
   // Write parameters
+  /*
   filename = upOpts.outfolder; filename += "eigenvalue_parameters.txt";
-  bike->writeParameters(filename.c_str());
+  bike->writeParameters(filename.c_str());*/
   // Write data record file. the function is orphaned from whipple.h currently
   // allows the evaluation of data by python
 //  filename = upOpts.outfolder; filename += "eval_record.py";
 //  writeEvalRecord_dt(filename.c_str());
   // Open data file
   filename = upOpts.outfolder; filename += "eigenvalues.dat";
-  std::ofstream OutputFile(filename.c_str(), std::ios::binary);
+  std::ofstream OutputFile( filename.c_str() ); // std::ios::binary);
   
   // Vector to store range of speeds to calculate eigenvalues
   gsl_vector * speed = linspaceN( upOpts.vi, upOpts.vf, upOpts.N);
@@ -293,14 +308,19 @@ void MainWindow::updateEigPlotSlot(void)
   for (int i = 0; i < upOpts.N; ++i) {
     bike->u5 = -gsl_vector_get(speed, i)/(bike->rf+bike->rft);
     bike->calcEvals();
-
-      OutputFile.write((char *) gsl_vector_ptr(speed, i), sizeof(double));
-    OutputFile.write((char *) bike->fourValues, 4*sizeof(double));  
+    OutputFile << *gsl_vector_ptr(speed,i);
+	for (int j = 0; j < 4; ++j)
+    {
+	  OutputFile << " " << bike->fourValues[j];
+    }
+    OutputFile << std::endl;
+//    OutputFile.write((char *) gsl_vector_ptr(speed, i), sizeof(double));
+//    OutputFile.write((char *) bike->fourValues, 4*sizeof(double));  
     } // for i
 
   std::cout << "Eigenvalue data written to ";
   if ( upOpts.outfolder.empty() )
-  { // this isn't working as I intended...
+  { 
   	std::cout << "current directory." << std::endl;
   }
   else

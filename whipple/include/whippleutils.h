@@ -38,6 +38,9 @@ void setBenchmarkParameters(MJWhippleParams * bike);
 // specified in the text file, the corresponding benchmark parameter is used.
 void readMJWhippleParams(MJWhippleParams *mjbike, const char *filename);
 
+// Write a text file for the Meijaard parameters.
+void writeMJWhippleParams(MJWhippleParams *mjbike, const char *filename);
+
 // Read a text file to get the native parameters. If a parameter is not
 // specified in the text file, the corresponding benchmark parameter is used.
 void readWhippleParams(WhippleParams * bike, const char * filename);

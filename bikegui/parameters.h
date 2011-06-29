@@ -26,14 +26,59 @@ private slots:
   void setBenchmarkParametersSlot(void);
 
   /**
-   * Chris should really rename this method, assigns updated values from mjwp to the Whipple bike.
+   *
    * */
-  void setMeijaardParams(Whipple * bike);
+  void paramBoxSlot(int index);
 
+  /**
+   * Update the display to the gui with updated Gyrostat parameter values.
+   * */
+  void updateGyroParamEdits(void);
+
+  /**
+   *
+   * */
+  void gyroAsteriskSlot();
+
+  /**
+   *
+   * */
+  void gyroLoadSlot();
+
+  /**
+   *
+   * */
+  void gyroSaveSlot();
+
+  /**
+   *
+   * */
+  void gyroSaveAsSlot();  
+  
   /**
    * Update the display to the gui with updated Meijaard parameter values.
    * */
-  void updateMeijaardParamEdits(void);
+  void updateMeijParamEdits(void);
+
+  /**
+   *
+   * */
+  void meijAsteriskSlot();
+
+  /**
+   *
+   * */
+  void meijLoadSlot();
+
+  /**
+   *
+   * */
+  void meijSaveSlot();
+
+  /**
+   *
+   * */
+  void meijSaveAsSlot();  
 
 private:
   /**
@@ -51,24 +96,72 @@ private:
    * */
   QGroupBox *paramBox;
 
+  /**
+   *
+   * */
+  void initParamBox();
+  
   // Whipple bicycle stuffs
   
   /**
    * Pointer to a whipple bike created in the MainWindow class. We have a pointer here so that we can modify the parameters that the bicycle(s) use(s).
    * */
   Whipple * bike;
-  /**
+  
+
+  // Gyrostat parameter stuffs
+/**
    * Structure, declared in Whipple.h, to hold the default (Gyrostat) parameters for Whipple objects.
    * */
   WhippleParams * gswp;
+  
+  /**
+   *
+   * */
+  void drawGyroParamBox();
+
+  /**
+   *
+   * */
+  QLabel * gyroFileLabel;
+  
+  /**
+   *
+   * */
+  QString gyrofdirname;
 
   // Meijaard parameter stuffs
+  
+
+  /**
+   * This is the first time that the user has chosen Meijaard parameters from the dropdown.
+   * */
+  int wasMeijSelectedBefore;
+
+/**
+   *
+   * */
+  void drawMeijParamBox();
+  
+  /**
+   * 
+   * */
+  QLabel * meijFileLabel;
+
+  /**
+   *
+   * */
+
+  QString meijfdirname;
   /**
    * Structure, declared in Whipple.h, to hold the input parameters if Meijaard parmeters are selected from the QtComboBox.
+zo
    * */
+
   MJWhippleParams * mjwp;
   /**
    * The number of Meijaard parameters.
+
    * */
   const static int NmeijParams = NMEIJPARAMS; // static?
   
@@ -86,6 +179,16 @@ private:
    * Holds the string names for use with QLabel objects for the GUI input of Meijaard parameters.
    * */
   std::string meijParamStrings[NMEIJPARAMS];
+
+  /**
+   *
+   * */
+  std::string meijParamToolTips[NMEIJPARAMS];
+
+  /**
+   *
+   * */
+  void defineMeijStrings();  
 
   /**
    * Holds the values, ripped from struct MJWhippleParams mjwp, for use with the GUI input of Meijaard parameters.

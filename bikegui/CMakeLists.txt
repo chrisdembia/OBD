@@ -13,6 +13,8 @@ add_executable(obdgui
 
 target_link_libraries(obdgui
                whipple
+	       vtkRendering
                ${GSL_LIBRARIES}
                ${GSLCBLAS_LIBRARIES}
-               ${QT_LIBRARIES})
+               ${QT_LIBRARIES}
+	       ${QT_QTMAIN_LIBRARY})

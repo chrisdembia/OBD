@@ -4,97 +4,155 @@
 #include "whippleutils.h"
 #include "parameters.h"
 
-
 WhippleParameter::WhippleParameter( Whipple *b, QWidget *parent)
   : QWidget(parent)
 {
+
+  // bring the bike pointer(s) from mainwindow over to parameters.
   bike = b;
+
+  // struct from whipple.h, to hold the parambox values
+  gswp = new WhippleParams; // gyrostat whipple parameters
+  mjwp = new MJWhippleParams; // Meijaard whipple parameters
+  
+  wasMeijSelectedBefore = false;
 
   comboBox = new QComboBox(this);
   comboBox->addItem(tr("Gyrostat parameters"));
   comboBox->addItem(tr("Franke parameters"));
   comboBox->addItem(tr("Meijaard parameters"));
 
-  paramBox = new QGroupBox( tr("Set parameter values"), this);
-  paramBox->setMaximumSize(200,600);
-
-  // putting benchmark parameter widgets into a QGridLayout
-  QGridLayout *meijParamLayout = new QGridLayout;
-  meijParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
-  
-  // struct from whipple.h, to hold the parambox values
-  gswp = new WhippleParams; // gyrostat whipple parameters
-  mjwp = new MJWhippleParams; // Meijaard whipple parameters
-
-  // MEIJAARD PARAMETERS
-  meijParamStrings[0] = "w (m)";
-  meijParamStrings[1] = "c (m)";
-  meijParamStrings[2] = "lambda (rad)";
-  meijParamStrings[3] = "g (m/s^2)";
-  meijParamStrings[4] = "v (m/s)";
-  meijParamStrings[5] = "t_{R} (m)";
-  meijParamStrings[6] = "t_{F} (m)";
-  meijParamStrings[7] = "r_R (m)";
-  meijParamStrings[8] = "m_R (kg)";
-  meijParamStrings[9] = "I_{Rxx} (kg m^2)";
-  meijParamStrings[10] = "I_{Ryy} (kg m^2)";
-  meijParamStrings[11] = "x_B (m)";
-  meijParamStrings[12] = "z_B (m)";
-  meijParamStrings[13] = "m_B (kg)";
-  meijParamStrings[14] = "I_{Bxx} (kg m^2)";
-  meijParamStrings[15] = "I_{Byy} (kg m^2)";
-  meijParamStrings[16] = "I_{Bzz} (kg m^2)";
-  meijParamStrings[17] = "I_{Bxz} (kg m^2)";
-  meijParamStrings[18] = "x_H (m)";
-  meijParamStrings[19] = "z_H (m)";
-  meijParamStrings[20] = "m_H (m)";
-  meijParamStrings[21] = "I_{Hxx} (kg m^2)";
-  meijParamStrings[22] = "I_{Hyy} (kg m^2)";
-  meijParamStrings[23] = "I_{Hzz} (kg m^2)";
-  meijParamStrings[24] = "I_{Hxz} (kg m^2)";
-  meijParamStrings[25] = "r_F (m)";
-  meijParamStrings[26] = "m_F (kg)";
-  meijParamStrings[27] = "I_{Fxx} (kg m^2)";
-  meijParamStrings[28] = "I_{Fyy} (kg m^2)";
-  
-  QLabel * meijLoadLabel = new QLabel("Load parameter file");
-  QToolButton * meijLoadButton = new QToolButton;
-  meijLoadButton->setText("Load");
-  QToolButton * meijSaveButton = new QToolButton;
-  meijSaveButton->setText("Save");
-  QLineEdit * meijLoadEdit = new QLineEdit("put dialogbox here");
-  
-  QToolButton * meijBenchParamsButton = new QToolButton;
-  meijBenchParamsButton->setText("Use benchmark parameters");
-  connect(meijBenchParamsButton, SIGNAL(clicked()), this, SLOT(setBenchmarkParametersSlot()) );
-  
-  meijParamLayout->addWidget(meijLoadLabel,0,0);
-  meijParamLayout->addWidget(meijLoadButton,0,1);
-  meijParamLayout->addWidget(meijSaveButton,0,2);
-  meijParamLayout->addWidget(meijLoadEdit,1,0,1,3);
-  meijParamLayout->addWidget(meijBenchParamsButton,2,0,1,3);
-  
-  QString lineEditValue;
-  // add a horizontal rule
-  for (int i = 0; i < NmeijParams; i++)
-  {
-  	meijParamLabels[i] = new QLabel( tr(meijParamStrings[i].c_str()) ); // dont need to save these
-
-  	meijParamEdits[i] = new QLineEdit( tr("=p") );
-	meijParamEdits[i]->setAlignment(Qt::AlignRight);
-
-	meijParamLayout->addWidget(meijParamLabels[i],i+3,0);
-	meijParamLayout->addWidget(meijParamEdits[i],i+3,1,1,2);
-  }
-
-  paramBox->setLayout(meijParamLayout);
-       
   layout = new QVBoxLayout(this);
   layout->addWidget(comboBox);
+
+  initParamBox();
+    
+  connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT( paramBoxSlot(int)) );
+
+//  bike->writeParameters(const_cast<char*>("whipple_workingparams.txt"));
+
+}
+
+void WhippleParameter::initParamBox()
+{
+  paramBox = new QGroupBox( tr("Set parameter values"), this);
+
+  paramBox->setMinimumSize(200,600);
+  paramBox->setMaximumSize(200,600);
+
   layout->addWidget(paramBox);
 }
 
-void WhippleParameter::updateMeijaardParamEdits(void)
+void WhippleParameter::paramBoxSlot(int index)
+{
+  delete paramBox;
+  initParamBox();
+  if (index == 0)
+  {
+  
+  }
+  else if (index == 1)
+  { // Franke parameters
+    QGridLayout * frankeParamLayout = new QGridLayout;
+    frankeParamLayout->addWidget(new QLabel( tr("Not available. Bug the developers!") ),0,0);
+    paramBox->setLayout(frankeParamLayout);
+  }
+  else if (index == 2)
+  { // Meijaard parameters
+    drawMeijParamBox();
+  }
+  // IMPLEMENT EVERYTHING ELSE.
+  // manage deleting objects etc.
+}
+
+void WhippleParameter::drawGyroParamBox()
+{
+  QGridLayout *gyroParamLayout = new QGridLayout;
+//  gyroParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
+
+}
+
+void WhippleParameter::drawMeijParamBox()
+{
+  // putting benchmark parameter widgets into a QGridLayout
+  QGridLayout *meijParamLayout = new QGridLayout;
+  meijParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
+  // DO I NEED THE ABOVE?
+  defineMeijStrings();
+  
+  // load parameters label
+  QLabel * meijLoadLabel = new QLabel("current file:");
+
+  // load parameters button
+  QToolButton * meijLoadButton = new QToolButton;
+  meijLoadButton->setText("Load");
+  connect(meijLoadButton,SIGNAL(clicked()),this,SLOT(meijLoadSlot()));
+  
+  // save parameters button
+  QToolButton * meijSaveButton = new QToolButton;
+  meijSaveButton->setText("Save");
+  connect(meijSaveButton,SIGNAL(clicked()),this,SLOT(meijSaveSlot()));
+
+  // line edit to show open file
+  meijFileLabel = new QLabel;
+  meijFileLabel->setTextFormat(Qt::RichText);
+  // the value for the file label is set further down 
+  
+  // use benchmark parameters button
+  QToolButton * meijBenchParamsButton = new QToolButton;
+  meijBenchParamsButton->setText("Use benchmark parameters");
+  connect(meijBenchParamsButton, SIGNAL(clicked()), this, SLOT(setBenchmarkParametersSlot()) );
+ 
+  // convert Meijaard parameters to Gyrostat parameters
+  QToolButton * meijToGyroButton = new QToolButton;
+  meijToGyroButton->setText("Convert Meij. to Gyro params");
+
+  // error message box
+  QTextEdit * meijErrorText = new QTextEdit("Parameters are okay.");
+
+ 
+  meijParamLayout->addWidget(meijLoadLabel,0,0);
+  meijParamLayout->addWidget(meijLoadButton,0,1);
+  meijParamLayout->addWidget(meijSaveButton,0,2);
+  meijParamLayout->addWidget(meijFileLabel,1,0,1,3);
+  meijParamLayout->addWidget(meijBenchParamsButton,2,0,1,3);
+  meijParamLayout->addWidget(meijToGyroButton,3,0,1,3);
+  meijParamLayout->addWidget(meijErrorText,4,0,3,3);  
+  for (int i = 0; i < NmeijParams; i++)
+  {
+    meijParamLabels[i] = new QLabel( tr(meijParamStrings[i].c_str()) ); // dont need to save these
+    meijParamLabels[i]->setToolTip( tr(meijParamToolTips[i].c_str() ) );
+
+    meijParamEdits[i] = new QLineEdit;
+    meijParamEdits[i]->setAlignment(Qt::AlignRight);
+    meijParamEdits[i]->setValidator(new QDoubleValidator(-999.0, 999.0, 5, meijParamEdits[i]));
+
+    meijParamLayout->addWidget(meijParamLabels[i],i+7,0);
+    meijParamLayout->addWidget(meijParamEdits[i],i+7,1,1,2);
+  }
+  meijParamEdits[4]->setReadOnly(true); // forward velocity is not a real parameter
+  // initialize parameters to the benchmark bicycle.
+  if (!wasMeijSelectedBefore)
+  {
+    setBenchmarkParametersSlot();
+    wasMeijSelectedBefore = true;
+  }
+  else
+  {
+    meijFileLabel->setText("<b>" + meijfdirname + "</b>");
+    updateMeijParamEdits();
+  }
+
+  for (int i = 0; i < NmeijParams; i++)
+  {
+    connect(meijParamEdits[i], SIGNAL(editingFinished()),this,SLOT(meijAsteriskSlot()));
+  }
+
+
+  paramBox->setLayout(meijParamLayout);
+}
+
+void WhippleParameter::updateMeijParamEdits(void)
 {
   // BENCHMARK MODEL PARAMETERS
   meijParamValues[0] = mjwp->w;
@@ -126,289 +184,167 @@ void WhippleParameter::updateMeijaardParamEdits(void)
   meijParamValues[26] = mjwp->mf;
   meijParamValues[27] = mjwp->IFxx;
   meijParamValues[28] = mjwp->IFyy;
-  
-  QString lineEditValue;
   // add a horizontal rule
-  for (int i = 0; i < NmeijParams; i++)
+  for (int k = 0; k < NmeijParams; k++)
   {
-  	lineEditValue.setNum(meijParamValues[i], 'g', 5 ); // 2nd arg: format, 3rd arg: precision
-    meijParamEdits[i]->setText( tr(lineEditValue.toStdString().c_str()) );
+    meijParamEdits[k]->setText( QString("%1").arg(meijParamValues[k]) );
   }
-  
+
   // from whippleutils.h
   convertParameters( gswp, mjwp);
 
+    bool validparams = bike->setParameters( gswp);
   // set the parameters to be used by the Whipple bike object.
-  bike->setParameters( gswp);
-//  bike->writeParameters(const_cast<char*>("whipple_workingparams.txt"));
+  try
+  {  // NOTE: QT WILL NOT CATCH EXCEPTIONS FOR US, SO ALL EXCEPTION-THROWING CODE MUST BE IN MY OWN TRY..CATCH
+    bool validparams = bike->setParameters( gswp);
+  }
+  catch (const char* errmsg)
+  {
+    std::cout << errmsg << std::endl;
+  }
+}
 
+void WhippleParameter::meijAsteriskSlot()
+{
+  // add an asterisk to the dialog box
+  if ( !meijFileLabel->text().endsWith("*</b>") )
+  {
+    QString qstr = meijFileLabel->text();
+    meijFileLabel->setText( qstr.insert( qstr.lastIndexOf("<"), "*") );
+  }
+
+  // revalidate and save the parameters  
+  mjwp->w = meijParamEdits[0]->text().toDouble();
+  mjwp->c = meijParamEdits[1]->text().toDouble();
+  mjwp->lambda = meijParamEdits[2]->text().toDouble();
+  mjwp->g = meijParamEdits[3]->text().toDouble();
+  mjwp->rrt = meijParamEdits[5]->text().toDouble();
+  mjwp->rft = meijParamEdits[6]->text().toDouble();
+  mjwp->rr = meijParamEdits[7]->text().toDouble();
+  mjwp->mr = meijParamEdits[8]->text().toDouble();
+  mjwp->IRxx = meijParamEdits[9]->text().toDouble();
+  mjwp->IRyy = meijParamEdits[10]->text().toDouble();
+  mjwp->xb = meijParamEdits[11]->text().toDouble();
+  mjwp->zb = meijParamEdits[12]->text().toDouble();
+  mjwp->mb = meijParamEdits[13]->text().toDouble();
+  mjwp->IBxx = meijParamEdits[14]->text().toDouble();
+  mjwp->IByy = meijParamEdits[15]->text().toDouble();
+  mjwp->IBzz = meijParamEdits[16]->text().toDouble();
+  mjwp->IBxz = meijParamEdits[17]->text().toDouble();
+  mjwp->xh = meijParamEdits[18]->text().toDouble();
+  mjwp->zh = meijParamEdits[19]->text().toDouble();
+  mjwp->mh = meijParamEdits[20]->text().toDouble();
+  mjwp->IHxx = meijParamEdits[21]->text().toDouble();
+  mjwp->IHyy = meijParamEdits[22]->text().toDouble();
+  mjwp->IHzz = meijParamEdits[23]->text().toDouble();
+  mjwp->IHxz = meijParamEdits[24]->text().toDouble();
+  mjwp->rf = meijParamEdits[25]->text().toDouble();
+  mjwp->mf = meijParamEdits[26]->text().toDouble();
+  mjwp->IFxx = meijParamEdits[27]->text().toDouble();
+  mjwp->IFyy = meijParamEdits[28]->text().toDouble();
+  
+  updateMeijParamEdits();
+}
+
+void WhippleParameter::meijLoadSlot()
+{
+  QString fdirname = QFileDialog::getOpenFileName(this, tr("Load file"), QDir::currentPath() );
+  if (!fdirname.isEmpty())
+  {
+    meijfdirname = fdirname;
+    readMJWhippleParams(mjwp, meijfdirname.toStdString().c_str() );
+    updateMeijParamEdits(); 
+    meijFileLabel->setText("<b>" + meijfdirname + "</b>");
+  }
+}
+
+void WhippleParameter::meijSaveSlot()
+{
+  QString fdirname = QFileDialog::getSaveFileName(this, tr("Save File"), QDir::currentPath(), tr("Text file (*, *.txt, *.dat,...);;Any file (*)") );
+  // from whippleutils.h
+  if (!fdirname.isEmpty())
+  {
+    meijfdirname = fdirname;
+    writeMJWhippleParams(mjwp, meijfdirname.toStdString().c_str() );
+    meijFileLabel->setText("<b>" + meijfdirname + "</b>");
+  }
+}
+
+void WhippleParameter::meijSaveAsSlot()
+{
 }
 
 void WhippleParameter::setBenchmarkParametersSlot()
 {
   // in whippleutils.h
   setBenchmarkParameters(mjwp);
-  // update the display
-  updateMeijaardParamEdits();
+
+  // update line edits
+  updateMeijParamEdits();
+  
+  // set the displayed file name appropriately (the data is built in)
+  meijfdirname = QString("benchmark");
+  meijFileLabel->setText("<b>" + meijfdirname + "</b>");
 }
 
-void WhippleParameter::setMeijaardParams(Whipple * bike)
+void WhippleParameter::updateGyroParamEdits(void)
 {
-// interact with Whipple object
-//void convertParameters(WhippleParams *bout, const MJWhippleParams * bin);
-  //  void writeParameters(const char * filename) const;
-    // FOR NOW THIS IS NOT NEEDED, SINCE THE METHOD IS SO EASY
+}
+
+void WhippleParameter::gyroAsteriskSlot()
+{
+}
+
+void WhippleParameter::gyroLoadSlot()
+{
+}
+
+void WhippleParameter::gyroSaveSlot()
+{
+}
+
+void WhippleParameter::gyroSaveAsSlot()
+{
 }
 
 
-
- // OLD CODE
-/*
-
-  QScrollArea *  scrollArea = new QScrollArea;
-  scrollArea->setBackgroundRole(QPalette::Dark);
-  scrollArea->setWidget(paramBox);
-  scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-
-
-  benchParamStrings[0] = "w (m)"; benchParamValues[0] = mjwp->w;
-  benchParamStrings[1] = "c (m)"; benchParamValues[1] = mjwp->c;
-  benchParamStrings[2] = "lambda (rad)"; benchParamValues[2] = mjwp->lambda;
-  benchParamStrings[3] = "g (m/s^2)"; benchParamValues[3] = mjwp->g;
-  benchParamStrings[4] = "v (m/s)"; benchParamValues[4] = 1337;
-  benchParamStrings[5] = "t_{R} (m)"; benchParamValues[5] = mjwp->rrt;
-  benchParamStrings[6] = "t_{F} (m)"; benchParamValues[6] = mjwp->rft;
-  benchParamStrings[7] = "r_R (m)"; benchParamValues[7] = mjwp->rr;
-  benchParamStrings[8] = "m_R (kg)"; benchParamValues[8] = mjwp->mr;
-  benchParamStrings[9] = "I_{Rxx} (kg m^2)"; benchParamValues[9] = mjwp->IRxx;
-  benchParamStrings[10] = "I_{Ryy} (kg m^2)"; benchParamValues[10] = mjwp->IRyy;
-  benchParamStrings[11] = "x_B (m)"; benchParamValues[11] = mjwp->xb;
-  benchParamStrings[12] = "z_B (m)"; benchParamValues[12] = mjwp->zb;
-  benchParamStrings[13] = "m_B (kg)"; benchParamValues[13] = mjwp->mb;
-  benchParamStrings[14] = "I_{Bxx} (kg m^2)"; benchParamValues[14] = mjwp->IBxx;
-  benchParamStrings[15] = "I_{Byy} (kg m^2)"; benchParamValues[15] = mjwp->IByy;
-  benchParamStrings[16] = "I_{Bzz} (kg m^2)"; benchParamValues[16] = mjwp->IBzz;
-  benchParamStrings[17] = "I_{Bxz} (kg m^2)"; benchParamValues[17] = mjwp->IBxz;
-  benchParamStrings[18] = "x_H (m)"; benchParamValues[18] = mjwp->xh;
-  benchParamStrings[19] = "z_H (m)"; benchParamValues[19] = mjwp->zh;
-  benchParamStrings[20] = "m_H (m)"; benchParamValues[20] = mjwp->mh;
-  benchParamStrings[21] = "I_{Hxx} (kg m^2)"; benchParamValues[21] = mjwp->IHxx;
-  benchParamStrings[22] = "I_{Hyy} (kg m^2)"; benchParamValues[22] = mjwp->IHyy;
-  benchParamStrings[23] = "I_{Hzz} (kg m^2)"; benchParamValues[23] = mjwp->IHzz;
-  benchParamStrings[24] = "I_{Hxz} (kg m^2)"; benchParamValues[24] = mjwp->IHxz;
-  benchParamStrings[25] = "r_F (m)"; benchParamValues[25] = mjwp->rf;
-  benchParamStrings[26] = "m_F (kg)"; benchParamValues[26] = mjwp->mf;
-  benchParamStrings[27] = "I_{Fxx} (kg m^2)"; benchParamValues[27] = mjwp->IFxx;
-  benchParamStrings[28] = "I_{Fyy} (kg m^2)"; benchParamValues[28] = mjwp->IFyy;
-  
-  benchParamStrings[0] = "w (m)"; benchParamValues[0] = "1.02";
-  benchParamStrings[1] = "c (m)"; benchParamValues[1] = "0.08";
-  benchParamStrings[2] = "lambda (rad)"; benchParamValues[2] = "pi/10";
-  benchParamStrings[3] = "g (m/s^2)"; benchParamValues[3] = "9.81";
-  benchParamStrings[4] = "v (m/s)"; benchParamValues[4] = "idk";
-  benchParamStrings[5] = "r_R (m)"; benchParamValues[5] = "0.3";
-  benchParamStrings[6] = "t_{R} (m)"; benchParamValues[6] = "0.0";
-  benchParamStrings[7] = "t_{F} (m)"; benchParamValues[7] = "0.0";
-  benchParamStrings[8] = "m_R (kg)"; benchParamValues[8] = "2.0";
-  benchParamStrings[9] = "I_{Rxx} (kg m^2)"; benchParamValues[9] = "0.0603";
-  benchParamStrings[10] = "I_{Ryy} (kg m^2)"; benchParamValues[10] = "0.12";
-  benchParamStrings[11] = "x_B (m)"; benchParamValues[11] = "0.3";
-  benchParamStrings[12] = "z_B (m)"; benchParamValues[12] = "0.9";
-  benchParamStrings[13] = "m_B (kg)"; benchParamValues[13] = "85.0";
-  benchParamStrings[14] = "I_{Bxx} (kg m^2)"; benchParamValues[14] = "9.2";
-  benchParamStrings[15] = "I_{Byy} (kg m^2)"; benchParamValues[15] = "11.0";
-  benchParamStrings[16] = "I_{Bzz} (kg m^2)"; benchParamValues[16] = "2.8";
-  benchParamStrings[17] = "I_{Bxz} (kg m^2)"; benchParamValues[17] = "2.4";
-  benchParamStrings[18] = "x_H (m)"; benchParamValues[18] = "0.9";
-  benchParamStrings[19] = "z_H (m)"; benchParamValues[19] = "0.7";
-  benchParamStrings[20] = "m_H (m)"; benchParamValues[20] = "4.0";
-  benchParamStrings[21] = "I_{Hxx} (kg m^2)"; benchParamValues[21] = "0.05892";
-  benchParamStrings[22] = "I_{Hyy} (kg m^2)"; benchParamValues[22] = "0.06";
-  benchParamStrings[23] = "I_{Hzz} (kg m^2)"; benchParamValues[23] = "0.00708";
-  benchParamStrings[24] = "I_{Hxz} (kg m^2)"; benchParamValues[24] = "0.00756";
-  benchParamStrings[25] = "r_F (m)"; benchParamValues[25] = "0.35";
-  benchParamStrings[26] = "m_F (kg)"; benchParamValues[26] = "3.0";
-  benchParamStrings[27] = "I_{Fxx} (kg m^2)"; benchParamValues[27] = "0.1405";
-  benchParamStrings[28] = "I_{Fyy} (kg m^2)"; benchParamValues[28] = "0.28";
-    QGridLayout *mainLayout = new QGridLayout;
-    mainLayout->setSizeConstraint(QLayout::SetFixedSize);
-
-	mainLayout->addWidget(display,0,0,1,6);
-	mainLayout->addWidget(backspaceButton,1,0,1,2);
-	mainLayout->addWidget(clearButton,1,2,1,2);
-	mainLayout->addWidget(clearAllButton,1,4,1,2);
-	
-	 mainLayout->addWidget(clearMemoryButton, 2, 0);
-     mainLayout->addWidget(readMemoryButton, 3, 0);
-     mainLayout->addWidget(setMemoryButton, 4, 0);
-     mainLayout->addWidget(addToMemoryButton, 5, 0);
-     
-     void MainWindow::createActions(void)
+void WhippleParameter::defineMeijStrings()
 {
-  // New action
-  newAction = new QAction(tr("&New"), this);
-  newAction->setShortcut(QKeySequence::New);
-  newAction->setStatusTip(tr("Create a new set of bicycle parameters"));
-  // connect(newAction, SIGNAL(triggered()), this, SLOT(newFile()));
+  // MEIJAARD PARAMETERS
+  meijParamStrings[0] = "w (m)";
+  meijParamStrings[1] = "c (m)";
+  meijParamStrings[2] = "lambda (rad)";
+  meijParamStrings[3] = "g (m/s^2)";
+  meijParamStrings[4] = "v (m/s)";
+  meijParamStrings[5] = "t_{R} (m)";
+  meijParamStrings[6] = "t_{F} (m)";
+  meijParamStrings[7] = "r_R (m)";
+  meijParamStrings[8] = "m_R (kg)";
+  meijParamStrings[9] = "I_{Rxx} (kg m^2)";
+  meijParamStrings[10] = "I_{Ryy} (kg m^2)";
+  meijParamStrings[11] = "x_B (m)";
+  meijParamStrings[12] = "z_B (m)";
+  meijParamStrings[13] = "m_B (kg)";
+  meijParamStrings[14] = "I_{Bxx} (kg m^2)";
+  meijParamStrings[15] = "I_{Byy} (kg m^2)";
+  meijParamStrings[16] = "I_{Bzz} (kg m^2)";
+  meijParamStrings[17] = "I_{Bxz} (kg m^2)";
+  meijParamStrings[18] = "x_H (m)";
+  meijParamStrings[19] = "z_H (m)";
+  meijParamStrings[20] = "m_H (m)";
+  meijParamStrings[21] = "I_{Hxx} (kg m^2)";
+  meijParamStrings[22] = "I_{Hyy} (kg m^2)";
+  meijParamStrings[23] = "I_{Hzz} (kg m^2)";
+  meijParamStrings[24] = "I_{Hxz} (kg m^2)";
+  meijParamStrings[25] = "r_F (m)";
+  meijParamStrings[26] = "m_F (kg)";
+  meijParamStrings[27] = "I_{Fxx} (kg m^2)";
+  meijParamStrings[28] = "I_{Fyy} (kg m^2)";
 
-  // Open action
-  openAction = new QAction(tr("&Open"), this);
-  openAction->setShortcut(QKeySequence::Open);
-  openAction->setStatusTip(tr("Open a set of bicycle parameters"));
-  // connect(openAction, SIGNAL(triggered()), this, SLOT(about()));
-
-	display = new QLineEdit("0");
-	display->setReadOnly(true);
-	display->setAlignment(Qt::AlignRight);
-	display->setMaxLength(15);
-
-*/
-
-/*
-  // creating benchmark parameter label and lineEdit widgets
-  QLabel * wheelbaseLabel = new QLabel( tr("w (m)") );
-  QLineEdit * wheelbaseEdit = new QLineEdit("1.02");
-  benchParamLayout->addWidget(wheelbaseLabel,0,0);
-  benchParamLayout->addWidget(wheelbaseEdit,0,1);
-    
-  QLabel * trailLabel = new QLabel( tr("c (m)") );
-  QLineEdit * trailEdit = new QLineEdit("0.08");
-  benchParamLayout->addWidget(trailLabel,1,0);
-  benchParamLayout->addWidget(trailEdit,1,1);
-  
-  QLabel * steeraxistiltLabel = new QLabel( tr("lambda (rad)") );
-  QLineEdit * steeraxistiltEdit = new QLineEdit("pi/10");
-  benchParamLayout->addWidget(steeraxistiltLabel,2,0);
-  benchParamLayout->addWidget(steeraxistiltEdit,2,1);
-  
-  QLabel * accelgravityLabel = new QLabel( tr("g (m/s^2)") );
-  QLineEdit * accelgravityEdit = new QLineEdit("9.81");
-  benchParamLayout->addWidget(accelgravityLabel,3,0);
-  benchParamLayout->addWidget(accelgravityEdit,3,1);
-  
-  QLabel * forwardspeedLabel = new QLabel( tr("v (m/s)") );
-  QLineEdit * forwardspeedEdit = new QLineEdit("idk");
-  benchParamLayout->addWidget(forwardspeedLabel,4,0);
-  benchParamLayout->addWidget(forwardspeedEdit,4,1);
-  
-  QLabel * radiusRLabel = new QLabel( tr("r_R (m)") );
-  QLineEdit * radiusREdit = new QLineEdit("0.3");
-  benchParamLayout->addWidget(radiusRLabel,5,0);
-  benchParamLayout->addWidget(radiusREdit,5,1);
-  
-  QLabel * thickRLabel = new QLabel( tr("t_{R} (m)") );
-  QLineEdit * thickREdit = new QLineEdit("0.0");
-  benchParamLayout->addWidget(thickRLabel,6,0);
-  benchParamLayout->addWidget(thickREdit,6,1);
-  
-  QLabel * thickFLabel = new QLabel( tr("t_{F} (m)") );
-  QLineEdit * thickFEdit = new QLineEdit("0.0");
-  benchParamLayout->addWidget(thickFLabel,7,0);
-  benchParamLayout->addWidget(thickFEdit,7,1);
-  
-  QLabel * massRLabel = new QLabel( tr("m_R (kg)") );
-  QLineEdit * massREdit = new QLineEdit("2.0");
-  benchParamLayout->addWidget(massRLabel,8,0);
-  benchParamLayout->addWidget(massREdit,8,1);
-  
-  QLabel * inertiaRxxLabel = new QLabel( tr("I_{Rxx} (kg m^2)") );
-  QLineEdit * inertiaRxxEdit = new QLineEdit("0.0603");
-  benchParamLayout->addWidget(inertiaRxxLabel,9,0);
-  benchParamLayout->addWidget(inertiaRxxEdit,9,1);
-  
-  QLabel * inertiaRyyLabel = new QLabel( tr("I_{Ryy} (kg m^2)") );
-  QLineEdit * inertiaRyyEdit = new QLineEdit("0.12");
-  benchParamLayout->addWidget(inertiaRyyLabel,10,0);
-  benchParamLayout->addWidget(inertiaRyyEdit,10,1);
-  
-  QLabel * posBxLabel = new QLabel( tr("x_B (m)") );
-  QLineEdit * posBxEdit = new QLineEdit("0.3");
-  benchParamLayout->addWidget(posBxLabel,11,0);
-  benchParamLayout->addWidget(posBxEdit,11,1);
-  
-  QLabel * posBzLabel = new QLabel( tr("z_B (m)") );
-  QLineEdit * posBzEdit = new QLineEdit("0.9");
-  benchParamLayout->addWidget(posBzLabel,12,0);
-  benchParamLayout->addWidget(posBzEdit,12,1);
-  
-  QLabel * massBLabel = new QLabel( tr("m_B (kg)") );
-  QLineEdit * massBEdit = new QLineEdit("85.0");
-  benchParamLayout->addWidget(massBLabel,13,0);
-  benchParamLayout->addWidget(massBEdit,13,1);
-  
-  QLabel * inertiaBxxLabel = new QLabel( tr("I_{Bxx} (kg m^2)") );
-  QLineEdit * inertiaBxxEdit = new QLineEdit("9.2");
-  benchParamLayout->addWidget(inertiaBxxLabel,14,0);
-  benchParamLayout->addWidget(inertiaBxxEdit,14,1);
-  
-  QLabel * inertiaByyLabel = new QLabel( tr("I_{Byy} (kg m^2)") );
-  QLineEdit * inertiaByyEdit = new QLineEdit("11.0");
-  benchParamLayout->addWidget(inertiaByyLabel,15,0);
-  benchParamLayout->addWidget(inertiaByyEdit,15,1);
-  
-  QLabel * inertiaBzzLabel = new QLabel( tr("I_{Bzz} (kg m^2)") );
-  QLineEdit * inertiaBzzEdit = new QLineEdit("2.8");
-  benchParamLayout->addWidget(inertiaBzzLabel,16,0);
-  benchParamLayout->addWidget(inertiaBzzEdit,16,1);
-  
-  QLabel * inertiaBxzLabel = new QLabel( tr("I_{Bxz} (kg m^2)") );
-  QLineEdit * inertiaBxzEdit = new QLineEdit("2.4");
-  benchParamLayout->addWidget(inertiaBxzLabel,17,0);
-  benchParamLayout->addWidget(inertiaBxzEdit,17,1);
-  
-  QLabel * posHxLabel = new QLabel( tr("x_H (m)") );
-  QLineEdit * posHxEdit = new QLineEdit("0.9");
-  benchParamLayout->addWidget(posHxLabel,18,0);
-  benchParamLayout->addWidget(posHxEdit,18,1);
-  
-  QLabel * posHzLabel = new QLabel( tr("z_H (m)") );
-  QLineEdit * posHzEdit = new QLineEdit("0.7");
-  benchParamLayout->addWidget(posHzLabel,19,0);
-  benchParamLayout->addWidget(posHzEdit,19,1);
-  
-  QLabel * massHLabel = new QLabel( tr("m_H (m)") );
-  QLineEdit * massHEdit = new QLineEdit("4.0");
-  benchParamLayout->addWidget(massHLabel,20,0);
-  benchParamLayout->addWidget(massHEdit,20,1);
-  
-  QLabel * inertiaHxxLabel = new QLabel( tr("I_{Hxx} (kg m^2)") );
-  QLineEdit * inertiaHxxEdit = new QLineEdit("0.05892");
-  benchParamLayout->addWidget(inertiaHxxLabel,21,0);
-  benchParamLayout->addWidget(inertiaHxxEdit,21,1);
-  
-  QLabel * inertiaHyyLabel = new QLabel( tr("I_{Hyy} (kg m^2)") );
-  QLineEdit * inertiaHyyEdit = new QLineEdit("0.06");
-  benchParamLayout->addWidget(inertiaHyyLabel,22,0);
-  benchParamLayout->addWidget(inertiaHyyEdit,22,1);
-  
-  QLabel * inertiaHzzLabel = new QLabel( tr("I_{Hzz} (kg m^2)") );
-  QLineEdit * inertiaHzzEdit = new QLineEdit("0.00708");
-  benchParamLayout->addWidget(inertiaHzzLabel,23,0);
-  benchParamLayout->addWidget(inertiaHzzEdit,23,1);
-  
-  QLabel * inertiaHxzLabel = new QLabel( tr("I_{Hxz} (kg m^2)") );
-  QLineEdit * inertiaHxzEdit = new QLineEdit("0.00756");
-  benchParamLayout->addWidget(inertiaHxzLabel,24,0);
-  benchParamLayout->addWidget(inertiaHxzEdit,24,1);
-  
-  QLabel * radiusFLabel = new QLabel( tr("r_F (m)") );
-  QLineEdit * radiusFEdit = new QLineEdit("0.35");
-  benchParamLayout->addWidget(radiusFLabel,25,0);
-  benchParamLayout->addWidget(radiusFEdit,25,1);
-  
-  QLabel * massFLabel = new QLabel( tr("m_F (kg)") );
-  QLineEdit * massFEdit = new QLineEdit("3.0");
-  benchParamLayout->addWidget(massFLabel,26,0);
-  benchParamLayout->addWidget(massFEdit,26,1);
-  
-  QLabel * inertiaFxxLabel = new QLabel( tr("I_{Fxx} (kg m^2)") );
-  QLineEdit * inertiaFxxEdit = new QLineEdit("0.1405");
-  benchParamLayout->addWidget(inertiaFxxLabel,27,0);
-  benchParamLayout->addWidget(inertiaFxxEdit,27,1);
-  
-  QLabel * inertiaFyyLabel = new QLabel( tr("I_{Fyy} (kg m^2)") );    
-  QLineEdit * inertiaFyyEdit = new QLineEdit("0.28");
-  benchParamLayout->addWidget(inertiaFyyLabel,28,0);
-  benchParamLayout->addWidget(inertiaFyyEdit,28,1);
-*/
-
+  meijParamToolTips[0] = "Wheel base: distance between contact patches of the front and rear wheels.";
+  for (int i = 1; i < NmeijParams; i++ )
+  {
+  meijParamToolTips[i] = "EDIT";
+  }
+}  
