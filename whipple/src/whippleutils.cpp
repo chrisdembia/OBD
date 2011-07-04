@@ -479,3 +479,142 @@ void readIntegrationParams(BikeParams *bike, const char *filename)
   fclose(fp);
 } // readIntegrationParams()
 */
+
+
+bool validateMJParameters(MJWhippleParams * p, bool throwExceptions)
+{
+  bool validparameters = true;
+
+  // Check that distances are non-negative
+  if (p->rr < 0.0) {
+    std::cerr << "rr must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+      throw  "rr must be greater than or equal to zero.";
+    validparameters = false;
+  }
+  if (p->rf < 0.0) {
+    std::cerr << "rf must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+      throw "rf must be greater than or equal to zero.\n";
+    validparameters = false;
+  }
+  if (p->rrt < 0.0) {
+    std::cerr << "rrt must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+      throw "rrt must be greater than or equal to zero.\n";
+    validparameters = false;
+  }
+  if (p->rft < 0.0) {
+    std::cerr << "rft must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+      throw "rft must be greater than or equal to zero.\n";
+    validparameters = false;
+  }
+  if (p->w < 0.0) {
+    std::cerr << "w must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+      throw "w must be greater than or equal to zero.\n";
+    validparameters = false;
+  }
+  if (p->lambda < -M_PI_2 || p->lambda > M_PI_2) {
+    std::cerr << "lambda must be between -pi/2 and pi/2.\n";
+    if (throwExceptions == true)
+       throw "lambda must be between -pi/2 and pi/2.\n";
+    validparameters = false;
+  }
+/*
+  // Check axle to axle offset is enough to avoid wheel to wheel overlap
+  if (validparameters) {
+    double minimumAxleOffset = p->rr + p->rf + p->rrt + p->rft,
+           d_zero = sqrt(pow(p->lr + p->lf, 2.0) + pow(p->ls, 2.0)),
+           d_pi   = sqrt(pow(p->lr - p->lf, 2.0) + pow(p->ls, 2.0));
+
+    if (d_zero < minimumAxleOffset) {
+      overlap[0] = true;
+    } else {
+      overlap[0] = false;
+    }
+    if (d_pi < minimumAxleOffset) {
+      overlap[1] = true;
+    } else {
+      overlap[1] = false;
+    }
+    if (overlap[0]) {
+      std::cerr << "Tire overlap will occur when steer = 0\n";
+      if (throwExceptions == true)
+        throw "Tire overlap will occur when steer = 0\n";
+    }
+    else if (overlap[1]) {
+      std::cerr << "Tire overlap will occur when steer = pi\n";
+      if (throwExceptions == true)
+        throw "Tire overlap will occur when steer = pi\n";
+    }
+    else if (overlap[0] && overlap[1]) {
+      validparameters = false;
+      std::cerr << "Tire overlap occurs for steer = 0 and steer = pi,"
+              "non realistic model.\n";
+      if (throwExceptions == true)
+        throw "Tire overlap occurs for steer = 0 and steer = pi, non realistic model.\n";
+      }
+  }
+EDIT */
+  // Check that masses are non-negative
+  if (p->mr < 0.0) {
+    std::cerr << "mr must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+      throw "mr must be greater than or equal to zero.\n";
+    validparameters = false;
+  }
+  if (p->mf < 0.0) {
+    std::cerr << "mf must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+      throw "mf must be greater than or equal to zero.\n";
+    validparameters = false;
+  }
+  if (p->mb < 0.0) {
+    std::cerr << "mb must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+      throw "mb must be greater than or equal to zero.\n";
+    validparameters = false;
+  }
+  if (p->mh < 0.0) {
+    std::cerr << "mh must be greater than or equal to zero.\n";
+    if (throwExceptions == true)
+      throw "mhb must be greater than or equal to zero.\n";
+    validparameters = false;
+  }
+
+  // Check that principal moments of inertia are all positive and that the
+  // triangle inequalities are satisfied.
+
+  // Rear wheel
+  if (p->IRyy < 0.0) {
+    std::cerr << "Rear wheel spin inertia must be non-negative.\n";
+    if (throwExceptions == true)
+      throw "Rear wheel spin inertia must be non-negative.\n";
+    validparameters = false;
+  }
+  // Front wheel
+  if (p->IFyy < 0.0) {
+    std::cerr << "Front wheel spin inertia must be non-negative.\n";
+    if (throwExceptions == true)
+      throw "Front wheel spin inertia must be non-negative.\n";
+    validparameters = false;
+  }
+  // Rear assembly
+  if (!Whipple::validInertia(p->IBxx, p->IByy, p->IBzz, p->IBxz)) {
+    std::cerr << "Rear assembly inertia invalid.\n";
+    if (throwExceptions == true)
+      throw "Rear assembly inertia invalid.\n";
+    validparameters = false;
+  }
+  // Front assembly
+  if (!Whipple::validInertia(p->IHxx, p->IHyy, p->IHzz, p->IHxz)) {
+    std::cerr << "Rear assembly inertia invalid.\n";
+    if (throwExceptions == true)
+      throw "Rear assembly inertia invalid.\n";
+    validparameters = false;
+  }
+
+  return validparameters;
+} // validateMJParameters()

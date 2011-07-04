@@ -8,7 +8,38 @@
 #include <getopt.h>
 #include "gslVecUtils.h"
 #include "whippleutils.h"
-//#include "QVTKWidget.h"
+// graphics
+#include <vtkSmartPointer.h>
+#include <vtkSphereSource.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkActor.h>
+#include <vtkImageViewer.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkInteractorStyleImage.h>
+#include <vtkRenderer.h>
+#include <vtkJPEGReader.h>
+ 
+#include <QVTKWidget.h>
+// plotting
+#include "vtkQtLineChartView.h"
+#include "vtkQtChartRepresentation.h"
+#include "vtkQtTableView.h"
+#include "vtkDataObjectToTable.h"
+#include "vtkTable.h"
+#define VTK_CREATE(type, name) \
+  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+
+/*
+#include <vtkRenderWindow.h>
+#include <vtkSmartPointer.h>
+#include <vtkChartXY.h>
+#include <vtkPlot.h>
+#include <vtkTable.h>
+#include <vtkFloatArray.h>
+#include <vtkContextView.h>
+#include <vtkContextScene.h>*/
+
+ 
 // constructor
 MainWindow::MainWindow()
 {
@@ -137,14 +168,6 @@ void MainWindow::createTabs(void)
   motionVisualizationWidget->setParent(tabWidget);
   */
   
-//  tabWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-/*  QScrollArea *  scrollArea = new QScrollArea;
-  scrollArea->setBackgroundRole(QPalette::Dark);
-  scrollArea->setWidget(tabWidget);
-  scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-  tabWidget->setMinimumSize(200,200);*/
-
   createUprightStabilityTab();
   createMotionVisualizationTab();
   
@@ -221,29 +244,139 @@ void MainWindow::createUprightStabilityTab(void)
   finalSpeedEdit->setAlignment(Qt::AlignRight);
   uprightSetLayout->addWidget(finalSpeedEdit,5,1);
   
-  QHBoxLayout *uprightTopLayout = new QHBoxLayout;
+QHBoxLayout *uprightTopLayout = new QHBoxLayout;
      QLabel * eigPlot = new QLabel("HELLO");
-     
-  QImage image("yellow.gif");
+  QImage image("human.png");
   eigPlot->setPixmap(QPixmap::fromImage(image));
          eigPlot->setMinimumSize(200,200);
-         /*
-    QGraphicsScene scene;
+    /*QGraphicsScene scene;
     QGraphicsView view(&scene);
     QGraphicsPixmapItem item(QPixmap("yellow.gif"));
     scene.addItem(&item);
     view.show();*/
-     //eigPlot->setBackgroundRole(QPalette::Base);
-     //eigPlot->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-     //eigPlot->setScaledContents(true);
+//eigPlot->setBackgroundRole(QPalette::Base);
+//eigPlot->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+//eigPlot->setScaledContents(true);
   //QGraphicsView
   //QCanvas
-     
 QGroupBox *uprightSetBox = new QGroupBox( tr("Settings") );
 uprightSetBox->setLayout(uprightSetLayout);
+ QScrollArea *eigScroll = new QScrollArea;
+ eigScroll->setBackgroundRole(QPalette::Dark);
+
+// VTK
+/*
+  // Create a table with some points in it
+  vtkSmartPointer<vtkTable> table = 
+    vtkSmartPointer<vtkTable>::New();
+ 
+  vtkSmartPointer<vtkFloatArray> arrX = 
+    vtkSmartPointer<vtkFloatArray>::New();
+  arrX->SetName("X Axis");
+  table->AddColumn(arrX);
+ 
+  vtkSmartPointer<vtkFloatArray> arrC = 
+    vtkSmartPointer<vtkFloatArray>::New();
+  arrC->SetName("Cosine");
+  table->AddColumn(arrC);
+ 
+  vtkSmartPointer<vtkFloatArray> arrS = 
+    vtkSmartPointer<vtkFloatArray>::New();
+  arrS->SetName("Sine");
+  table->AddColumn(arrS);
+ 
+  // Fill in the table with some example values
+  int numPoints = 69;
+  float inc = 7.5 / (numPoints-1);
+  table->SetNumberOfRows(numPoints);
+  for (int i = 0; i < numPoints; ++i)
+  {
+    table->SetValue(i, 0, i * inc);
+    table->SetValue(i, 1, cos(i * inc));
+    table->SetValue(i, 2, sin(i * inc));
+  }
+ 
+  // Set up the view
+  vtkSmartPointer<vtkContextView> view = 
+    vtkSmartPointer<vtkContextView>::New();
+  view->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
+ 
+  // Add multiple line plots, setting the colors etc
+  vtkSmartPointer<vtkChartXY> chart = 
+    vtkSmartPointer<vtkChartXY>::New();
+  view->GetScene()->AddItem(chart);
+  vtkPlot *line = chart->AddPlot(vtkChart::LINE);
+  line->SetInput(table, 0, 1);
+  line->SetColor(0, 255, 0, 255);
+  line->SetWidth(1.0);
+  line = chart->AddPlot(vtkChart::LINE);
+  line->SetInput(table, 0, 2);
+  line->SetColor(255, 0, 0, 255);
+  line->SetWidth(5.0);
   
-uprightTopLayout->addWidget(uprightSetBox);
- uprightTopLayout->addWidget(eigPlot);
+    // Start interactor
+  view->GetInteractor()->Initialize();
+ view->GetInteractor()->Start();
+  
+*/
+ 
+ // Create a sphere and create a vtkTable from its point data (normal vectors)
+  VTK_CREATE(vtkSphereSource, sphereSource);
+  VTK_CREATE(vtkDataObjectToTable, tableConverter);
+  tableConverter->SetInput(sphereSource->GetOutput());
+  tableConverter->SetFieldType(vtkDataObjectToTable::POINT_DATA);
+  tableConverter->Update();
+  vtkTable* pointTable = tableConverter->GetOutput();
+
+  // Create a line chart view
+  vtkSmartPointer<vtkQtLineChartView> chartView = 
+    vtkSmartPointer<vtkQtLineChartView>::New();
+  chartView->SetupDefaultInteractor();
+  
+    uprightTopLayout->addWidget(uprightSetBox);
+ // eigScroll->setWidget(chartView->GetWidget());
+//    uprightTopLayout->addWidget(eigScroll);
+  chartView->GetWidget()->setMinimumSize(800,800);
+//        uprightTopLayout->addWidget(chartView->GetWidget());
+
+  // Set the chart title
+  chartView->SetTitle("Sphere Normals");
+
+  // Add the table to the view
+  vtkDataRepresentation* dataRep = chartView->AddRepresentationFromInput(pointTable);
+
+  // You can downcast to get the chart representation:
+  vtkQtChartRepresentation* chartRep =
+    vtkQtChartRepresentation::SafeDownCast(dataRep);
+  if (!chartRep)
+    {
+    std::cerr << "Failed to get chart table representation." << std::endl;
+//    return 1;
+    }
+
+  // TODO-
+  // The user shouldn't be required to call Update().
+  // The view should handle updates automatically. 
+  chartView->Update();
+
+  // Show the view's qt widget
+  chartView->Show();
+/*
+  // Show the table in a vtkQtTableView with split columns off
+  VTK_CREATE(vtkQtTableView, tableView);
+  tableView->SetSplitMultiComponentColumns(false);
+  tableView->AddRepresentationFromInput(pointTable);
+  tableView->Update();
+  tableView->GetWidget()->show();
+
+  // Show the table in a vtkQtTableView with split column on
+  VTK_CREATE(vtkQtTableView, tableView2);
+  tableView2->SetSplitMultiComponentColumns(true);
+  tableView2->AddRepresentationFromInput(pointTable);
+  tableView2->Update();
+  tableView2->GetWidget()->show();
+ */
+  // eigScroll->setWidget(eigPlot); 
 
 
   
@@ -253,10 +386,39 @@ uprightTopLayout->addWidget(uprightSetBox);
 
 void MainWindow::createMotionVisualizationTab(void)
 {
-	QLabel *l1 = new QLabel( tr("TESTING") );
+//	QLabel *l1 = new QLabel( tr("TESTING") );
 	QGridLayout *motionLayout = new QGridLayout;
-	motionLayout->addWidget(l1);
-	motionVisualizationTab->setLayout(motionLayout);
+
+  QVTKWidget *widget = new QVTKWidget(uprightStabilityTab);
+  widget->resize(256,256);
+ 
+  //setup sphere
+  vtkSmartPointer<vtkSphereSource> sphereSource = 
+      vtkSmartPointer<vtkSphereSource>::New();
+  sphereSource->Update();
+  vtkSmartPointer<vtkPolyDataMapper> sphereMapper = 
+      vtkSmartPointer<vtkPolyDataMapper>::New();
+  sphereMapper->SetInputConnection(sphereSource->GetOutputPort());
+  vtkSmartPointer<vtkActor> sphereActor = 
+      vtkSmartPointer<vtkActor>::New();
+  sphereActor->SetMapper(sphereMapper);
+ 
+  //setup window
+  vtkSmartPointer<vtkRenderWindow> renderWindow = 
+      vtkSmartPointer<vtkRenderWindow>::New();
+ 
+  //setup renderer
+  vtkSmartPointer<vtkRenderer> renderer = 
+      vtkSmartPointer<vtkRenderer>::New();
+  renderWindow->AddRenderer(renderer);
+ 
+  renderer->AddActor(sphereActor);
+  renderer->ResetCamera();
+ 
+  widget->SetRenderWindow(renderWindow);
+  
+  motionLayout->addWidget(widget);
+  motionVisualizationTab->setLayout(motionLayout);
 }
 
 void MainWindow::saveEigSlot(void)

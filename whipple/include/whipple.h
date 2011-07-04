@@ -144,6 +144,10 @@ class Whipple {
     void setBenchmarkParameters(void);
     void setBenchmarkState(void);
     bool setParameters(WhippleParams * p, bool throwExceptions = false);
+    /**
+     *
+     * */
+//    static bool validateMJParameters( MJWhippleParams * p, bool throwExceptions = false);
     void setState(const double state[10]);
 
     // Steady turning related functions
@@ -167,9 +171,9 @@ class Whipple {
     friend void hc_fdf(double q2, void * params, double * f, double * df);
     friend std::ostream &operator<<(std::ostream &file, const Whipple * discs);
 
-  private:
-    bool validInertia(double Ixx, double Iyy, double Izz, double Ixz) const;
-    void insertionSort(int N, double ar[]) const;
+//  private:
+    static bool validInertia(double Ixx, double Iyy, double Izz, double Ixz);
+    static void insertionSort(int N, double ar[]);
 
 };
 #endif

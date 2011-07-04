@@ -37,7 +37,7 @@ void WhippleParameter::initParamBox()
   paramBox = new QGroupBox( tr("Set parameter values"), this);
 
   paramBox->setMinimumSize(200,600);
-  paramBox->setMaximumSize(200,600);
+  paramBox->setMaximumHeight(600);
 
   layout->addWidget(paramBox);
 }
@@ -98,7 +98,7 @@ void WhippleParameter::drawGyroParamBox()
   connect(gyroBenchParamsButton, SIGNAL(clicked()), this, SLOT(setGyroBenchParametersSlot()) );
   
   // error message box
-  QTextEdit * gyroErrorText = new QTextEdit("Parameters are okay.");
+  gyroErrorText = new QTextEdit("Error messages will appear here.");
 
  
   gyroParamLayout->addWidget(gyroLoadLabel,0,0);
@@ -144,9 +144,20 @@ void WhippleParameter::drawGyroParamBox()
 
 void WhippleParameter::drawMeijParamBox()
 {
+  QGroupBox * meijParamFileBox = new QGroupBox( tr("File management"),paramBox );
+  QGroupBox * meijParamModBox = new QGroupBox( tr("Modify parameters"),paramBox );
+  meijParamFileBox->setMaximumHeight(175);
   // putting benchmark parameter widgets into a QGridLayout
-  QGridLayout *meijParamLayout = new QGridLayout;
-  meijParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
+  QVBoxLayout * meijParamLayout = new QVBoxLayout(paramBox);
+  QGridLayout * meijParamFileLayout = new QGridLayout(meijParamFileBox);
+  QGridLayout * meijParamModLayout = new QGridLayout(meijParamModBox);
+
+  meijParamFileBox->setLayout(meijParamFileLayout);
+  meijParamModBox->setLayout(meijParamModLayout);
+  meijParamLayout->addWidget(meijParamFileBox);
+  
+
+//  meijParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
   // DO I NEED THE ABOVE?
  
   defineMeijStrings();
@@ -179,16 +190,16 @@ void WhippleParameter::drawMeijParamBox()
   meijToGyroButton->setText("Convert Meij. to Gyro params");
 
   // error message box
-  QTextEdit * meijErrorText = new QTextEdit("Parameters are okay.");
+  meijErrorText = new QTextEdit("Parameters are okay.");
 
  
-  meijParamLayout->addWidget(meijLoadLabel,0,0);
-  meijParamLayout->addWidget(meijLoadButton,0,1);
-  meijParamLayout->addWidget(meijSaveButton,0,2);
-  meijParamLayout->addWidget(meijFileLabel,1,0,1,3);
-  meijParamLayout->addWidget(meijBenchParamsButton,2,0,1,3);
-  meijParamLayout->addWidget(meijToGyroButton,3,0,1,3);
-  meijParamLayout->addWidget(meijErrorText,4,0,3,3);  
+  meijParamFileLayout->addWidget(meijLoadLabel,0,0);
+  meijParamFileLayout->addWidget(meijLoadButton,0,1);
+  meijParamFileLayout->addWidget(meijSaveButton,0,2);
+  meijParamFileLayout->addWidget(meijFileLabel,1,0,1,3);
+  meijParamFileLayout->addWidget(meijBenchParamsButton,2,0,1,3);
+  meijParamFileLayout->addWidget(meijToGyroButton,3,0,1,3);
+  meijParamFileLayout->addWidget(meijErrorText,4,0,3,3);  
   for (int i = 0; i < NmeijParams; i++)
   {
     meijParamLabels[i] = new QLabel( tr(meijParamStrings[i].c_str()), paramBox ); // dont need to save these
@@ -198,8 +209,8 @@ void WhippleParameter::drawMeijParamBox()
     meijParamEdits[i]->setAlignment(Qt::AlignRight);
     meijParamEdits[i]->setValidator(new QDoubleValidator(-999.0, 999.0, 5, meijParamEdits[i]));
 
-    meijParamLayout->addWidget(meijParamLabels[i],i+7,0);
-    meijParamLayout->addWidget(meijParamEdits[i],i+7,1,1,2);
+    meijParamModLayout->addWidget(meijParamLabels[i],i,0);
+    meijParamModLayout->addWidget(meijParamEdits[i],i,1,1,2);
   }
   meijParamEdits[4]->setReadOnly(true); // forward velocity is not a real parameter
   // initialize parameters to the benchmark bicycle.
@@ -219,7 +230,12 @@ void WhippleParameter::drawMeijParamBox()
     connect(meijParamEdits[i], SIGNAL(textEdited(const QString&)),this,SLOT(meijAsteriskSlot(const QString&)));
   }
 
-
+  
+  QScrollArea * meijParamModScroll = new QScrollArea;
+// meijParamModScroll->setBackgroundRole(QPalette::Dark);
+  meijParamModScroll->setWidget(meijParamModBox);
+  
+  meijParamLayout->addWidget(meijParamModScroll);  
   paramBox->setLayout(meijParamLayout);
 }
 
@@ -308,19 +324,41 @@ void WhippleParameter::meijAsteriskSlot(const QString& ss)
 
 void WhippleParameter::sendMeijParamToBike()
 {
-  // from whippleutils.h
-  WhippleParams *gswptemp = new WhippleParams;
-  convertParameters( gswptemp, mjwp);
 
+  bool validparameters = false;
+  meijErrorText->setTextColor( Qt::black );
+  meijErrorText->setText( tr("Error messages appear here.") );
   // set the parameters to be used by the Whipple bike object.
   try
   {  // NOTE: QT WILL NOT CATCH EXCEPTIONS FOR US, SO ALL EXCEPTION-THROWING CODE MUST BE IN MY OWN TRY..CATCH
-    bike->setParameters( gswptemp);
-    delete gswptemp;
+
+   // MAY TRY TO IMPLEMENT TRYCATCH INTO CONVERTPARAMETERS INSTEAD. NOTE THAT THERE ARE ERRORS BEING CAUGHT BY GYROSTAT SET THAT ARE NOT BEING CAUGHT BY WHIPPLE SET
+    validparameters = validateMJParameters( mjwp, true);
   }
   catch (const char* errmsg)
   {
-    std::cout << errmsg << std::endl;
+    meijErrorText->setTextColor( Qt::red );
+    meijErrorText->setText( tr(errmsg) );
+  }
+  catch (...)
+  {
+    std::cerr << "Caught an unknown exception in WhippleParameter::sendMeijParamToBike(). Tried to run bike->validateMJParameters( MJWhippleParams*, bool ), which should only throw const char *'s." << std::endl;
+  }
+
+  if (validparameters)
+  { // from whippleutils.h
+    WhippleParams *gswptemp = new WhippleParams;
+    convertParameters( gswptemp, mjwp);
+    try
+    {
+      bike->setParameters( gswptemp, true);
+    }
+    catch (...)
+    {
+      meijErrorText->setTextColor( Qt::red );
+      meijErrorText->setText( tr("Caught an error after internally converting Meijaard parameters to Gyrostat parameters.") );
+    }
+    delete gswptemp;
   }
 
 }
@@ -443,15 +481,21 @@ void WhippleParameter::sendGyroParamToBike()
 {
 
   // set the parameters to be used by the Whipple bike object.
+  gyroErrorText->setTextColor( Qt::black );
+  gyroErrorText->setText( tr("Error messages appear here.") );
   try
   {  // NOTE: QT WILL NOT CATCH EXCEPTIONS FOR US, SO ALL EXCEPTION-THROWING CODE MUST BE IN MY OWN TRY..CATCH
-    bike->setParameters( gswp);
+    bike->setParameters( gswp, true);
   }
-  catch (const char* errmsg)
+  catch (const char * errmsg)
   {
-    std::cout << "caught: " << errmsg << std::endl;
+    gyroErrorText->setTextColor( Qt::red );
+    gyroErrorText->setText( tr(errmsg) );
   }
-
+  catch (...)
+  {
+    std::cerr << "Caught an unknown exception in WhippleParameter::sendGyroParamToBike(). Tried to run bike->setParameters( WhippleParams*, bool ), which should only throw const char *'s." << std::endl;
+  }
 }
 
 void WhippleParameter::gyroLoadSlot()
@@ -484,7 +528,6 @@ void WhippleParameter::gyroSaveSlot()
 void WhippleParameter::gyroSaveAsSlot()
 {
 }
-
 
 void WhippleParameter::setGyroBenchParametersSlot()
 {

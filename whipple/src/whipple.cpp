@@ -244,13 +244,13 @@ bool Whipple::setParameters(WhippleParams * p, bool throwExceptions)
   if (p->rrt < 0.0) {
     std::cerr << "rrt must be greater than or equal to zero.\n";
     if (throwExceptions == true)
-    throw "rrt must be greater than or equal to zero.\n";
+      throw "rrt must be greater than or equal to zero.\n";
     validparameters = false;
   }
   if (p->rft < 0.0) {
     std::cerr << "rft must be greater than or equal to zero.\n";
     if (throwExceptions == true)
-    throw "rft must be greater than or equal to zero.\n";
+      throw "rft must be greater than or equal to zero.\n";
     validparameters = false;
   }
   if (p->lr < 0.0) {
@@ -280,21 +280,25 @@ bool Whipple::setParameters(WhippleParams * p, bool throwExceptions)
 
     if (d_zero < minimumAxleOffset) {
       overlap[0] = true;
-      std::cerr << "Tire overlap will occur when steer = 0\n";
-      if (throwExceptions == true)
-        throw "Tire overlap will occur when steer = 0\n";
     } else {
       overlap[0] = false;
     }
     if (d_pi < minimumAxleOffset) {
       overlap[1] = true;
-      std::cerr << "Tire overlap will occur when steer = pi\n";
-      if (throwExceptions == true)
-        throw "Tire overlap will occur when steer = pi\n";
     } else {
       overlap[1] = false;
     }
-    if (overlap[0] && overlap[1]) {
+    if (overlap[0]) {
+      std::cerr << "Tire overlap will occur when steer = 0\n";
+      if (throwExceptions == true)
+        throw "Tire overlap will occur when steer = 0\n";
+    }
+    else if (overlap[1]) {
+      std::cerr << "Tire overlap will occur when steer = pi\n";
+      if (throwExceptions == true)
+        throw "Tire overlap will occur when steer = pi\n";
+    }
+    else if (overlap[0] && overlap[1]) {
       validparameters = false;
       std::cerr << "Tire overlap occurs for steer = 0 and steer = pi,"
               "non realistic model.\n";
@@ -376,7 +380,6 @@ bool Whipple::setParameters(WhippleParams * p, bool throwExceptions)
 
   return validparameters;
 } // setParameters()
-
 void Whipple::setState(const double state[10])
 {
   q0 = state[0];  // Yaw
@@ -587,7 +590,7 @@ void Whipple::printCfgCon(void) const
             << "NH[2] = " << constraints[2] << "\n";
 } // printLPS
 
-bool Whipple::validInertia(double Ixx, double Iyy, double Izz, double Ixz) const
+bool Whipple::validInertia(double Ixx, double Iyy, double Izz, double Ixz)
 {
   bool isvalid = true;
   double sqrt_term = sqrt(pow(Ixx - Izz, 2.0) + 4.0*Ixz*Ixz);
@@ -597,7 +600,7 @@ bool Whipple::validInertia(double Ixx, double Iyy, double Izz, double Ixz) const
   I[1] = (Ixx + Izz - sqrt_term)/2.0;
   I[2] = (Ixx + Izz + sqrt_term)/2.0;
 
-  insertionSort(3, I);
+  Whipple::insertionSort(3, I);
 
   for (int i = 0; i < 3; ++i) {
     if (I[i] < 0.0) {
@@ -622,7 +625,7 @@ bool Whipple::validInertia(double Ixx, double Iyy, double Izz, double Ixz) const
   return isvalid;
 }
 
-void Whipple::insertionSort(int N, double ar[]) const
+void Whipple::insertionSort(int N, double ar[])
 {
   int j;
   double temp;

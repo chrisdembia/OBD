@@ -177,7 +177,10 @@ private:
    * */
   double gyroParamValues[NGYROPARAMS];
 
-
+  /**
+   *
+   * */
+  QTextEdit *gyroErrorText;
   // Meijaard parameter stuffs
   /**
    * This is the first time that the user has chosen Meijaard parameters from the dropdown.
@@ -250,5 +253,10 @@ zo
    * Holds the values, ripped from struct MJWhippleParams mjwp, for use with the GUI input of Meijaard parameters.
    * */
   double meijParamValues[NMEIJPARAMS];
+
+  /**
+   *
+   * */
+  QTextEdit * meijErrorText;
 };
 #endif

@@ -50,4 +50,6 @@ void readState(double * bike, const char * filename);
 
 // Read the integration parameters from a text file
 //void readIntegrationParams(BikeParams *bike, const char *filename);
+
+bool validateMJParameters(MJWhippleParams * b, bool throwExceptions = false);
 #endif
