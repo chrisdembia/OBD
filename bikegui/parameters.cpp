@@ -37,8 +37,8 @@ void WhippleParameter::initParamBox()
   paramBox = new QGroupBox( tr("Set parameter values"), this);
 
   paramBox->setMinimumSize(200,600);
-  paramBox->setMaximumHeight(600);
-
+//  paramBox->setMaximumHeight(600);
+  paramBox->resize(200,600);
   layout->addWidget(paramBox);
 }
 
@@ -53,9 +53,9 @@ void WhippleParameter::paramBoxSlot(int index)
   }
   else if (index == 1)
   { // Franke parameters
-/*    QGridLayout * frankeParamLayout = new QGridLayout;
+    QGridLayout * frankeParamLayout = new QGridLayout;
     frankeParamLayout->addWidget(new QLabel( tr("Not available. Bug the developers!") ),0,0);
-    paramBox->setLayout(frankeParamLayout);*/
+    paramBox->setLayout(frankeParamLayout);
 //    drawGyroParamBox();
   }
   else if (index == 2)
@@ -69,9 +69,20 @@ void WhippleParameter::paramBoxSlot(int index)
 void WhippleParameter::drawGyroParamBox()
 {
   // putting gyrostat parameter widgets into a QGridLayout
-  QGridLayout *gyroParamLayout = new QGridLayout;
-  gyroParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
+//  gyroParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
   
+  QGroupBox * gyroParamFileBox = new QGroupBox( tr("File management"),paramBox );
+  QGroupBox * gyroParamModBox = new QGroupBox( tr("Modify parameters"),paramBox );
+  gyroParamFileBox->setMaximumHeight(175);
+  // putting benchmark parameter widgets into a QGridLayout
+  QVBoxLayout * gyroParamLayout = new QVBoxLayout(paramBox);
+  QGridLayout * gyroParamFileLayout = new QGridLayout(gyroParamFileBox);
+  QGridLayout * gyroParamModLayout = new QGridLayout(gyroParamModBox);
+
+  gyroParamFileBox->setLayout(gyroParamFileLayout);
+  gyroParamModBox->setLayout(gyroParamModLayout);
+  gyroParamLayout->addWidget(gyroParamFileBox);
+
   defineGyroStrings();
   
   // load parameters label
@@ -101,12 +112,12 @@ void WhippleParameter::drawGyroParamBox()
   gyroErrorText = new QTextEdit("Error messages will appear here.");
 
  
-  gyroParamLayout->addWidget(gyroLoadLabel,0,0);
-  gyroParamLayout->addWidget(gyroLoadButton,0,1);
-  gyroParamLayout->addWidget(gyroSaveButton,0,2);
-  gyroParamLayout->addWidget(gyroFileLabel,1,0,1,3);
-  gyroParamLayout->addWidget(gyroBenchParamsButton,2,0,1,3);
-  gyroParamLayout->addWidget(gyroErrorText,4,0,3,3);  
+  gyroParamFileLayout->addWidget(gyroLoadLabel,0,0);
+  gyroParamFileLayout->addWidget(gyroLoadButton,0,1);
+  gyroParamFileLayout->addWidget(gyroSaveButton,0,2);
+  gyroParamFileLayout->addWidget(gyroFileLabel,1,0,1,3);
+  gyroParamFileLayout->addWidget(gyroBenchParamsButton,2,0,1,3);
+  gyroParamFileLayout->addWidget(gyroErrorText,4,0,3,3);  
   
   for (int i = 0; i < NgyroParams; i++)
   {
@@ -117,8 +128,8 @@ void WhippleParameter::drawGyroParamBox()
     gyroParamEdits[i]->setAlignment(Qt::AlignRight);
     gyroParamEdits[i]->setValidator(new QDoubleValidator(-999.0, 999.0, 5, gyroParamEdits[i]));
 
-    gyroParamLayout->addWidget(gyroParamLabels[i],i+7,0);
-    gyroParamLayout->addWidget(gyroParamEdits[i],i+7,1,1,2);
+    gyroParamModLayout->addWidget(gyroParamLabels[i],i,0);
+    gyroParamModLayout->addWidget(gyroParamEdits[i],i,1,1,2);
   }
   
 // initialize parameters to the benchmark bicycle.
@@ -138,6 +149,11 @@ void WhippleParameter::drawGyroParamBox()
   {
     connect(gyroParamEdits[i], SIGNAL(textEdited(const QString&)),this,SLOT(gyroAsteriskSlot(const QString&)));
   }
+
+  QScrollArea * gyroParamModScroll = new QScrollArea;
+  gyroParamModScroll->setWidget(gyroParamModBox);
+  
+  gyroParamLayout->addWidget(gyroParamModScroll);  
 
   paramBox->setLayout(gyroParamLayout);
 }

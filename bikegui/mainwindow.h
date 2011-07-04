@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include "button.h"
 #include <string>
+#include <QVTKWidget.h>
 
 class Whipple;
 class QAction;
@@ -77,7 +78,8 @@ private:
   QLineEdit *pitchGuessEdit;
   QLineEdit *initSpeedEdit;
   QLineEdit *finalSpeedEdit;
-  
+
+  QVTKWidget *eigPlotQVTKW; 
   // Parameter widget
   WhippleParameter *paramWidget;
 
