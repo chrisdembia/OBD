@@ -1,10 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <string>
+#include <vector>
+
 #include <QtGui>
 #include <QMainWindow>
-#include "button.h"
-#include <string>
 #include <QVTKWidget.h>
 
 class Whipple;
@@ -41,6 +42,7 @@ private:
   void createStatusBar(void);
   void createTabs(void);
   void createUprightStabilityTab(void);
+  void createSteadyTurningTab(void);
   void createMotionVisualizationTab(void);
   Button * createButton(const QString &text, const char *member);
   // Menus

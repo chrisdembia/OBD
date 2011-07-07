@@ -9,7 +9,10 @@ WhippleParameter::WhippleParameter( Whipple *b, QWidget *parent)
 {
 
   // bring the bike pointer(s) from mainwindow over to parameters.
+  Nbikes = 1;
   bike = b;
+
+  initBikeBox();
 
   // struct from whipple.h, to hold the parambox values
   gswp = new WhippleParams; // gyrostat whipple parameters
@@ -18,18 +21,22 @@ WhippleParameter::WhippleParameter( Whipple *b, QWidget *parent)
   wasGyroSelectedBefore = false; 
   wasMeijSelectedBefore = false;
 
-  comboBox = new QComboBox(this);
-  comboBox->addItem(tr("Gyrostat parameters"));
-  comboBox->addItem(tr("Franke parameters"));
-  comboBox->addItem(tr("Meijaard parameters"));
+  paramComboBox = new QComboBox(this);
+  paramComboBox->addItem(tr("Gyrostat parameters"));
+  paramComboBox->addItem(tr("Franke parameters"));
+  paramComboBox->addItem(tr("Meijaard parameters"));
 
   layout = new QVBoxLayout(this);
-  layout->addWidget(comboBox);
+  layout->addWidget(paramComboBox);
 
   initParamBox();
   drawGyroParamBox();
     
-  connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT( paramBoxSlot(int)) );
+  connect(paramComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT( paramBoxSlot(int)) );
+}
+
+void WhippleParameter::initBikeBox() {
+//  bikeComboBox = new QComboBox(
 }
 
 void WhippleParameter::initParamBox()
@@ -37,8 +44,6 @@ void WhippleParameter::initParamBox()
   paramBox = new QGroupBox( tr("Set parameter values"), this);
 
   paramBox->setMinimumSize(200,600);
-//  paramBox->setMaximumHeight(600);
-  paramBox->resize(200,600);
   layout->addWidget(paramBox);
 }
 
@@ -71,9 +76,14 @@ void WhippleParameter::drawGyroParamBox()
   // putting gyrostat parameter widgets into a QGridLayout
 //  gyroParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
   
-  QGroupBox * gyroParamFileBox = new QGroupBox( tr("File management"),paramBox );
-  QGroupBox * gyroParamModBox = new QGroupBox( tr("Modify parameters"),paramBox );
+  QGroupBox * gyroParamFileBox = 
+    new QGroupBox( tr("File management"),paramBox );
+  QScrollArea * gyroParamModScroll = new QScrollArea(paramBox);
+  QGroupBox * gyroParamModBox = 
+    new QGroupBox( tr("Modify parameters"), gyroParamModScroll );
+  
   gyroParamFileBox->setMaximumHeight(175);
+
   // putting benchmark parameter widgets into a QGridLayout
   QVBoxLayout * gyroParamLayout = new QVBoxLayout(paramBox);
   QGridLayout * gyroParamFileLayout = new QGridLayout(gyroParamFileBox);
@@ -86,30 +96,30 @@ void WhippleParameter::drawGyroParamBox()
   defineGyroStrings();
   
   // load parameters label
-  QLabel * gyroLoadLabel = new QLabel("current file:");
+  QLabel * gyroLoadLabel = new QLabel("current file:",gyroParamFileBox);
 
   // load parameters button
-  QToolButton * gyroLoadButton = new QToolButton;
+  QToolButton * gyroLoadButton = new QToolButton(gyroParamFileBox);
   gyroLoadButton->setText("Load");
   connect(gyroLoadButton,SIGNAL(clicked()),this,SLOT(gyroLoadSlot()));
   
   // save parameters button
-  QToolButton * gyroSaveButton = new QToolButton;
+  QToolButton * gyroSaveButton = new QToolButton(gyroParamFileBox);
   gyroSaveButton->setText("Save");
   connect(gyroSaveButton,SIGNAL(clicked()),this,SLOT(gyroSaveSlot()));
 
   // line edit to show open file
-  gyroFileLabel = new QLabel;
+  gyroFileLabel = new QLabel(gyroParamFileBox);
   gyroFileLabel->setTextFormat(Qt::RichText);
   // the value for the file label is set further down 
   
   // use benchmark parameters button
-  QToolButton * gyroBenchParamsButton = new QToolButton;
+  QToolButton * gyroBenchParamsButton = new QToolButton(gyroParamFileBox);
   gyroBenchParamsButton->setText("Use benchmark parameters");
   connect(gyroBenchParamsButton, SIGNAL(clicked()), this, SLOT(setGyroBenchParametersSlot()) );
   
   // error message box
-  gyroErrorText = new QTextEdit("Error messages will appear here.");
+  gyroErrorText = new QTextEdit("Error messages will appear here.",gyroParamFileBox);
 
  
   gyroParamFileLayout->addWidget(gyroLoadLabel,0,0);
@@ -121,10 +131,10 @@ void WhippleParameter::drawGyroParamBox()
   
   for (int i = 0; i < NgyroParams; i++)
   {
-    gyroParamLabels[i] = new QLabel( tr(gyroParamStrings[i].c_str()), paramBox ); // dont need to save these
+    gyroParamLabels[i] = new QLabel( tr(gyroParamStrings[i].c_str()), gyroParamModBox ); // dont need to save these
     gyroParamLabels[i]->setToolTip( tr(gyroParamToolTips[i].c_str() ) );
 
-    gyroParamEdits[i] = new QLineEdit( paramBox);
+    gyroParamEdits[i] = new QLineEdit( gyroParamModBox);
     gyroParamEdits[i]->setAlignment(Qt::AlignRight);
     gyroParamEdits[i]->setValidator(new QDoubleValidator(-999.0, 999.0, 5, gyroParamEdits[i]));
 
@@ -150,7 +160,6 @@ void WhippleParameter::drawGyroParamBox()
     connect(gyroParamEdits[i], SIGNAL(textEdited(const QString&)),this,SLOT(gyroAsteriskSlot(const QString&)));
   }
 
-  QScrollArea * gyroParamModScroll = new QScrollArea;
   gyroParamModScroll->setWidget(gyroParamModBox);
   
   gyroParamLayout->addWidget(gyroParamModScroll);  
@@ -160,8 +169,11 @@ void WhippleParameter::drawGyroParamBox()
 
 void WhippleParameter::drawMeijParamBox()
 {
-  QGroupBox * meijParamFileBox = new QGroupBox( tr("File management"),paramBox );
-  QGroupBox * meijParamModBox = new QGroupBox( tr("Modify parameters"),paramBox );
+  QGroupBox * meijParamFileBox =
+    new QGroupBox( tr("File management"),paramBox );
+  QScrollArea * meijParamModScroll = new QScrollArea(paramBox);
+  QGroupBox * meijParamModBox =
+    new QGroupBox( tr("Modify parameters"), meijParamModScroll);
   meijParamFileBox->setMaximumHeight(175);
   // putting benchmark parameter widgets into a QGridLayout
   QVBoxLayout * meijParamLayout = new QVBoxLayout(paramBox);
@@ -179,34 +191,34 @@ void WhippleParameter::drawMeijParamBox()
   defineMeijStrings();
   
   // load parameters label
-  QLabel * meijLoadLabel = new QLabel("current file:");
+  QLabel * meijLoadLabel = new QLabel("current file:",meijParamFileBox);
 
   // load parameters button
-  QToolButton * meijLoadButton = new QToolButton;
+  QToolButton * meijLoadButton = new QToolButton(meijParamFileBox);
   meijLoadButton->setText("Load");
   connect(meijLoadButton,SIGNAL(clicked()),this,SLOT(meijLoadSlot()));
   
   // save parameters button
-  QToolButton * meijSaveButton = new QToolButton;
+  QToolButton * meijSaveButton = new QToolButton(meijParamFileBox);
   meijSaveButton->setText("Save");
   connect(meijSaveButton,SIGNAL(clicked()),this,SLOT(meijSaveSlot()));
 
   // line edit to show open file
-  meijFileLabel = new QLabel;
+  meijFileLabel = new QLabel(meijParamModBox);
   meijFileLabel->setTextFormat(Qt::RichText);
   // the value for the file label is set further down 
   
   // use benchmark parameters button
-  QToolButton * meijBenchParamsButton = new QToolButton;
+  QToolButton * meijBenchParamsButton = new QToolButton(meijParamFileBox);
   meijBenchParamsButton->setText("Use benchmark parameters");
   connect(meijBenchParamsButton, SIGNAL(clicked()), this, SLOT(setMeijBenchParametersSlot()) );
  
   // convert Meijaard parameters to Gyrostat parameters
-  QToolButton * meijToGyroButton = new QToolButton;
+  QToolButton * meijToGyroButton = new QToolButton(meijParamFileBox);
   meijToGyroButton->setText("Convert Meij. to Gyro params");
 
   // error message box
-  meijErrorText = new QTextEdit("Parameters are okay.");
+  meijErrorText = new QTextEdit("Parameters are okay.",meijParamFileBox);
 
  
   meijParamFileLayout->addWidget(meijLoadLabel,0,0);
@@ -218,10 +230,11 @@ void WhippleParameter::drawMeijParamBox()
   meijParamFileLayout->addWidget(meijErrorText,4,0,3,3);  
   for (int i = 0; i < NmeijParams; i++)
   {
-    meijParamLabels[i] = new QLabel( tr(meijParamStrings[i].c_str()), paramBox ); // dont need to save these
+    meijParamLabels[i] =
+      new QLabel( tr(meijParamStrings[i].c_str()), meijParamModBox); // dont need to save these
     meijParamLabels[i]->setToolTip( tr(meijParamToolTips[i].c_str() ) );
 
-    meijParamEdits[i] = new QLineEdit( paramBox);
+    meijParamEdits[i] = new QLineEdit(meijParamModBox);
     meijParamEdits[i]->setAlignment(Qt::AlignRight);
     meijParamEdits[i]->setValidator(new QDoubleValidator(-999.0, 999.0, 5, meijParamEdits[i]));
 
@@ -247,8 +260,6 @@ void WhippleParameter::drawMeijParamBox()
   }
 
   
-  QScrollArea * meijParamModScroll = new QScrollArea;
-// meijParamModScroll->setBackgroundRole(QPalette::Dark);
   meijParamModScroll->setWidget(meijParamModBox);
   
   meijParamLayout->addWidget(meijParamModScroll);  
@@ -521,9 +532,7 @@ void WhippleParameter::gyroLoadSlot()
   {
     gyrofdirname = fdirname;
     // from whippleutils.h
-std::cout << gswp->rr << std::endl;
     readWhippleParams(gswp, gyrofdirname.toStdString().c_str() );
-std::cout << gswp->rr << std::endl;
     updateGyroParamEdits(); 
     gyroFileLabel->setText("<b>" + gyrofdirname + "</b>");
   }
@@ -634,7 +643,10 @@ void WhippleParameter::defineGyroStrings()
   }
 } 
 
-
+int WhippleParameter::getNbikes()
+{
+  return Nbikes;
+}
 
 
 

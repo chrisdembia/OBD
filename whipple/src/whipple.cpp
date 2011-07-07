@@ -149,30 +149,30 @@ void Whipple::writeParameters(const char * filename) const
   std::ofstream fp(filename, std::ios::out);
   fp.precision(16);
   if (fp.is_open()) {
-  fp << "rr   = " << rr << '\n'
-     << "rrt  = " << rrt << '\n'
-     << "rf   = " << rf << '\n'
-     << "rft  = " << rft << '\n'
-     << "lr   = " << lr << '\n'
-     << "ls   = " << ls << '\n'
-     << "lf   = " << lf << '\n'
-     << "mr   = " << mr << '\n'
-     << "mf   = " << mf << '\n'
-     << "ICyy = " << ICyy << '\n'
-     << "IDxx = " << IDxx << '\n'
-     << "IDyy = " << IDyy << '\n'
-     << "IDzz = " << IDzz << '\n'
-     << "IDxz = " << IDxz << '\n'
-     << "IExx = " << IExx << '\n'
-     << "IEyy = " << IEyy << '\n'
-     << "IEzz = " << IEzz << '\n'
-     << "IExz = " << IExz << '\n'
-     << "IFyy = " << IFyy << '\n'
-     << "lrx  = " << lrx << '\n'
-     << "lrz  = " << lrz << '\n'
-     << "lfx  = " << lfx << '\n'
-     << "lfz  = " << lfz << '\n'
-     << "g    = " << g << '\n';
+  fp << "rr=" << rr << '\n'
+     << "rrt=" << rrt << '\n'
+     << "rf=" << rf << '\n'
+     << "rft=" << rft << '\n'
+     << "lr=" << lr << '\n'
+     << "ls=" << ls << '\n'
+     << "lf=" << lf << '\n'
+     << "mr=" << mr << '\n'
+     << "mf=" << mf << '\n'
+     << "ICyy=" << ICyy << '\n'
+     << "IDxx=" << IDxx << '\n'
+     << "IDyy=" << IDyy << '\n'
+     << "IDzz=" << IDzz << '\n'
+     << "IDxz=" << IDxz << '\n'
+     << "IExx=" << IExx << '\n'
+     << "IEyy=" << IEyy << '\n'
+     << "IEzz=" << IEzz << '\n'
+     << "IExz=" << IExz << '\n'
+     << "IFyy=" << IFyy << '\n'
+     << "lrx=" << lrx << '\n'
+     << "lrz=" << lrz << '\n'
+     << "lfx=" << lfx << '\n'
+     << "lfz=" << lfz << '\n'
+     << "g=" << g << '\n';
   } else {
     std::cerr << "Unable to open " << filename << "for writing." << '\n';
     std::cerr << "Aborting." << '\n';
@@ -180,8 +180,9 @@ void Whipple::writeParameters(const char * filename) const
   }
 } // writeParameters()
 
-Whipple::Whipple()
+Whipple::Whipple(std::string bikename)
 {
+  name = bikename;
   // Setup the root finder and the numerical integrator
   initRootFinder();
   initODESolver();

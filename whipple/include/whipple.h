@@ -23,6 +23,7 @@
 #include <fstream>
 #include <cstring>
 #include <cmath>
+#include <string>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_odeiv.h>
 #include <gsl/gsl_roots.h>
@@ -117,7 +118,7 @@ class Whipple {
     double F[11], dF[36];
 
     // Member functions
-    Whipple();
+    Whipple(std::string bikename = "bike1");
     ~Whipple();
 
     // Mutators
@@ -170,10 +171,11 @@ class Whipple {
     friend double hc_df(double q2, void * params);
     friend void hc_fdf(double q2, void * params, double * f, double * df);
     friend std::ostream &operator<<(std::ostream &file, const Whipple * discs);
-
-//  private:
+//    friend vaidateMJParameters(MJWhippleParams *, bool);
     static bool validInertia(double Ixx, double Iyy, double Izz, double Ixz);
     static void insertionSort(int N, double ar[]);
+  private:
+    std::string name;
 
 };
 #endif

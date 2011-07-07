@@ -64,6 +64,8 @@ MainWindow::MainWindow()
   createStatusBar();
   createTabs();
 
+  //  QVBoxLayout 
+  setCentralWidget(tabWidget);
 }
 
 void MainWindow::about(void)
@@ -151,6 +153,7 @@ void MainWindow::createStatusBar(void)
 {
   statusBar()->showMessage(versionString);
 }
+
 void MainWindow::createTabs(void)
 {
 
@@ -171,11 +174,8 @@ void MainWindow::createTabs(void)
   */
   
   createUprightStabilityTab();
+  createSteadyTurningTab();
   createMotionVisualizationTab();
-  
-
-//  QVBoxLayout 
-  setCentralWidget(tabWidget);
 }
 
 void MainWindow::createUprightStabilityTab(void)
@@ -248,14 +248,8 @@ uprightSetBox->setMaximumWidth(200);
   
 QHBoxLayout *uprightTopLayout = new QHBoxLayout;
     uprightTopLayout->addWidget(uprightSetBox);
-/***********************************************************/
-/***********************************************************/
-/***********************************************************/
-/***********************************************************/
-/***********************************************************/
   // QVTK set up and initialization
   eigPlotQVTKW = new QVTKWidget(uprightStabilityTab);
-
 //  chartView->GetWidget()->setMinimumSize(800,800);
 //        uprightTopLayout->addWidget(chartView->GetWidget());
 //QGroupBox *eigVTKBox = new QGroupBox( tr("heyyo") );
@@ -263,8 +257,20 @@ QHBoxLayout *uprightTopLayout = new QHBoxLayout;
     uprightTopLayout->addWidget(eigPlotQVTKW);  
   uprightStabilityTab->setLayout(uprightTopLayout);
 
-eigPlotQVTKW->setMinimumSize(200,500);
+eigPlotQVTKW->setMinimumSize(500,200);
 //    return 0; for errors?
+}
+
+void MainWindow::createSteadyTurningTab(void)
+{
+  QGridLayout *steadyLayout = new QGridLayout;
+
+  QComboBox *bikeDropDown = new QComboBox;
+  bikeDropDown->addItem( tr("bike1") );
+  
+    
+  steadyLayout->addWidget(bikeDropDown);
+  steadyTurningTab->setLayout(steadyLayout);
 }
 
 void MainWindow::createMotionVisualizationTab(void)
@@ -328,21 +334,21 @@ void MainWindow::updateEigPlotSlot(void)
   arrX->SetName("forward velocity (m/s)");
   eigPlotVTKTable->AddColumn(arrX);
   
-  int Nbikes = 1;
+//  int Nbikes = 1;
   int NeigPerBike = 4;
-  std::vector<std::string> bikenames(Nbikes*NeigPerBike);
+  std::vector<std::string> bikenames(paramWidget->getNbikes()*NeigPerBike);
   bikenames[0] = "eig1";
   bikenames[1] = "eig2";
   bikenames[2] = "eig3";
   bikenames[3] = "eig4";
 
-  std::vector< vtkSmartPointer<vtkFloatArray> > arrY(Nbikes*NeigPerBike); 
+  std::vector< vtkSmartPointer<vtkFloatArray> > arrY(paramWidget->getNbikes()*NeigPerBike); 
   int idx;
-  for (int i = 0; i < Nbikes; i++)
+  for (int i = 0; i < paramWidget->getNbikes(); i++)
   {
     for (int j = 0; j < 4; j++)
     {
-      idx = j + i*Nbikes;
+      idx = j + i*paramWidget->getNbikes();
       arrY[idx] = vtkSmartPointer<vtkFloatArray>::New();
       arrY[idx]->SetName(bikenames[j].c_str());
       eigPlotVTKTable->AddColumn(arrY[idx]);
@@ -409,11 +415,11 @@ void MainWindow::updateEigPlotSlot(void)
   eigPlotVTKView->GetScene()->AddItem(eigPlotVTKChart);
   vtkPlot *eigPlotVTKLine;
 
-  for (int i = 0; i < Nbikes; i++)
+  for (int i = 0; i < paramWidget->getNbikes(); i++)
   {
     for (int j = 0; j < 4; j++)
     {
-      idx = j + i*Nbikes;
+      idx = j + i*paramWidget->getNbikes();
       eigPlotVTKLine = eigPlotVTKChart->AddPlot(vtkChart::LINE);
       eigPlotVTKLine->SetInput(eigPlotVTKTable, 0, j+1);
       eigPlotVTKLine->SetColor(0, 255, 0, 255);
