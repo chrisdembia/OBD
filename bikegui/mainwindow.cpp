@@ -1,25 +1,26 @@
 #include <cstdlib>
+#include <string>
 #include <vector>
+
+#include <ctime>
+
 #include <QtGui>
-#include "parameters.h"
-#include "button.h"
-#include "mainwindow.h"
-#include "OBDConfig.h"
-#include "whipple.h"
-#include <getopt.h>
-#include "gslVecUtils.h"
-#include "whippleutils.h"
 // graphics
 #include <vtkSmartPointer.h>
-#include <vtkSphereSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
+#include <vtkActor2D.h>
 #include <vtkImageViewer.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkInteractorStyleImage.h>
 #include <vtkRenderer.h>
 #include <vtkJPEGReader.h>
- 
+#include <vtkProperty.h>
+#include <vtkCamera.h>
+#include <vtkTextMapper.h>
+#include <vtkTextProperty.h>
+#include <vtkProperty.h>
+
 #include <QVTKWidget.h>
 // plotting
 #include "vtkQtLineChartView.h"
@@ -31,15 +32,27 @@
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 #include <vtkMath.h>
-#include <vtkRenderWindow.h>
 #include <vtkSmartPointer.h>
+#include <vtkRenderWindow.h>
 #include <vtkChartXY.h>
 #include <vtkPlot.h>
 #include <vtkTable.h>
 #include <vtkFloatArray.h>
 #include <vtkContextView.h>
 #include <vtkContextScene.h>
- 
+
+#include "OBDConfig.h"
+#include "whipple.h"
+#include <getopt.h>
+#include "gslVecUtils.h"
+#include "whipple.h"
+#include "whippleutils.h"
+#include "OBDConfig.h"
+
+#include "parameters.h"
+#include "mainwindow.h"
+
+std::ostream &operator<<(std::ostream &outfile, const Whipple * discs);
 // constructor
 MainWindow::MainWindow()
 {
@@ -66,6 +79,10 @@ MainWindow::MainWindow()
 
   //  QVBoxLayout 
   setCentralWidget(tabWidget);
+}
+
+MainWindow::~MainWindow() {
+
 }
 
 void MainWindow::about(void)
@@ -275,39 +292,41 @@ void MainWindow::createSteadyTurningTab(void)
 
 void MainWindow::createMotionVisualizationTab(void)
 {
-//	QLabel *l1 = new QLabel( tr("TESTING") );
-	QGridLayout *motionLayout = new QGridLayout;
 
-  QVTKWidget *motionQVTKW = new QVTKWidget(uprightStabilityTab);
+  QGroupBox *motionLSetBox = new QGroupBox("Parameters",motionVisualizationTab);
+  QGridLayout *motionLSetLayout = new QGridLayout(motionLSetBox);
+//  QGroupBox* motionRSetBox = new
+	QGridLayout *motionLayout = new QGridLayout(motionVisualizationTab);
+
+
+  motionQVTKW = new QVTKWidget(uprightStabilityTab);
 //  motionQVTKW->resize(256,256);
- 
-  //setup sphere
-  vtkSmartPointer<vtkSphereSource> sphereSource = 
-      vtkSmartPointer<vtkSphereSource>::New();
-  sphereSource->Update();
-  vtkSmartPointer<vtkPolyDataMapper> sphereMapper = 
-      vtkSmartPointer<vtkPolyDataMapper>::New();
-  sphereMapper->SetInputConnection(sphereSource->GetOutputPort());
-  vtkSmartPointer<vtkActor> sphereActor = 
-      vtkSmartPointer<vtkActor>::New();
-  sphereActor->SetMapper(sphereMapper);
- 
-  //setup window
-  vtkSmartPointer<vtkRenderWindow> renderWindow = 
-      vtkSmartPointer<vtkRenderWindow>::New();
- 
-  //setup renderer
-  vtkSmartPointer<vtkRenderer> renderer = 
-      vtkSmartPointer<vtkRenderer>::New();
-  renderWindow->AddRenderer(renderer);
- 
-  renderer->AddActor(sphereActor);
-  renderer->ResetCamera();
- 
-  motionQVTKW->SetRenderWindow(renderWindow);
-  
-  motionLayout->addWidget(motionQVTKW);
+  motionLayout->addWidget(motionLSetBox,0,0);
+  motionLayout->addWidget(motionQVTKW,0,1);
   motionVisualizationTab->setLayout(motionLayout);
+
+  // motionLSetBox
+  QLabel *label1 = new QLabel("test");
+  QToolButton* simulateButton = new QToolButton(motionLSetBox);
+  simulateButton->setText("Start simulation");
+  connect(simulateButton, SIGNAL(clicked()), this, SLOT(simulateSlot()) );
+
+  // motionLSetBox Widgets to motionLayout
+  motionLSetLayout->addWidget(label1);
+  motionLSetLayout->addWidget(simulateButton);
+
+// CAN HAVE MULTIPLE RENDERERS IN ONE RENDERWINDOW, DIFF BACKGROUNDS
+// AND CAMERA ANGLES
+  // DELETE THE POINTERS DELEETE THE POINTERS!:w
+
+  //setup window
+  motionRenderWindow = vtkRenderWindow::New();
+
+  //setup renderer
+  motionRenderer = vtkRenderer::New();
+  motionRenderWindow->AddRenderer(motionRenderer);
+  motionQVTKW->SetRenderWindow(motionRenderWindow);
+  // USE CMAKE TO IDENTIFY TYPE OF COMPUTER? FOR VIDEO AVI OUTPUT
 }
 
 void MainWindow::saveEigSlot(void)
@@ -319,6 +338,7 @@ void MainWindow::saveEigSlot(void)
   QString dir = QFileDialog::getExistingDirectory(this,tr("Choose Directory"),QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
 }
+
 
 void MainWindow::updateEigPlotSlot(void)
 {
@@ -449,6 +469,39 @@ void MainWindow::updateEigPlotSlot(void)
   // SHOULD MAKE DESTRUCTORS
 
 }
+
+std::ostream &operator<<(std::ostream &file, const Whipple * discs)
+{
+  file.write((char *) &(discs->t), sizeof discs->t);
+  file.write((char *) &discs->q0, sizeof discs->q0);
+  file.write((char *) &discs->q1, sizeof discs->q1);
+  file.write((char *) &discs->q2, sizeof discs->q2);
+  file.write((char *) &discs->q3, sizeof discs->q3);
+  file.write((char *) &discs->q4, sizeof discs->q4);
+  file.write((char *) &discs->q5, sizeof discs->q5);
+  file.write((char *) &discs->q6, sizeof discs->q6);
+  file.write((char *) &discs->q7, sizeof discs->q7);
+  file.write((char *) &discs->u0, sizeof discs->u0);
+  file.write((char *) &discs->u1, sizeof discs->u1);
+  file.write((char *) &discs->u2, sizeof discs->u2);
+  file.write((char *) &discs->u3, sizeof discs->u3);
+  file.write((char *) &discs->u4, sizeof discs->u4);
+  file.write((char *) &discs->u5, sizeof discs->u5);
+  file.write((char *) discs->no_fn, sizeof discs->no_fn);
+  file.write((char *) &discs->Rx, sizeof discs->Rx);
+  file.write((char *) &discs->Ry, sizeof discs->Ry);
+  file.write((char *) &discs->Rz, sizeof discs->Rz);
+  file.write((char *) &discs->Fx, sizeof discs->Fx);
+  file.write((char *) &discs->Fy, sizeof discs->Fy);
+  file.write((char *) &discs->Fz, sizeof discs->Fz);
+  file.write((char *) &discs->ke, sizeof discs->ke);
+  file.write((char *) &discs->pe, sizeof discs->pe);
+  file.write((char *) &discs->fa_yaw, sizeof discs->fa_yaw);
+  file.write((char *) &discs->fa_lean, sizeof discs->fa_lean);
+  file.write((char *) &discs->fa_pitch, sizeof discs->fa_pitch);
+  file.write((char *) discs->constraints, sizeof discs->constraints);
+  return file;
+} // ostream &operator<<()
 // VTK
 /*
   // Create a table with some points in it
@@ -560,3 +613,4 @@ void MainWindow::updateEigPlotSlot(void)
 //eigPlot->setScaledContents(true);
   //QGraphicsView
   //QCanvas
+

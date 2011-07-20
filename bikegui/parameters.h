@@ -30,7 +30,7 @@ private slots:
   /**
    *
    * */
-  void gyroAsteriskSlot(const QString&);
+  void gyroAsteriskSlot();
 
   /**
    *
@@ -55,7 +55,7 @@ private slots:
   /**
    *
    * */
-  void meijAsteriskSlot(const QString&);
+  void meijAsteriskSlot();
 
   /**
    *
@@ -126,7 +126,8 @@ private:
    * Structure, declared in Whipple.h, to hold the default (Gyrostat) parameters for Whipple objects.
    * */
   WhippleParams * gswp;
-  
+  WhippleParams * gswptemp;
+
   /**
    *
    * */
@@ -175,7 +176,7 @@ private:
   /**
    *
    * */
-  std::string gyroParamStrings[NGYROPARAMS];
+  QString gyroParamStrings[NGYROPARAMS];
 
   /**
    *
@@ -232,6 +233,7 @@ private:
 zo
    * */
   MJWhippleParams * mjwp;
+  MJWhippleParams * mjwptemp;
 
   /**
    * The number of Meijaard parameters.
@@ -252,7 +254,7 @@ zo
   /**
    * Holds the string names for use with QLabel objects for the GUI input of Meijaard parameters.
    * */
-  std::string meijParamStrings[NMEIJPARAMS];
+  QString meijParamStrings[NMEIJPARAMS];
 
   /**
    *

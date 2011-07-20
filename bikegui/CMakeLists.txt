@@ -5,7 +5,8 @@ FIND_PACKAGE(VTK)
 INCLUDE(${VTK_USE_FILE})
 
 include_directories(${PROJECT_SOURCE_DIR}/whipple/include)
-set(obdgui_sources main.cpp mainwindow.cpp parameters.cpp)
+set(obdgui_sources main.cpp mainwindow.cpp parameters.cpp
+    motionvisualization.cpp)
 set(obdgui_headers mainwindow.h parameters.h)
 
 qt4_wrap_cpp(obdgui_headers_moc ${obdgui_headers})

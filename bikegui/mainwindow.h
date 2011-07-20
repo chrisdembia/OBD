@@ -8,6 +8,8 @@
 #include <QMainWindow>
 #include <QVTKWidget.h>
 
+#include <vtkSmartPointer.h>
+
 class Whipple;
 class QAction;
 class WhippleParameter;
@@ -28,11 +30,13 @@ class MainWindow : public QMainWindow
 public:
   MainWindow();
   // need the destructor too
+  ~MainWindow();
   
 private slots:
   void about(void);
   void updateEigPlotSlot(void);
   void saveEigSlot(void);
+  void simulateSlot(void);
 
 private:
   // Member functions
@@ -44,7 +48,10 @@ private:
   void createUprightStabilityTab(void);
   void createSteadyTurningTab(void);
   void createMotionVisualizationTab(void);
-  Button * createButton(const QString &text, const char *member);
+
+  // motion visualization
+  void drawTriad(void);
+
   // Menus
   QMenu *fileMenu;
   QMenu *helpMenu;
@@ -82,6 +89,11 @@ private:
   QLineEdit *finalSpeedEdit;
 
   QVTKWidget *eigPlotQVTKW; 
+
+  // motion visualization
+  QVTKWidget *motionQVTKW; 
+  vtkSmartPointer<vtkRenderer> motionRenderer;
+  vtkSmartPointer<vtkRenderWindow> motionRenderWindow;
   // Parameter widget
   WhippleParameter *paramWidget;
 
