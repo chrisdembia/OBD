@@ -7,6 +7,7 @@
 
 #include <QtGui>
 #include <QVTKWidget.h>
+// vtk sources
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
 #include <vtkCylinderSource.h>
@@ -15,10 +16,16 @@
 #include <vtkPlaneSource.h>
 #include <vtkParametricFunctionSource.h>
 #include <vtkParametricTorus.h>
+// vtk filters
+#include <vtkTransformPolyDataFilter.h>
+// vtk mappers
 #include <vtkPolyDataMapper.h>
+// vtk actors
 #include <vtkActor.h>
 #include <vtkActor2D.h>
 #include <vtkAssembly.h>
+// vtk misc
+#include <vtkTransform.h>
 #include <vtkImageViewer.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkInteractorStyleImage.h>
@@ -54,6 +61,12 @@ class myvtkTriad
   std::vector< vtkSmartPointer<vtkArrowSource> > triadSources;
   std::vector< vtkSmartPointer<vtkPolyDataMapper> > triadMappers;
   std::vector< vtkSmartPointer<vtkActor> > triadActors;
+};
+
+class myvtkBike
+{
+  public:
+    myvtkBike(vtkSmartPointer<vtkRenderer>);
 };
 
 void MainWindow::simulateSlot(void)
@@ -107,7 +120,7 @@ void MainWindow::simulateSlot(void)
   motionRenderer->ResetCamera();
 */
   // draw coordinate triad
-  myvtkTriad triad1(motionRenderer);
+  myvtkTriad triad0(motionRenderer);
   // ground
   VTK_CREATE(vtkPlaneSource,groundSource);
   groundSource->SetNormal(0,0,-1);
@@ -116,10 +129,11 @@ void MainWindow::simulateSlot(void)
   groundMapper->SetInputConnection(groundSource->GetOutputPort());
   VTK_CREATE(vtkActor,groundActor);
   groundActor->SetMapper(groundMapper);
+  groundActor->SetScale(3,3,3);
   groundActor->GetProperty()->SetOpacity(0.5);
   // draw a bike
   // rear wheel: two cones and a torus
-  double rearwheelcenter[3] = {0,0,-bike->rr-bike->rrt};
+  double rearwheelcenter[3] = {0,0, -bike->rr - bike->rrt};
   double hubhalfwidth = .1;
   // rear cone right
   // source
@@ -136,7 +150,7 @@ void MainWindow::simulateSlot(void)
   // filter
   VTK_CREATE(vtkTransformPolyDataFilter,rearConeRightFilter);
   rearConeRightFilter->SetInputConnection(rearConeRightSource->GetOutputPort());
-  rearConeRightFilter->SetTransform(
+  rearConeRightFilter->SetTransform(rearConeRightTransform);
   // mapper
   VTK_CREATE(vtkPolyDataMapper,rearConeRightMapper);
   rearConeRightMapper->SetInputConnection(rearConeRightFilter->GetOutputPort());
@@ -144,6 +158,7 @@ void MainWindow::simulateSlot(void)
   VTK_CREATE(vtkActor,rearConeRightActor);
   rearConeRightActor->SetMapper(rearConeRightMapper);
   rearConeRightActor->GetProperty()->SetOpacity(0.3);
+
   // rear cone left
   // source
   VTK_CREATE(vtkConeSource,rearConeLeftSource);
@@ -151,16 +166,23 @@ void MainWindow::simulateSlot(void)
   rearConeLeftSource->SetRadius(bike->rr);
   rearConeLeftSource->SetResolution(100);
   rearConeLeftSource->Update();
+  // transform
+  VTK_CREATE(vtkTransform,rearConeLeftTransform);
+  rearConeLeftTransform->Identity();
+  rearConeLeftTransform->Translate(0,-hubhalfwidth/2,0);
+  rearConeLeftTransform->RotateZ(-90);
+  // filter
+  VTK_CREATE(vtkTransformPolyDataFilter,rearConeLeftFilter);
+  rearConeLeftFilter->SetInputConnection(rearConeLeftSource->GetOutputPort());
+  rearConeLeftFilter->SetTransform(rearConeLeftTransform);
   // mapper
   VTK_CREATE(vtkPolyDataMapper,rearConeLeftMapper);
-  rearConeLeftMapper->SetInputConnection(rearConeLeftSource->GetOutputPort());
+  rearConeLeftMapper->SetInputConnection(rearConeLeftFilter->GetOutputPort());
   // actor
   VTK_CREATE(vtkActor,rearConeLeftActor);
   rearConeLeftActor->SetMapper(rearConeLeftMapper);
-  rearConeLeftActor->SetOrientation(0,0,-90);
- // rearConeLeftActor->AddPosition(0,-hubhalfwidth/2,rearwheelcenter[2]);
-  rearConeLeftActor->AddPosition(0,-hubhalfwidth/2,0);
   rearConeLeftActor->GetProperty()->SetOpacity(0.3);
+  
   // rear torus
   VTK_CREATE(vtkParametricTorus,rearTorus);
   // source
@@ -169,75 +191,258 @@ void MainWindow::simulateSlot(void)
   rearTorus->SetRingRadius(bike->rr);
   rearTorus->SetCrossSectionRadius(bike->rrt+.02);
   rearTorusSource->Update();
+  // transform
+  VTK_CREATE(vtkTransform,rearTorusTransform);
+  rearTorusTransform->Identity();
+  rearTorusTransform->RotateX(90);
+  // filter
+  VTK_CREATE(vtkTransformPolyDataFilter,rearTorusFilter);
+  rearTorusFilter->SetInputConnection(rearTorusSource->GetOutputPort());
+  rearTorusFilter->SetTransform(rearTorusTransform);
   // mapper
   VTK_CREATE(vtkPolyDataMapper,rearTorusMapper);
-  rearTorusMapper->SetInputConnection(rearTorusSource->GetOutputPort());
+  rearTorusMapper->SetInputConnection(rearTorusFilter->GetOutputPort());
   // actor
   VTK_CREATE(vtkActor,rearTorusActor);
   rearTorusActor->SetMapper(rearTorusMapper);
-  rearTorusActor->SetOrientation(90,0,0);
-//  rearTorusActor->AddPosition(rearwheelcenter);
 
   // rear wheel assembly
   VTK_CREATE(vtkAssembly,rearWheelAssy);
   rearWheelAssy->AddPart(rearConeRightActor);
   rearWheelAssy->AddPart(rearConeLeftActor);
   rearWheelAssy->AddPart(rearTorusActor);
-  myvtkTriad triad4(motionRenderer);
-  triad4.SetPosition(rearWheelAssy->GetPosition());
-  triad4.SetOrientation(rearWheelAssy->GetOrientation());
-  triad4.SetScale(.2,.2,.2);
-/*  
-  // rear frame mass center ball
+  rearWheelAssy->SetPosition(rearwheelcenter);
+  myvtkTriad triad1(motionRenderer);
+  triad1.SetPosition(rearWheelAssy->GetPosition());
+  triad1.SetOrientation(rearWheelAssy->GetOrientation());
+  triad1.SetScale(.2,.2,.2);
+
+  // rear frame: center of mass ball and tube
+  // rear center of mass ball
+  // source
   VTK_CREATE(vtkSphereSource,rearCOMSource);
   rearCOMSource->SetRadius(0.08);
+  rearCOMSource->SetThetaResolution(100);
+  rearCOMSource->SetPhiResolution(100);
   rearCOMSource->Update();
+  // transform
+  VTK_CREATE(vtkTransform,rearCOMTransform);
+  rearCOMTransform->Identity();
+  rearCOMTransform->Translate(bike->lrx,0,bike->lrz);
+  // filter
+  VTK_CREATE(vtkTransformPolyDataFilter,rearCOMFilter);
+  rearCOMFilter->SetInputConnection(rearCOMSource->GetOutputPort());
+  rearCOMFilter->SetTransform(rearCOMTransform);
+  // mapper
   VTK_CREATE(vtkPolyDataMapper,rearCOMMapper);
-  rearCOMMapper->SetInputConnection(rearCOMSource->GetOutputPort());
+  rearCOMMapper->SetInputConnection(rearCOMFilter->GetOutputPort());
+  // actor
   VTK_CREATE(vtkActor,rearCOMActor);
   rearCOMActor->SetMapper(rearCOMMapper);
-  rearCOMActor->SetOrigin(-bike->lrx,0,-bike->lrz);
-  rearCOMActor->AddPosition(bike->lrx,0,bike->lrz+rearwheelcenter[2]);
-  rearCOMActor->RotateY(180/M_PI*bike->q2);
-  myvtkTriad triad3(motionRenderer);
-  triad3.SetPosition(rearCOMActor->GetPosition());
-  triad3.SetOrientation(rearCOMActor->GetOrientation());
-  triad3.SetScale(.2,.2,.2);
-  // MUST MOVE CENTER OF ROTATION TO WHEEL HUB, AND THEN ROTATE BY PITCH ANGLE
+  
   // rear frame tube
+  // source
   VTK_CREATE(vtkCylinderSource,rearTubeSource);
   rearTubeSource->SetRadius(0.012);
   rearTubeSource->SetHeight(bike->lr);
+  // transform
+  VTK_CREATE(vtkTransform,rearTubeTransform);
+  rearTubeTransform->Identity();
+  rearTubeTransform->RotateZ(90);
+  rearTubeTransform->Translate(0,-bike->lr/2,0);
+  // filter
+  VTK_CREATE(vtkTransformPolyDataFilter,rearTubeFilter);
+  rearTubeFilter->SetInputConnection(rearTubeSource->GetOutputPort());
+  rearTubeFilter->SetTransform(rearTubeTransform);
+  // mapper
   VTK_CREATE(vtkPolyDataMapper,rearTubeMapper);
-  rearTubeMapper->SetInputConnection(rearTubeSource->GetOutputPort());
+  rearTubeMapper->SetInputConnection(rearTubeFilter->GetOutputPort());
+  // actor
   VTK_CREATE(vtkActor,rearTubeActor);
   rearTubeActor->SetMapper(rearTubeMapper);
-  rearTubeActor->SetOrigin(0,bike->lr/2,0);
-  rearTubeActor->SetPosition(0,-bike->lr/2,rearwheelcenter[2]);
-  rearTubeActor->RotateZ(90);
-  rearTubeActor->RotateX(180/M_PI*bike->q2);
+
+  VTK_CREATE(vtkAssembly,rearFrameAssy);
+  rearFrameAssy->AddPart(rearCOMActor);
+  rearFrameAssy->AddPart(rearTubeActor);
+  rearFrameAssy->SetPosition(rearwheelcenter);
+  rearFrameAssy->RotateY(180/M_PI*bike->q2);
+
   myvtkTriad triad2(motionRenderer);
-  triad2.SetPosition(rearTubeActor->GetPosition());
-  triad2.SetOrientation(rearTubeActor->GetOrientation());
+  triad2.SetPosition(rearFrameAssy->GetPosition());
+  triad2.SetOrientation(rearFrameAssy->GetOrientation());
   triad2.SetScale(.2,.2,.2);
-*/
-//  motionRenderer->AddActor(groundActor);
-//  motionRenderer->AddActor(rearConeRightActor);
- // motionRenderer->AddActor(rearConeLeftActor);
- // motionRenderer->AddActor(rearTorusActor);
- // motionRenderer->AddActor(rearCOMActor);
- // motionRenderer->AddActor(rearTubeActor);
- //
+
+  // front frame
+  // front frame tube
+  // source
+  VTK_CREATE(vtkCylinderSource,frontTubeSource);
+  frontTubeSource->SetRadius(0.012);
+  frontTubeSource->SetHeight(bike->ls);
+  // transform
+  VTK_CREATE(vtkTransform,frontTubeTransform);
+  frontTubeTransform->Identity();
+  frontTubeTransform->RotateZ(90);
+  frontTubeTransform->Translate(0,-bike->ls/2,0);
+  // filter
+  VTK_CREATE(vtkTransformPolyDataFilter,frontTubeFilter);
+  frontTubeFilter->SetInputConnection(frontTubeSource->GetOutputPort());
+  frontTubeFilter->SetTransform(frontTubeTransform);
+  // mapper
+  VTK_CREATE(vtkPolyDataMapper,frontTubeMapper);
+  frontTubeMapper->SetInputConnection(frontTubeFilter->GetOutputPort());
+  // actor
+  VTK_CREATE(vtkActor,frontTubeActor);
+  frontTubeActor->SetMapper(frontTubeMapper);
+
+  // front frame offset
+  // source
+  VTK_CREATE(vtkCylinderSource,frontOffsetSource);
+  frontOffsetSource->SetRadius(0.012);
+  frontOffsetSource->SetHeight(bike->lf);
+  frontOffsetSource->DebugOn();
+  // transform
+  VTK_CREATE(vtkTransform,frontOffsetTransform);
+  frontOffsetTransform->Identity();
+  frontOffsetTransform->RotateX(90);
+  frontOffsetTransform->Translate(bike->ls,-bike->lf/2,0);
+  // filter
+  VTK_CREATE(vtkTransformPolyDataFilter,frontOffsetFilter);
+  frontOffsetFilter->SetInputConnection(frontOffsetSource->GetOutputPort());
+  frontOffsetFilter->SetTransform(frontOffsetTransform);
+  // mapper
+  VTK_CREATE(vtkPolyDataMapper,frontOffsetMapper);
+  frontOffsetMapper->SetInputConnection(frontOffsetFilter->GetOutputPort());
+  // actor
+  VTK_CREATE(vtkActor,frontOffsetActor);
+  frontOffsetActor->SetMapper(frontOffsetMapper);
+
+  VTK_CREATE(vtkAssembly,frontFrameAssy);
+  frontFrameAssy->AddPart(frontTubeActor);
+  frontFrameAssy->AddPart(frontOffsetActor);
+  frontFrameAssy->SetPosition(0,0,-1);
+
+  // front frame transform
+  VTK_CREATE(vtkTransform,frontFrameTransform);
+  frontFrameTransform->SetMatrix(rearFrameAssy->GetMatrix());
+  frontFrameTransform->Translate(bike->lr,0,0);
+  frontFrameTransform->RotateY(-90);
+//  frontFrameAssy->PokeMatrix(frontFrameTransform->GetMatrix());
+  frontFrameAssy->SetPosition(frontFrameTransform->GetPosition());
+  frontFrameAssy->SetOrientation(frontFrameTransform->GetOrientation());
+
+  myvtkTriad triad3(motionRenderer);
+  triad3.SetPosition(frontFrameAssy->GetPosition());
+  triad3.SetOrientation(frontFrameAssy->GetOrientation());
+  triad3.SetScale(.2,.2,.2);
+
+  // front wheel: two cones and a torus
+  double frontwheelcenter[3] = {0,0, -bike->rf - bike->rft};
+  // front cone right
+  // source
+  VTK_CREATE(vtkConeSource,frontConeRightSource);
+  frontConeRightSource->SetHeight(hubhalfwidth);
+  frontConeRightSource->SetRadius(bike->rr);
+  frontConeRightSource->SetResolution(100);
+  frontConeRightSource->Update();
+  // transform
+  VTK_CREATE(vtkTransform,frontConeRightTransform);
+  frontConeRightTransform->Identity();
+  frontConeRightTransform->Translate(0,hubhalfwidth/2,0);
+  frontConeRightTransform->RotateZ(90);
+  // filter
+  VTK_CREATE(vtkTransformPolyDataFilter,frontConeRightFilter);
+  frontConeRightFilter->SetInputConnection(frontConeRightSource->GetOutputPort());
+  frontConeRightFilter->SetTransform(frontConeRightTransform);
+  // mapper
+  VTK_CREATE(vtkPolyDataMapper,frontConeRightMapper);
+  frontConeRightMapper->SetInputConnection(frontConeRightFilter->GetOutputPort());
+  // actor
+  VTK_CREATE(vtkActor,frontConeRightActor);
+  frontConeRightActor->SetMapper(frontConeRightMapper);
+  frontConeRightActor->GetProperty()->SetOpacity(0.3);
+
+  // front cone left
+  // source
+  VTK_CREATE(vtkConeSource,frontConeLeftSource);
+  frontConeLeftSource->SetHeight(hubhalfwidth);
+  frontConeLeftSource->SetRadius(bike->rr);
+  frontConeLeftSource->SetResolution(100);
+  frontConeLeftSource->Update();
+  // transform
+  VTK_CREATE(vtkTransform,frontConeLeftTransform);
+  frontConeLeftTransform->Identity();
+  frontConeLeftTransform->Translate(0,-hubhalfwidth/2,0);
+  frontConeLeftTransform->RotateZ(-90);
+  // filter
+  VTK_CREATE(vtkTransformPolyDataFilter,frontConeLeftFilter);
+  frontConeLeftFilter->SetInputConnection(frontConeLeftSource->GetOutputPort());
+  frontConeLeftFilter->SetTransform(frontConeLeftTransform);
+  // mapper
+  VTK_CREATE(vtkPolyDataMapper,frontConeLeftMapper);
+  frontConeLeftMapper->SetInputConnection(frontConeLeftFilter->GetOutputPort());
+  // actor
+  VTK_CREATE(vtkActor,frontConeLeftActor);
+  frontConeLeftActor->SetMapper(frontConeLeftMapper);
+  frontConeLeftActor->GetProperty()->SetOpacity(0.3);
+  
+  // front torus
+  VTK_CREATE(vtkParametricTorus,frontTorus);
+  // source
+  VTK_CREATE(vtkParametricFunctionSource,frontTorusSource);
+  frontTorusSource->SetParametricFunction(frontTorus);
+  frontTorus->SetRingRadius(bike->rr);
+  frontTorus->SetCrossSectionRadius(bike->rrt+.02);
+  frontTorusSource->Update();
+  // transform
+  VTK_CREATE(vtkTransform,frontTorusTransform);
+  frontTorusTransform->Identity();
+  frontTorusTransform->RotateX(90);
+  // filter
+  VTK_CREATE(vtkTransformPolyDataFilter,frontTorusFilter);
+  frontTorusFilter->SetInputConnection(frontTorusSource->GetOutputPort());
+  frontTorusFilter->SetTransform(frontTorusTransform);
+  // mapper
+  VTK_CREATE(vtkPolyDataMapper,frontTorusMapper);
+  frontTorusMapper->SetInputConnection(frontTorusFilter->GetOutputPort());
+  // actor
+  VTK_CREATE(vtkActor,frontTorusActor);
+  frontTorusActor->SetMapper(frontTorusMapper);
+
+  // front wheel assembly
+  VTK_CREATE(vtkAssembly,frontWheelAssy);
+  frontWheelAssy->AddPart(frontConeRightActor);
+  frontWheelAssy->AddPart(frontConeLeftActor);
+  frontWheelAssy->AddPart(frontTorusActor);
+  frontWheelAssy->SetPosition(frontwheelcenter);
+  
+  // front frame transform
+  VTK_CREATE(vtkTransform,frontWheelTransform);
+  frontWheelTransform->SetMatrix(frontFrameAssy->GetMatrix());
+  frontWheelTransform->Translate(bike->ls,0,-bike->lf);
+  frontWheelTransform->RotateY(90-180/M_PI*bike->q2);
+  frontWheelAssy->SetPosition(frontWheelTransform->GetPosition());
+  frontWheelAssy->SetOrientation(frontWheelTransform->GetOrientation());
+
+  myvtkTriad triad4(motionRenderer);
+  triad4.SetPosition(frontWheelAssy->GetPosition());
+  triad4.SetOrientation(frontWheelAssy->GetOrientation());
+  triad4.SetScale(.2,.2,.2);
+
+
   // render the actor assemblies
+  motionRenderer->AddActor(groundActor);
   motionRenderer->AddActor(rearWheelAssy);
+  motionRenderer->AddActor(rearFrameAssy);
+  motionRenderer->AddActor(frontFrameAssy);
+  motionRenderer->AddActor(frontWheelAssy);
   motionRenderer->SetBackground(.8,1,.8);
   motionQVTKW->GetInteractor()->Initialize();
   
 //  motionRenderWindow->SetAAFrames(2);
   // camera settings
   motionRenderer->ResetCamera();
-  motionRenderer->GetActiveCamera()->SetPosition(0,1,0);
- // motionRenderer->GetActiveCamera()->SetViewUp(0,0,-1);
+  motionRenderer->GetActiveCamera()->SetPosition(0,1,-.5);
+  motionRenderer->GetActiveCamera()->SetViewUp(0,0,-1);
 //  motionRenderer->GetActiveCamera()->Elevation(-95);
   QTime simtime;
   simtime.start();
@@ -245,17 +450,17 @@ void MainWindow::simulateSlot(void)
   int frameswitch = 0;
   int period = 1000/30; //bike->fps;
  // cylActor->RotateX(.01*framectr);
-  while (simtime.elapsed() < 1)
+  while (simtime.elapsed() < 10000)
   {
     if ( simtime.elapsed() % period < 1 && frameswitch == 0)
     {
       framectr++;
       frameswitch = 1;
-      motionRenderer->ResetCamera();
- //     rearTorusActor->AddPosition(.01,0,0);
+      rearWheelAssy->AddPosition(.01,0,0);
 //  motionRenderer->GetActiveCamera()->Elevation(.01*framectr);
   //    rearTorusActor->
 //      motionRenderer->Render();
+      motionRenderer->ResetCamera();
       motionQVTKW->GetRenderWindow()->Render();
       std::cout << simtime.elapsed() << " fn " << framectr << std::endl;
     }
