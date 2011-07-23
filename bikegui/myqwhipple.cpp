@@ -367,6 +367,9 @@ MyQWhipple::MyQWhipple(vtkSmartPointer<vtkRenderer> ren,Whipple* b)
   motionVarNames[30] = "nh1";
   motionVarNames[31] = "nh2";
   motionTable = vtkSmartPointer<vtkTable>::New();
+  // need animation runtime control. max time or add to the array somehow.
+  // maybe set so that the filesize of output jpgs etc is < 1GB.
+  motionTable->SetNumberOfRows(100000);
   motionArrays.resize(NMOTIONVARS);
 
   for (uint i = 0; i < motionArrays.size(); i++) {

@@ -1,10 +1,6 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
-
-
-#include <QtGui>
-#include <QVTKWidget.h>
 // vtk sources
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
@@ -28,19 +24,18 @@
 #include <vtkImageViewer.h>
 #include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
+#include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkInteractorStyleImage.h>
-//#include <vtkJPEGReader.h>
 #include <vtkProperty.h>
 #include <vtkCamera.h>
 #include <vtkTextProperty.h>
 #include <vtkProperty.h>
 #include <vtkMath.h>
-#include <vtkRenderWindow.h>
 #include <vtkPolyData.h>
 #include <vtkCommand.h>
 
 #include <vtkWindowToImageFilter.h>
+//#include <vtkJPEGReader.h>
 #include <vtkJPEGWriter.h>
 #include <vtkPostScriptWriter.h>
 
@@ -52,6 +47,43 @@
 #include "myqwhipple.h"
 
 
+void myQMotion::createMotionVisualizationTab(void)
+{
+
+  QGroupBox *motionLSetBox = new QGroupBox("Parameters",motionVisualizationTab);
+  QGridLayout *motionLSetLayout = new QGridLayout(motionLSetBox);
+//  QGroupBox* motionRSetBox = new
+	QGridLayout *motionLayout = new QGridLayout(motionVisualizationTab);
+
+  motionQVTKW = new QVTKWidget(uprightStabilityTab);
+//  motionQVTKW->resize(256,256);
+  motionLayout->addWidget(motionLSetBox,0,0);
+  motionLayout->addWidget(motionQVTKW,0,1);
+  motionVisualizationTab->setLayout(motionLayout);
+
+  // motionLSetBox
+  QLabel *label1 = new QLabel("test");
+  QToolButton* simulateButton = new QToolButton(motionLSetBox);
+  simulateButton->setText("Start simulation");
+  connect(simulateButton, SIGNAL(clicked()), this, SLOT(simulateSlot()) );
+
+  // motionLSetBox Widgets to motionLayout
+  motionLSetLayout->addWidget(label1);
+  motionLSetLayout->addWidget(simulateButton);
+
+// CAN HAVE MULTIPLE RENDERERS IN ONE RENDERWINDOW, DIFF BACKGROUNDS
+// AND CAMERA ANGLES
+  // DELETE THE POINTERS DELEETE THE POINTERS!:w
+
+  //setup window
+  motionRenderWindow = vtkRenderWindow::New();
+
+  //setup renderer
+  motionRenderer = vtkRenderer::New();
+  motionRenderWindow->AddRenderer(motionRenderer);
+  motionQVTKW->SetRenderWindow(motionRenderWindow);
+  // USE CMAKE TO IDENTIFY TYPE OF COMPUTER? FOR VIDEO AVI OUTPUT
+}
 
 class vtkTimerCallback2 : public vtkCommand
 {
@@ -77,6 +109,7 @@ class vtkTimerCallback2 : public vtkCommand
       }
 
       qbike->MotionUpdate();
+     // qbike->MotionSetValues(TimerCount);
       // render
       vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::SafeDownCast(caller);
       iren->GetRenderWindow()->Render();
@@ -101,7 +134,7 @@ class vtkTimerCallback2 : public vtkCommand
     double state[10];
 };
 
-void MainWindow::simulateSlot(void)
+void myQMotion::simulateSlot(void)
 {
   // WHIPPLE CODE
   bike->evalConstants();
@@ -168,6 +201,7 @@ void MainWindow::simulateSlot(void)
   // draw a bike
   MyQWhipple *qbike1 = new MyQWhipple(motionRenderer,bike);
   qbike1->MotionUpdate();
+//  qbike1->MotionSetValues(0);
   motionRenderer->SetBackground(.8,1,.8);
   motionQVTKW->GetInteractor()->Initialize();
  
@@ -228,73 +262,5 @@ void MainWindow::simulateSlot(void)
 }
 
 
-void myvtkTriad::SetOrientation(double vx, double vy, double vz)
-{
-  for (int i = 0; i < 3; i++) {
-    triadActors[i]->SetOrientation(vx,vy,vz);
-  }
-  triadActors[1]->AddOrientation(0,0,90);
-  triadActors[2]->AddOrientation(0,-90,0);
-}
 
-void myvtkTriad::SetOrientation(double v[3])
-{
-  for (int i = 0; i < 3; i++) {
-    triadActors[i]->SetOrientation(v[0],v[1],v[2]);
-  }
-  triadActors[1]->RotateZ(90);
-  triadActors[2]->RotateY(-90);
-//  triadActors[1]->AddOrientation(0,0,90);
-//  triadActors[2]->AddOrientation(0,-90,0);
-}
-
-void myvtkTriad::AddOrientation(double vx, double vy, double vz)
-{
-  for (int i = 0; i < 3; i++) {
-    triadActors[i]->AddOrientation(vx,vy,vz);
-  }
-}
-
-void myvtkTriad::AddOrientation(double v[3])
-{
-  for (int i = 0; i < 3; i++) {
-    triadActors[i]->AddOrientation(v[0],v[1],v[2]);
-  }
-}
-
-void myvtkTriad::SetPosition(double px, double py, double pz)
-{
-  for (int i = 0; i < 3; i++) {
-    triadActors[i]->SetPosition(px,py,pz);
-  }
-}
-
-void myvtkTriad::SetPosition(double p[3])
-{
-  for (int i = 0; i < 3; i++) {
-    triadActors[i]->SetPosition(p[0],p[1],p[2]);
-  }
-}
-
-void myvtkTriad::AddPosition(double px, double py, double pz)
-{
-  for (int i = 0; i < 3; i++) {
-    triadActors[i]->AddPosition(px,py,pz);
-  }
-}
-
-void myvtkTriad::AddPosition(double p[3])
-{
-  for (int i = 0; i < 3; i++) {
-    triadActors[i]->AddPosition(p[0],p[1],p[2]);
-  }
-}
-
-void myvtkTriad::SetScale(double sx,double sy,double sz)
-{
-  for (int i = 0; i < 3; i++) {
-    triadActors[i]->SetScale(sx,sy,sz);
-  }
-}
-
-  
+// CAN'T HIT START ANIMATION TWICE!!

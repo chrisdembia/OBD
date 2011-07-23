@@ -1,20 +1,10 @@
-
+// cstd
 #include <cstdlib>
-#include <string>
 #include <vector>
-
-
-#include <QtGui>
-#include <QVTKWidget.h>
+// qt
 // vtk sources
 #include <vtkSmartPointer.h>
-#include <vtkSphereSource.h>
-#include <vtkCylinderSource.h>
-#include <vtkConeSource.h>
 #include <vtkArrowSource.h>
-#include <vtkPlaneSource.h>
-#include <vtkParametricFunctionSource.h>
-#include <vtkParametricTorus.h>
 // vtk filters
 #include <vtkTransformPolyDataFilter.h>
 // vtk mappers
@@ -22,11 +12,9 @@
 #include <vtkPolyDataMapper.h>
 // vtk actors
 #include <vtkActor.h>
-#include <vtkActor2D.h>
 #include <vtkAssembly.h>
 // vtk misc
 #include <vtkTransform.h>
-#include <vtkImageViewer.h>
 #include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
 #include <vtkRenderWindowInteractor.h>
@@ -41,15 +29,11 @@
 #include <vtkPolyData.h>
 #include <vtkCommand.h>
 
-#include <vtkWindowToImageFilter.h>
-#include <vtkJPEGWriter.h>
-#include <vtkPostScriptWriter.h>
-
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
-
-#include "parameters.h"
+// obdgui
 #include "mainwindow.h"
+#include "parameters.h"
 #include "myqwhipple.h"
 
 myvtkTriad::myvtkTriad(vtkSmartPointer<vtkRenderer> renderer)
@@ -77,4 +61,74 @@ myvtkTriad::myvtkTriad(vtkSmartPointer<vtkRenderer> renderer)
   triadActors[2]->GetProperty()->SetColor(0.0,0.0,1.0);
   triadActors[1]->RotateZ(90);
   triadActors[2]->RotateY(-90);
+}
+
+
+void myvtkTriad::SetOrientation(double vx, double vy, double vz)
+{
+  for (int i = 0; i < 3; i++) {
+    triadActors[i]->SetOrientation(vx,vy,vz);
+  }
+  triadActors[1]->AddOrientation(0,0,90);
+  triadActors[2]->AddOrientation(0,-90,0);
+}
+
+void myvtkTriad::SetOrientation(double v[3])
+{
+  for (int i = 0; i < 3; i++) {
+    triadActors[i]->SetOrientation(v[0],v[1],v[2]);
+  }
+  triadActors[1]->RotateZ(90);
+  triadActors[2]->RotateY(-90);
+//  triadActors[1]->AddOrientation(0,0,90);
+//  triadActors[2]->AddOrientation(0,-90,0);
+}
+
+void myvtkTriad::AddOrientation(double vx, double vy, double vz)
+{
+  for (int i = 0; i < 3; i++) {
+    triadActors[i]->AddOrientation(vx,vy,vz);
+  }
+}
+
+void myvtkTriad::AddOrientation(double v[3])
+{
+  for (int i = 0; i < 3; i++) {
+    triadActors[i]->AddOrientation(v[0],v[1],v[2]);
+  }
+}
+
+void myvtkTriad::SetPosition(double px, double py, double pz)
+{
+  for (int i = 0; i < 3; i++) {
+    triadActors[i]->SetPosition(px,py,pz);
+  }
+}
+
+void myvtkTriad::SetPosition(double p[3])
+{
+  for (int i = 0; i < 3; i++) {
+    triadActors[i]->SetPosition(p[0],p[1],p[2]);
+  }
+}
+
+void myvtkTriad::AddPosition(double px, double py, double pz)
+{
+  for (int i = 0; i < 3; i++) {
+    triadActors[i]->AddPosition(px,py,pz);
+  }
+}
+
+void myvtkTriad::AddPosition(double p[3])
+{
+  for (int i = 0; i < 3; i++) {
+    triadActors[i]->AddPosition(p[0],p[1],p[2]);
+  }
+}
+
+void myvtkTriad::SetScale(double sx,double sy,double sz)
+{
+  for (int i = 0; i < 3; i++) {
+    triadActors[i]->SetScale(sx,sy,sz);
+  }
 }

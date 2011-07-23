@@ -2,24 +2,8 @@
 #include <string>
 #include <vector>
 
-#include <ctime>
-
 #include <QtGui>
 // graphics
-#include <vtkSmartPointer.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkActor.h>
-#include <vtkActor2D.h>
-#include <vtkImageViewer.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkInteractorStyleImage.h>
-#include <vtkRenderer.h>
-#include <vtkJPEGReader.h>
-#include <vtkProperty.h>
-#include <vtkCamera.h>
-#include <vtkTextMapper.h>
-#include <vtkTextProperty.h>
-#include <vtkProperty.h>
 
 #include <QVTKWidget.h>
 // plotting
@@ -27,13 +11,14 @@
 #include "vtkQtChartRepresentation.h"
 #include "vtkQtTableView.h"
 #include "vtkDataObjectToTable.h"
-#include "vtkTable.h"
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 #include <vtkMath.h>
 #include <vtkSmartPointer.h>
+#include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkChartXY.h>
 #include <vtkPlot.h>
 #include <vtkTable.h>
@@ -41,8 +26,6 @@
 #include <vtkContextView.h>
 #include <vtkContextScene.h>
 
-#include "OBDConfig.h"
-#include "whipple.h"
 #include <getopt.h>
 #include "gslVecUtils.h"
 #include "whipple.h"
@@ -140,7 +123,7 @@ void MainWindow::createActions(void)
 
 void MainWindow::createDockWindows(void)
 {
-  QDockWidget *dock = new QDockWidget(tr("Parameters"));
+  QDockWidget *dock = new QDockWidget(tr("Bike Definitions"));
   dock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
   addDockWidget(Qt::LeftDockWidgetArea, dock);
   paramWidget = new WhippleParameter(bike, dock);
@@ -297,7 +280,6 @@ void MainWindow::createMotionVisualizationTab(void)
   QGridLayout *motionLSetLayout = new QGridLayout(motionLSetBox);
 //  QGroupBox* motionRSetBox = new
 	QGridLayout *motionLayout = new QGridLayout(motionVisualizationTab);
-
 
   motionQVTKW = new QVTKWidget(uprightStabilityTab);
 //  motionQVTKW->resize(256,256);
