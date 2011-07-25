@@ -32,9 +32,7 @@
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 // obdgui
-#include "mainwindow.h"
-#include "parameters.h"
-#include "myqwhipple.h"
+#include "myvtkTriad.h"
 
 myvtkTriad::myvtkTriad(vtkSmartPointer<vtkRenderer> renderer)
 {

@@ -45,7 +45,7 @@
 #include <vtkJPEGWriter.h>
 #include <vtkPostScriptWriter.h>
 
-#include "mainwindow.h"
+#include "myqwhipple.h"
 #include "myvtkTriad.h"
 
 #define VTK_CREATE(type, name) \
@@ -332,50 +332,50 @@ MyQWhipple::MyQWhipple(vtkSmartPointer<vtkRenderer> ren,Whipple* b)
   renderer->AddActor(frontFrameAssy);
   renderer->AddActor(frontWheelAssy);
 
-  // motion data storage
-  motionVarNames.resize(NMOTIONVARS);
-  motionVarNames[0] = "t";
-  motionVarNames[1] = "q0";
-  motionVarNames[2] = "q1";
-  motionVarNames[3] = "q2";
-  motionVarNames[4] = "q3";
-  motionVarNames[5] = "q4";
-  motionVarNames[6] = "q5";
-  motionVarNames[7] = "q6";
-  motionVarNames[8] = "q7";
-  motionVarNames[9] = "u0";
-  motionVarNames[10] = "u1";
-  motionVarNames[11] = "u2";
-  motionVarNames[12] = "u3";
-  motionVarNames[13] = "u4";
-  motionVarNames[14] = "u5";
-  motionVarNames[15] = "fnx";
-  motionVarNames[16] = "fny";
-  motionVarNames[17] = "fnz";
-  motionVarNames[18] = "Rx";
-  motionVarNames[19] = "Ry";
-  motionVarNames[20] = "Rz";
-  motionVarNames[21] = "Fx";
-  motionVarNames[22] = "Fy";
-  motionVarNames[23] = "Fz";
-  motionVarNames[24] = "KE";
-  motionVarNames[25] = "PE";
-  motionVarNames[26] = "fa_yaw";
-  motionVarNames[27] = "fa_lean";
-  motionVarNames[28] = "fa_pitch";
-  motionVarNames[29] = "nh0";
-  motionVarNames[30] = "nh1";
-  motionVarNames[31] = "nh2";
-  motionTable = vtkSmartPointer<vtkTable>::New();
+  // sim data storage
+  simVarNames.resize(NMOTIONVARS);
+  simVarNames[0] = "t";
+  simVarNames[1] = "q0";
+  simVarNames[2] = "q1";
+  simVarNames[3] = "q2";
+  simVarNames[4] = "q3";
+  simVarNames[5] = "q4";
+  simVarNames[6] = "q5";
+  simVarNames[7] = "q6";
+  simVarNames[8] = "q7";
+  simVarNames[9] = "u0";
+  simVarNames[10] = "u1";
+  simVarNames[11] = "u2";
+  simVarNames[12] = "u3";
+  simVarNames[13] = "u4";
+  simVarNames[14] = "u5";
+  simVarNames[15] = "fnx";
+  simVarNames[16] = "fny";
+  simVarNames[17] = "fnz";
+  simVarNames[18] = "Rx";
+  simVarNames[19] = "Ry";
+  simVarNames[20] = "Rz";
+  simVarNames[21] = "Fx";
+  simVarNames[22] = "Fy";
+  simVarNames[23] = "Fz";
+  simVarNames[24] = "KE";
+  simVarNames[25] = "PE";
+  simVarNames[26] = "fa_yaw";
+  simVarNames[27] = "fa_lean";
+  simVarNames[28] = "fa_pitch";
+  simVarNames[29] = "nh0";
+  simVarNames[30] = "nh1";
+  simVarNames[31] = "nh2";
+  simTable = vtkSmartPointer<vtkTable>::New();
   // need animation runtime control. max time or add to the array somehow.
   // maybe set so that the filesize of output jpgs etc is < 1GB.
-  motionTable->SetNumberOfRows(100000);
-  motionArrays.resize(NMOTIONVARS);
+  simTable->SetNumberOfRows(100000);
+  simArrays.resize(NMOTIONVARS);
 
-  for (uint i = 0; i < motionArrays.size(); i++) {
-    motionArrays[i] = vtkSmartPointer<vtkFloatArray>::New();
-    motionArrays[i]->SetName(motionVarNames[i].c_str());
-    motionTable->AddColumn(motionArrays[i]);
+  for (uint i = 0; i < simArrays.size(); i++) {
+    simArrays[i] = vtkSmartPointer<vtkFloatArray>::New();
+    simArrays[i]->SetName(simVarNames[i].c_str());
+    simTable->AddColumn(simArrays[i]);
   }
 }
   
@@ -471,46 +471,52 @@ void MyQWhipple::MotionUpdate()
   //renderer->GetActiveCamera()->SetPosition(frontFrameAssy->GetPosition());
 //  renderer->GetActiveCamera()->SetDistance(5);
 //  renderer->GetActiveCamera()->SetViewUp(0,0,-1);
-//  motionRenderer->GetActiveCamera()->Elevation(-95);
+//  simRenderer->GetActiveCamera()->Elevation(-95);
 //  renderer->GetActiveCamera()->SetFocalPoint(frontFrameAssy->GetPosition());
 }
 
 void MyQWhipple::MotionSetValues(int rowidx)
 {
    // do some nice memory managemen here to control the size of the array
-  for (uint i = 0; i < motionArrays.size(); i++) {
-    motionTable->SetValue(rowidx,i,bike->t);
-    motionTable->SetValue(rowidx,i,bike->q0);
-    motionTable->SetValue(rowidx,i,bike->q1);
-    motionTable->SetValue(rowidx,i,bike->q2);
-    motionTable->SetValue(rowidx,i,bike->q3);
-    motionTable->SetValue(rowidx,i,bike->q4);
-    motionTable->SetValue(rowidx,i,bike->q5);
-    motionTable->SetValue(rowidx,i,bike->q6);
-    motionTable->SetValue(rowidx,i,bike->q7);
-    motionTable->SetValue(rowidx,i,bike->u0);
-    motionTable->SetValue(rowidx,i,bike->u1);
-    motionTable->SetValue(rowidx,i,bike->u2);
-    motionTable->SetValue(rowidx,i,bike->u3);
-    motionTable->SetValue(rowidx,i,bike->u4);
-    motionTable->SetValue(rowidx,i,bike->u5);
-    motionTable->SetValue(rowidx,i,bike->no_fn[0]);
-    motionTable->SetValue(rowidx,i,bike->no_fn[1]);
-    motionTable->SetValue(rowidx,i,bike->no_fn[2]);
-    motionTable->SetValue(rowidx,i,bike->Rx);
-    motionTable->SetValue(rowidx,i,bike->Ry);
-    motionTable->SetValue(rowidx,i,bike->Rz);
-    motionTable->SetValue(rowidx,i,bike->Fx);
-    motionTable->SetValue(rowidx,i,bike->Fy);
-    motionTable->SetValue(rowidx,i,bike->Fz);
-    motionTable->SetValue(rowidx,i,bike->ke);
-    motionTable->SetValue(rowidx,i,bike->pe);
-    motionTable->SetValue(rowidx,i,bike->fa_yaw);
-    motionTable->SetValue(rowidx,i,bike->fa_lean);
-    motionTable->SetValue(rowidx,i,bike->fa_pitch);
-    motionTable->SetValue(rowidx,i,bike->constraints[0]);
-    motionTable->SetValue(rowidx,i,bike->constraints[1]);
-    motionTable->SetValue(rowidx,i,bike->constraints[2]);
+  for (uint i = 0; i < simArrays.size(); i++) {
+    simTable->SetValue(rowidx,i,bike->t);
+    simTable->SetValue(rowidx,i,bike->q0);
+    simTable->SetValue(rowidx,i,bike->q1);
+    simTable->SetValue(rowidx,i,bike->q2);
+    simTable->SetValue(rowidx,i,bike->q3);
+    simTable->SetValue(rowidx,i,bike->q4);
+    simTable->SetValue(rowidx,i,bike->q5);
+    simTable->SetValue(rowidx,i,bike->q6);
+    simTable->SetValue(rowidx,i,bike->q7);
+    simTable->SetValue(rowidx,i,bike->u0);
+    simTable->SetValue(rowidx,i,bike->u1);
+    simTable->SetValue(rowidx,i,bike->u2);
+    simTable->SetValue(rowidx,i,bike->u3);
+    simTable->SetValue(rowidx,i,bike->u4);
+    simTable->SetValue(rowidx,i,bike->u5);
+    simTable->SetValue(rowidx,i,bike->no_fn[0]);
+    simTable->SetValue(rowidx,i,bike->no_fn[1]);
+    simTable->SetValue(rowidx,i,bike->no_fn[2]);
+    simTable->SetValue(rowidx,i,bike->Rx);
+    simTable->SetValue(rowidx,i,bike->Ry);
+    simTable->SetValue(rowidx,i,bike->Rz);
+    simTable->SetValue(rowidx,i,bike->Fx);
+    simTable->SetValue(rowidx,i,bike->Fy);
+    simTable->SetValue(rowidx,i,bike->Fz);
+    simTable->SetValue(rowidx,i,bike->ke);
+    simTable->SetValue(rowidx,i,bike->pe);
+    simTable->SetValue(rowidx,i,bike->fa_yaw);
+    simTable->SetValue(rowidx,i,bike->fa_lean);
+    simTable->SetValue(rowidx,i,bike->fa_pitch);
+    simTable->SetValue(rowidx,i,bike->constraints[0]);
+    simTable->SetValue(rowidx,i,bike->constraints[1]);
+    simTable->SetValue(rowidx,i,bike->constraints[2]);
+    simTable->Update();
   }
+}
+
+vtkSmartPointer<vtkTable> MyQWhipple::GetSimTable()
+{
+  return simTable;
 }
 

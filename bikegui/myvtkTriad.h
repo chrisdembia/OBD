@@ -29,9 +29,6 @@
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 // obdgui
-#include "parameters.h"
-#include "mainwindow.h"
-
 
 class myvtkTriad
 {

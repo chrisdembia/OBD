@@ -63,7 +63,6 @@
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 #include "parameters.h"
-#include "mainwindow.h"
 
 #include <vtkPlaneSource.h>
 #include <vtkParametricFunctionSource.h>
@@ -98,7 +97,6 @@
 #include <vtkJPEGWriter.h>
 #include <vtkPostScriptWriter.h>
 
-#include "mainwindow.h"
 #include "myvtkTriad.h"
 
 
@@ -109,6 +107,7 @@ class MyQWhipple
   ~MyQWhipple();
   void MotionUpdate();
   Whipple* GetBike();
+  vtkSmartPointer<vtkTable> GetSimTable();
   void MotionSetValues(int rowidx);
 
   private:
@@ -255,10 +254,10 @@ class MyQWhipple
   vtkSmartPointer<vtkAssembly> frontWheelAssy;
   vtkSmartPointer<vtkTransform> frontWheelTransform;
   
-  // motion data
-  std::vector<std::string> motionVarNames;
-  vtkSmartPointer<vtkTable> motionTable;
-  std::vector<vtkSmartPointer<vtkFloatArray> > motionArrays;
+  // sim data
+  std::vector<std::string> simVarNames;
+  vtkSmartPointer<vtkTable> simTable;
+  std::vector<vtkSmartPointer<vtkFloatArray> > simArrays;
 };
 
 #endif

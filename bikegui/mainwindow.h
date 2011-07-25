@@ -31,6 +31,7 @@
 #include "parameters.h"
 #include "mainwindow.h"
 #include "myqwhipple.h"
+#include "myqsimtab.h"
 // obd
 #include "whipple.h"
 #include "whippleutils.h"
@@ -64,21 +65,16 @@ private slots:
   void about(void);
   void updateEigPlotSlot(void);
   void saveEigSlot(void);
-  void simulateSlot(void);
 
 private:
   // Member functions
-  void createActions(void);
-  void createDockWindows(void);
-  void createMenus(void);
-  void createStatusBar(void);
-  void createTabs(void);
-  void createUprightStabilityTab(void);
-  void createSteadyTurningTab(void);
-  void createMotionVisualizationTab(void);
-
-  // motion visualization
-  void drawTriad(void);
+  void initActions(void);
+  void initDockWindows(void);
+  void initMenus(void);
+  void initStatusBar(void);
+  void initTabs(void);
+  void initUprightStabilityTab(void);
+  void initSteadyTurningTab(void);
 
   // Menus
   QMenu *fileMenu;
@@ -102,7 +98,7 @@ private:
   // Tabs
   QWidget *uprightStabilityTab;
   QWidget *steadyTurningTab;
-  QWidget *motionVisualizationTab;
+  myQSimTab *simTab;
   
   // upright stability
   QLineEdit *saveEigFilenameEdit;
@@ -113,10 +109,8 @@ private:
 
   QVTKWidget *eigPlotQVTKW; 
 
-  // motion visualization
-  QVTKWidget *motionQVTKW; 
-  vtkSmartPointer<vtkRenderer> motionRenderer;
-  vtkSmartPointer<vtkRenderWindow> motionRenderWindow;
+  // sim visualization
+
   // Parameter widget
   WhippleParameter *paramWidget;
 

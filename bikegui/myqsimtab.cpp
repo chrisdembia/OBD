@@ -1,6 +1,8 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <QtGui>
+#include <QVTKWidget.h>
 // vtk sources
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
@@ -33,6 +35,12 @@
 #include <vtkMath.h>
 #include <vtkPolyData.h>
 #include <vtkCommand.h>
+// vtk plotting
+#include <vtkTable.h>
+#include <vtkContextView.h>
+#include <vtkContextScene.h>
+#include <vtkChartXY.h>
+#include <vtkPlot.h>
 
 #include <vtkWindowToImageFilter.h>
 //#include <vtkJPEGReader.h>
@@ -41,49 +49,94 @@
 
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+#define NMOTIONVARS 32
 
-#include "parameters.h"
-#include "mainwindow.h"
+#include "whipple.h"
+#include "myqsimtab.h"
+#include "myvtkTriad.h"
 #include "myqwhipple.h"
 
-
-void myQMotion::createMotionVisualizationTab(void)
+myQSimTab::myQSimTab(Whipple* b, QWidget *parent) : QWidget(parent)
 {
+  bike = b;
+  qbike1 = new MyQWhipple(simRenderer,bike);
+  simLSetBox = new QGroupBox("Parameters",this);
+  simLSetLayout = new QGridLayout(simLSetBox);
+//  QGroupBox* simRSetBox = new
+	simLayout = new QGridLayout(this);
 
-  QGroupBox *motionLSetBox = new QGroupBox("Parameters",motionVisualizationTab);
-  QGridLayout *motionLSetLayout = new QGridLayout(motionLSetBox);
-//  QGroupBox* motionRSetBox = new
-	QGridLayout *motionLayout = new QGridLayout(motionVisualizationTab);
+  simQVTKW = new QVTKWidget(this);
+//  simQVTKW->resize(256,256);
 
-  motionQVTKW = new QVTKWidget(uprightStabilityTab);
-//  motionQVTKW->resize(256,256);
-  motionLayout->addWidget(motionLSetBox,0,0);
-  motionLayout->addWidget(motionQVTKW,0,1);
-  motionVisualizationTab->setLayout(motionLayout);
+  // simLSetBox
+  label1 = new QLabel("test");
+  startsimButton = new QToolButton(simLSetBox);
+  startsimButton->setText("Start simulation");
+  connect(startsimButton, SIGNAL(clicked()), this, SLOT(startsimSlot()) );
 
-  // motionLSetBox
-  QLabel *label1 = new QLabel("test");
-  QToolButton* simulateButton = new QToolButton(motionLSetBox);
-  simulateButton->setText("Start simulation");
-  connect(simulateButton, SIGNAL(clicked()), this, SLOT(simulateSlot()) );
-
-  // motionLSetBox Widgets to motionLayout
-  motionLSetLayout->addWidget(label1);
-  motionLSetLayout->addWidget(simulateButton);
 
 // CAN HAVE MULTIPLE RENDERERS IN ONE RENDERWINDOW, DIFF BACKGROUNDS
 // AND CAMERA ANGLES
   // DELETE THE POINTERS DELEETE THE POINTERS!:w
 
   //setup window
-  motionRenderWindow = vtkRenderWindow::New();
+  simRenderWindow = vtkRenderWindow::New();
 
   //setup renderer
-  motionRenderer = vtkRenderer::New();
-  motionRenderWindow->AddRenderer(motionRenderer);
-  motionQVTKW->SetRenderWindow(motionRenderWindow);
+  simRenderer = vtkRenderer::New();
+  simRenderWindow->AddRenderer(simRenderer);
+  simQVTKW->SetRenderWindow(simRenderWindow);
   // USE CMAKE TO IDENTIFY TYPE OF COMPUTER? FOR VIDEO AVI OUTPUT
+
+  // plot
+  simPlotQVTKW = new QVTKWidget(this);
+  simPlotVTKView = vtkSmartPointer<vtkContextView>::New();
+  simPlotVTKView->SetInteractor(simPlotQVTKW->GetInteractor());
+  simPlotQVTKW->SetRenderWindow(simPlotVTKView->GetRenderWindow());
+  simPlotVTKChart = vtkSmartPointer<vtkChartXY>::New();
+  simPlotVTKView->GetScene()->AddItem(simPlotVTKChart);
+//  VTK_CREATE(vtkPlot,simPlotVTKLine);
+  vtkPlot* simPlotVTKLine;
+  for (int i = 0; i < NMOTIONVARS-1; i++) {
+    simPlotVTKLine = simPlotVTKChart->AddPlot(vtkChart::LINE);
+    simPlotVTKLine->SetInput(qbike1->GetSimTable(), 0, i+1);
+    simPlotVTKLine->SetColor(0,255,0,255);
+    // ideally, create 32 vtkPlot simPlotVTKLines
+
+  }
+
+  // arrange layouts
+  // simLSetBox Widgets to simLayout
+  simLSetLayout->addWidget(label1);
+  simLSetLayout->addWidget(startsimButton);
+  
+  simLayout->addWidget(simLSetBox,0,0);
+  simLayout->addWidget(simQVTKW,0,1);
+  simLayout->addWidget(simPlotQVTKW,1,0,1,2);
+  setLayout(simLayout);
+  
 }
+/* 
+ * need simPlotVTKView
+ * simPlotVTKChart
+ * simPlotVTKLine
+ * // QVTK QVTK QVTK QVTK 
+  eigPlotVTKTable->Update();
+  
+  // Add multiple line plots, setting the colors etc
+  vtkSmartPointer<vtkChartXY> eigPlotVTKChart = vtkSmartPointer<vtkChartXY>::New();
+  eigPlotVTKView->GetScene()->AddItem(eigPlotVTKChart);
+  vtkPlot *eigPlotVTKLine;
+
+  for (int i = 0; i < paramWidget->getNbikes(); i++)
+  {
+    for (int j = 0; j < 4; j++)
+    {
+      idx = j + i*paramWidget->getNbikes();
+      eigPlotVTKLine = eigPlotVTKChart->AddPlot(vtkChart::LINE);
+      eigPlotVTKLine->SetInput(eigPlotVTKTable, 0, j+1);
+      eigPlotVTKLine->SetColor(0, 255, 0, 255);
+  }*/
 
 class vtkTimerCallback2 : public vtkCommand
 {
@@ -109,7 +162,7 @@ class vtkTimerCallback2 : public vtkCommand
       }
 
       qbike->MotionUpdate();
-     // qbike->MotionSetValues(TimerCount);
+//      qbike->MotionSetValues(TimerCount);
       // render
       vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::SafeDownCast(caller);
       iren->GetRenderWindow()->Render();
@@ -134,7 +187,7 @@ class vtkTimerCallback2 : public vtkCommand
     double state[10];
 };
 
-void myQMotion::simulateSlot(void)
+void myQSimTab::startsimSlot(void)
 {
   // WHIPPLE CODE
   bike->evalConstants();
@@ -182,11 +235,11 @@ void myQMotion::simulateSlot(void)
   VTK_CREATE(vtkTextMapper,text1Mapper);
   VTK_CREATE(vtkActor2D,text1Actor2D);
     // CAN I LUMP TOGETHER DIFFERENT "SOURCES" INTO ONE ACTOR?"
-  motionRenderer->SetBackground(1,1,1);
-  motionRenderer->ResetCamera();
+  simRenderer->SetBackground(1,1,1);
+  simRenderer->ResetCamera();
 */
   // draw coordinate triad
-  myvtkTriad triad0(motionRenderer);
+  myvtkTriad triad0(simRenderer);
   // ground
   VTK_CREATE(vtkPlaneSource,groundSource);
   groundSource->SetNormal(0,0,-1);
@@ -199,24 +252,23 @@ void myQMotion::simulateSlot(void)
   groundActor->GetProperty()->SetColor(0,0,0);
   groundActor->GetProperty()->SetOpacity(0.5);
   // draw a bike
-  MyQWhipple *qbike1 = new MyQWhipple(motionRenderer,bike);
   qbike1->MotionUpdate();
 //  qbike1->MotionSetValues(0);
-  motionRenderer->SetBackground(.8,1,.8);
-  motionQVTKW->GetInteractor()->Initialize();
+  simRenderer->SetBackground(.8,1,.8);
+  simQVTKW->GetInteractor()->Initialize();
  
   VTK_CREATE(vtkWindowToImageFilter,w2i);
 //  VTK_CREATE(vtkJPEGWriter,writer);
   VTK_CREATE(vtkPostScriptWriter,writer);
-//  motionRenderWindow->SetAAFrames(2);
+//  simRenderWindow->SetAAFrames(2);
   // camera settings
-  motionRenderer->ResetCamera();
-  motionRenderer->AddActor(groundActor);
-  motionRenderer->GetActiveCamera()->SetPosition(0,1,-.5);
-  motionRenderer->GetActiveCamera()->SetViewUp(0,0,-1);
-//  motionRenderer->GetActiveCamera()->Elevation(-95);
+  simRenderer->ResetCamera();
+  simRenderer->AddActor(groundActor);
+  simRenderer->GetActiveCamera()->SetPosition(0,1,-.5);
+  simRenderer->GetActiveCamera()->SetViewUp(0,0,-1);
+//  simRenderer->GetActiveCamera()->Elevation(-95);
   // Render and interact
-  motionQVTKW->GetRenderWindow()->Render();
+  simQVTKW->GetRenderWindow()->Render();
  
   // Sign up to receive TimerEvent
   VTK_CREATE(vtkTimerCallback2,callback);
@@ -224,42 +276,22 @@ void myQMotion::simulateSlot(void)
   callback->SetState(state);
   callback->writer = writer;
   callback->w2i = w2i;
-  motionQVTKW->GetInteractor()->AddObserver(vtkCommand::TimerEvent, callback);
+  simQVTKW->GetInteractor()->AddObserver(vtkCommand::TimerEvent, callback);
  
-  int timerId = motionQVTKW->GetInteractor()->
+  int timerId = simQVTKW->GetInteractor()->
       CreateRepeatingTimer(1000/bike->fps);
   std::cout << "timerId: " << timerId << std::endl;
  
   // Start the interaction and timer
-  motionQVTKW->GetInteractor()->Start();
+  simQVTKW->GetInteractor()->Start();
 //  delete qbike1;
 
-  /*QTime simtime;
-  simtime.start();
-  int framectr = 0;
-  int frameswitch = 0;
-  int period = 1000/30; //bike->fps;
- // cylActor->RotateX(.01*framectr);
-  while (simtime.elapsed() < 10000)
-  {
-    if ( simtime.elapsed() % period < 1 && frameswitch == 0)
-    {
-      framectr++;
-      frameswitch = 1;
- //     rearWheelAssy->AddPosition(.01,0,0);
-//  motionRenderer->GetActiveCamera()->Elevation(.01*framectr);
-  //    rearTorusActor->
-//      motionRenderer->Render();
-      motionRenderer->ResetCamera();
-      motionQVTKW->GetRenderWindow()->Render();
-      std::cout << simtime.elapsed() << " fn " << framectr << std::endl;
-    }
-    if (simtime.elapsed() % period > 1)
-    {
-      frameswitch = 0;
-    }
-*/
 }
+void myQSimTab::updatePlotSlot(void)
+{
+}
+
+
 
 
 
