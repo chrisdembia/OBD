@@ -33,6 +33,7 @@
 #include "OBDConfig.h"
 
 #include "parameters.h"
+#include "myquprighttab.h"
 #include "mainwindow.h"
 #include "myqsimtab.h"
 
@@ -161,20 +162,19 @@ void MainWindow::initTabs(void)
 //  msgLabel = new QLabel;
 
   tabWidget = new QTabWidget();
-  uprightStabilityTab = new QWidget;
+  uprightTab = new MyQUprightTab(bike, tabWidget);
   steadyTurningTab = new QWidget;
   simTab = new myQSimTab(bike,tabWidget);
   
-  tabWidget->addTab( uprightStabilityTab, tr("Upright stability"));
+  tabWidget->addTab( uprightTab, tr("Upright stability"));
   tabWidget->addTab( steadyTurningTab, tr("Steady turning"));
   tabWidget->addTab( simTab, tr("Simulation"));
   /*
-  uprightStabilityTab->setParent(tabWidget);
+  uprightTab->setParent(tabWidget);
   steadyTurningWidget->setParent(tabWidget);
   simVisualizationWidget->setParent(tabWidget);
   */
   
-  initUprightStabilityTab();
   initSteadyTurningTab();
 }
 

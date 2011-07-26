@@ -33,13 +33,12 @@
 #include "whippleutils.h"
 #include "OBDConfig.h"
 
-#include "parameters.h"
-#include "mainwindow.h"
-#include "myqsimtab.h"
+#include "myquprighttab.h"
 
-MyQUprightTab::MyQUprightTab(void)
+MyQUprightTab::MyQUprightTab(Whipple* b, QWidget *parent) : QWidget(parent)
 {
 
+  bike = b;
   // upOpts is a structure for run parameters for upright stability eigenvalue plots
   upOpts.outfolder[0] = '\0';
   upOpts.N = 201;
@@ -47,10 +46,10 @@ MyQUprightTab::MyQUprightTab(void)
   upOpts.vi = 0.0;
   upOpts.vf = 10.0;  
   
-  QGridLayout *uprightSetLayout = new QGridLayout;
+  uprightSetLayout = new QGridLayout;
 //  uprightSetLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
   uprightSetLayout->setVerticalSpacing(0);  
-  QToolButton * updateEigButton = new QToolButton(uprightStabilityTab);
+  updateEigButton = new QToolButton(this);
   updateEigButton->setText( tr("Update eigenvalue plot") );
   connect(updateEigButton, SIGNAL(clicked()), this, SLOT(updateEigPlotSlot()) );
   uprightSetLayout->addWidget(updateEigButton,0,0);
@@ -60,7 +59,7 @@ MyQUprightTab::MyQUprightTab(void)
   uprightSetLayout->addWidget(new QLabel( tr("Save eigenvalue data"),0,0 ) );
   
   // Save button
-  QToolButton * saveEigButton = new QToolButton(uprightStabilityTab);
+  saveEigButton = new QToolButton(this);
   saveEigButton->setText( tr("Save Plot") );
   connect(saveEigButton, SIGNAL(clicked()), this, SLOT(saveEigSlot() ) );
   uprightSetLayout->addWidget(saveEigButton,0,1,Qt::AlignRight);
@@ -98,26 +97,25 @@ MyQUprightTab::MyQUprightTab(void)
   finalSpeedEdit->setAlignment(Qt::AlignRight);
   uprightSetLayout->addWidget(finalSpeedEdit,5,1);
 
-QGroupBox *uprightSetBox = new QGroupBox( tr("Settings") );
+uprightSetBox = new QGroupBox( tr("Settings") );
 
 uprightSetBox->setLayout(uprightSetLayout);
 uprightSetBox->setMaximumWidth(200);
  //QScrollArea *eigScroll = new QScrollArea;
  //eigScroll->setBackgroundRole(QPalette::Dark);
   
-QHBoxLayout *uprightTopLayout = new QHBoxLayout;
+uprightTopLayout = new QHBoxLayout;
     uprightTopLayout->addWidget(uprightSetBox);
   // QVTK set up and initialization
-  eigPlotQVTKW = new QVTKWidget(uprightStabilityTab);
+  eigPlotQVTKW = new QVTKWidget(this);
 //  chartView->GetWidget()->setMinimumSize(800,800);
 //        uprightTopLayout->addWidget(chartView->GetWidget());
 //QGroupBox *eigVTKBox = new QGroupBox( tr("heyyo") );
 //eigVTKBox->setLayout(eigPlotLayout);
     uprightTopLayout->addWidget(eigPlotQVTKW);  
-  uprightStabilityTab->setLayout(uprightTopLayout);
+  setLayout(uprightTopLayout);
 
 eigPlotQVTKW->setMinimumSize(500,200);
-//    return 0; for errors?
 }
 
 void MyQUprightTab::saveEigSlot(void)
@@ -133,37 +131,44 @@ void MyQUprightTab::saveEigSlot(void)
 void MyQUprightTab::updateEigPlotSlot(void)
 {
   // THIS STUFF BELOW IS MOSTLY COPIED
-  // Set up my 2D world...
-  VTK_CREATE(vtkContextView, eigPlotVTKView); // This contains a chart object
+eigPlotVTKView = vtkSmartPointer<vtkContextView>::New();
   eigPlotVTKView->SetInteractor(eigPlotQVTKW->GetInteractor());
   eigPlotQVTKW->SetRenderWindow(eigPlotVTKView->GetRenderWindow());
-  
-  // Create a table with some points in it...
-  VTK_CREATE(vtkTable, eigPlotVTKTable);
-  VTK_CREATE(vtkFloatArray, arrX);
+eigPlotVTKTable = vtkSmartPointer<vtkTable>::New();
+arrX = vtkSmartPointer<vtkFloatArray>::New();
   arrX->SetName("forward velocity (m/s)");
   eigPlotVTKTable->AddColumn(arrX);
-  
-//  int Nbikes = 1;
+//    return 0; for errors?
   int NeigPerBike = 4;
-  std::vector<std::string> bikenames(paramWidget->getNbikes()*NeigPerBike);
+  std::vector<std::string> bikenames(1*NeigPerBike);
   bikenames[0] = "eig1";
   bikenames[1] = "eig2";
   bikenames[2] = "eig3";
   bikenames[3] = "eig4";
 
-  std::vector< vtkSmartPointer<vtkFloatArray> > arrY(paramWidget->getNbikes()*NeigPerBike); 
+  arrY.resize(1*NeigPerBike);
   int idx;
-  for (int i = 0; i < paramWidget->getNbikes(); i++)
+  for (int i = 0; i < 1; i++)
   {
     for (int j = 0; j < 4; j++)
     {
-      idx = j + i*paramWidget->getNbikes();
+      idx = j + i*1;
       arrY[idx] = vtkSmartPointer<vtkFloatArray>::New();
       arrY[idx]->SetName(bikenames[j].c_str());
       eigPlotVTKTable->AddColumn(arrY[idx]);
     }
-  }   
+  }
+  eigPlotVTKChart = vtkSmartPointer<vtkChartXY>::New();
+  eigPlotVTKView->GetScene()->AddItem(eigPlotVTKChart);
+//  eigPlotQVTKW->GetInteractor()->Initialize();
+//  eigPlotQVTKW->GetInteractor()->Start();
+//  eigPlotQVTKW->GetRenderWindow()->Render();
+  eigPlotQVTKW->GetRenderWindow()->LineSmoothingOn();
+  // Set up my 2D world...
+
+  // Create a table with some points in it...
+
+//  int Nbikes = 1;
 
 // WHIPPLE WHIPPLE WHIPPLE WHIPPLE 
   std::string filename;
@@ -171,7 +176,7 @@ void MyQUprightTab::updateEigPlotSlot(void)
   upOpts.N = nEvalPointsEdit->text().toInt();
   upOpts.pitchguess = pitchGuessEdit->text().toDouble();
   upOpts.vi = initSpeedEdit->text().toDouble();
-  upOpts.vf = finalSpeedEdit->text().toDouble();  
+  upOpts.vf = finalSpeedEdit->text().toDouble();
 
 // TIME TO GRAB PARAMETERS FROM PARAMETER WIDGET!! must validate them, yo.
 
@@ -180,7 +185,7 @@ void MyQUprightTab::updateEigPlotSlot(void)
   bike->computeOutputs();
 
   // Write parameters
-  
+
   filename = upOpts.outfolder; filename += "eigenvalue_parameters.txt";
   bike->writeParameters(filename.c_str());
   // Write data record file. the function is orphaned from whipple.h currently
@@ -198,6 +203,7 @@ void MyQUprightTab::updateEigPlotSlot(void)
   bike->u3 = 0.0;
   bike->evalConstants();
 
+//  eigPlotQVTKW->GetRenderWindow()->Finalize();
   eigPlotVTKTable->SetNumberOfRows(upOpts.N);
   for (int i = 0; i < upOpts.N; ++i) {
     bike->u5 = -gsl_vector_get(speed, i)/(bike->rf+bike->rft);
@@ -221,24 +227,22 @@ void MyQUprightTab::updateEigPlotSlot(void)
   eigPlotVTKTable->Update();
   
   // Add multiple line plots, setting the colors etc
-  vtkSmartPointer<vtkChartXY> eigPlotVTKChart = vtkSmartPointer<vtkChartXY>::New();
-  eigPlotVTKView->GetScene()->AddItem(eigPlotVTKChart);
   vtkPlot *eigPlotVTKLine;
-
-  for (int i = 0; i < paramWidget->getNbikes(); i++)
+ // int idx = 0;
+  for (int i = 0; i < 1; i++)
   {
     for (int j = 0; j < 4; j++)
     {
-      idx = j + i*paramWidget->getNbikes();
+      idx = j + i*1;
       eigPlotVTKLine = eigPlotVTKChart->AddPlot(vtkChart::LINE);
       eigPlotVTKLine->SetInput(eigPlotVTKTable, 0, j+1);
       eigPlotVTKLine->SetColor(0, 255, 0, 255);
       eigPlotVTKLine->SetWidth(2.0);
     }
   }
-
   eigPlotQVTKW->GetInteractor()->Initialize();
   eigPlotQVTKW->GetInteractor()->Start();
+  eigPlotQVTKW->GetRenderWindow()->Render();
 
 
 

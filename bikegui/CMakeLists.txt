@@ -7,7 +7,8 @@ INCLUDE(${VTK_USE_FILE})
 include_directories(${PROJECT_SOURCE_DIR}/whipple/include)
 set(obdgui_sources main.cpp mainwindow.cpp parameters.cpp
     myqsimtab.cpp myqwhipple.cpp myvtkTriad.cpp myquprighttab.cpp)
-set(obdgui_headers mainwindow.h parameters.h myqsimtab.h myqwhipple.h
+set(obdgui_headers mainwindow.h parameters.h myqsimtab.h myquprighttab.h
+    myqwhipple.h
     myvtkTriad.h)
 
 qt4_wrap_cpp(obdgui_headers_moc ${obdgui_headers})

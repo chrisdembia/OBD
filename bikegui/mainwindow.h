@@ -31,6 +31,7 @@
 #include "parameters.h"
 #include "mainwindow.h"
 #include "myqwhipple.h"
+#include "myquprighttab.h"
 #include "myqsimtab.h"
 // obd
 #include "whipple.h"
@@ -45,12 +46,6 @@ class WhippleParameter;
 class Button;
 // class QVTKWidget;
 
-struct uprightOptions {
-  std::string outfolder;
-  double pitchguess;
-  int N; // number of points on plot (linspace between velocities)
-  double vi, vf; // initial and final velocity
-} ;
 
 class MainWindow : public QMainWindow
 {
@@ -63,8 +58,6 @@ public:
   
 private slots:
   void about(void);
-  void updateEigPlotSlot(void);
-  void saveEigSlot(void);
 
 private:
   // Member functions
@@ -73,7 +66,6 @@ private:
   void initMenus(void);
   void initStatusBar(void);
   void initTabs(void);
-  void initUprightStabilityTab(void);
   void initSteadyTurningTab(void);
 
   // Menus
@@ -96,18 +88,10 @@ private:
   QTabWidget *tabWidget;
   
   // Tabs
-  QWidget *uprightStabilityTab;
+  MyQUprightTab* uprightTab;
   QWidget *steadyTurningTab;
   myQSimTab *simTab;
   
-  // upright stability
-  QLineEdit *saveEigFilenameEdit;
-  QLineEdit *nEvalPointsEdit;
-  QLineEdit *pitchGuessEdit;
-  QLineEdit *initSpeedEdit;
-  QLineEdit *finalSpeedEdit;
-
-  QVTKWidget *eigPlotQVTKW; 
 
   // sim visualization
 
