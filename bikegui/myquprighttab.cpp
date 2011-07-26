@@ -37,7 +37,7 @@
 #include "mainwindow.h"
 #include "myqsimtab.h"
 
-void MainWindow::initUprightStabilityTab(void)
+MyQUprightTab::MyQUprightTab(void)
 {
 
   // upOpts is a structure for run parameters for upright stability eigenvalue plots
@@ -120,7 +120,7 @@ eigPlotQVTKW->setMinimumSize(500,200);
 //    return 0; for errors?
 }
 
-void MainWindow::saveEigSlot(void)
+void MyQUprightTab::saveEigSlot(void)
 {
   /*QFileDialog *saveEigDirDial = new QFileDialog(uprightStabilityTab);
   saveEigDirDial->setFileMode(QFileDialog::Directory);
@@ -130,7 +130,7 @@ void MainWindow::saveEigSlot(void)
 
 }
 
-void MainWindow::updateEigPlotSlot(void)
+void MyQUprightTab::updateEigPlotSlot(void)
 {
   // THIS STUFF BELOW IS MOSTLY COPIED
   // Set up my 2D world...

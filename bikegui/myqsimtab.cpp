@@ -117,6 +117,7 @@ myQSimTab::myQSimTab(Whipple* b, QWidget *parent) : QWidget(parent)
   }
 
   simCallback->plotrenwin = simPlotQVTKW->GetRenderWindow();
+  simCallback->simPlotQVTKW = simPlotQVTKW;
   // arrange layouts
   // simLSetBox Widgets to simLayout
   simLSetLayout->addWidget(label1);
@@ -220,8 +221,6 @@ void myQSimTab::startsimSlot(void)
   // Start the interaction and timer
   simQVTKW->GetInteractor()->Start();
 //  delete qbike1;
-  simPlotQVTKW->GetInteractor()->Initialize();
-  simPlotQVTKW->GetInteractor()->Start();
 
 }
 

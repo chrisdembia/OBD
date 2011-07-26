@@ -83,8 +83,12 @@ class vtkTimerCallback2 : public vtkCommand
 
       qbike->MotionUpdate();
       qbike->MotionSetValues(TimerCount);
+      if (TimerCount == 100) {
+  simPlotQVTKW->GetInteractor()->Initialize();
+  simPlotQVTKW->GetInteractor()->Start();
       plotrenwin->Render();
-      std::cout << "simtableval" << qbike->GetSimTable()->GetValue(TimerCount,0) << std::endl;
+      }
+      std::cout << "simtableval" << qbike->GetSimTable()->GetValue(TimerCount,1) << std::endl;
       // render
       vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::SafeDownCast(caller);
       iren->GetRenderWindow()->Render();
@@ -104,6 +108,7 @@ class vtkTimerCallback2 : public vtkCommand
     vtkSmartPointer<vtkPostScriptWriter> writer;
     vtkSmartPointer<vtkWindowToImageFilter> w2i;
     vtkSmartPointer<vtkRenderWindow> plotrenwin;
+    QVTKWidget* simPlotQVTKW;
   private:
     int TimerCount;
     double time;
