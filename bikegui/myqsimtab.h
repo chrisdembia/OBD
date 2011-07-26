@@ -76,13 +76,13 @@ class vtkTimerCallback2 : public vtkCommand
       }
       std::cout << this->TimerCount << std::endl;
       // UPDATE
-      time = (double)TimerCount/(double)qbike->GetBike()->fps; 
-      while (qbike->GetBike()->t < time) {
-        qbike->GetBike()->evolve(time,state);
+      time = (double)TimerCount/(double)qbike->getBike()->fps; 
+      while (qbike->getBike()->t < time) {
+        qbike->getBike()->evolve(time,state);
       }
 
-      qbike->MotionUpdate();
-      qbike->MotionSetValues(TimerCount);
+      qbike->SimUpdate();
+      qbike->SimSetValues(TimerCount);
       if (TimerCount == 100) {
   simPlotQVTKW->GetInteractor()->Initialize();
   simPlotQVTKW->GetInteractor()->Start();
@@ -120,7 +120,7 @@ class myQSimTab : public QWidget
   Q_OBJECT;
 
   public:
-  myQSimTab(std::vector<MyQWhipple*>* qb, Whipple* b, QWidget*parent);
+  myQSimTab(std::vector<MyQWhipple*>* qb, QWidget*parent = 0);
 
   private slots:
   void startsimSlot(void);
@@ -128,8 +128,6 @@ class myQSimTab : public QWidget
   void updatePlotSlot(void);
 
   private:
-  Whipple* bike;
-  MyQWhipple* qbike1;
   std::vector<MyQWhipple*>* qbikes;
 
   QGroupBox *simLSetBox;

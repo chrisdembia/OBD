@@ -6,14 +6,13 @@
 #include "parameters.h"
 #include "myqwhipple.h"
 
-WhippleParameter::WhippleParameter(std::vector<MyQWhipple*>* qb, Whipple *b, QWidget *parent)
+WhippleParameter::WhippleParameter(std::vector<MyQWhipple*>* qb, QWidget *parent)
   : QWidget(parent)
 {
 
   // bring the bike pointer(s) from mainwindow over to parameters.
-  Nbikes = 1;
-  bike = b;
   qbikes = qb;
+  qbikes->push_back( new MyQWhipple("bike1") );
 
   initBikeBox();
 
@@ -37,10 +36,12 @@ WhippleParameter::WhippleParameter(std::vector<MyQWhipple*>* qb, Whipple *b, QWi
   initParamBox();
   drawGyroParamBox();
     
-  connect(paramComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT( paramBoxSlot(int)) );
+  connect(paramComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(
+        paramBoxSlot(int)) );
 }
 
-void WhippleParameter::initBikeBox() {
+void WhippleParameter::initBikeBox()
+{
 //  bikeComboBox = new QComboBox(
 }
 
@@ -395,7 +396,8 @@ void WhippleParameter::sendMeijParamToBike()
     convertParameters( gswptemptemp, mjwptemp);
     try
     {
-      validparameters = bike->setParameters( gswptemptemp, true);
+      validparameters = qbikes->at(0)->getBike()->setParameters( gswptemptemp,
+          true);
     }
     catch (...)
     {
@@ -540,7 +542,7 @@ void WhippleParameter::sendGyroParamToBike()
   bool validparameters = false;
   try
   {  // NOTE: QT WILL NOT CATCH EXCEPTIONS FOR US, SO ALL EXCEPTION-THROWING CODE MUST BE IN MY OWN TRY..CATCH
-    validparameters = bike->setParameters( gswptemp, true);
+    validparameters = qbikes->at(0)->getBike()->setParameters( gswptemp, true);
   }
   catch (const char * errmsg)
   {
@@ -581,7 +583,8 @@ void WhippleParameter::gyroSaveSlot()
     gyroSaveAsSlot();
   }
   else {
-  bike->writeParameters( gyrofdirname.toStdString().c_str() );
+  qbikes->at(0)->getBike()->writeParameters( gyrofdirname.toStdString().c_str()
+      );
   }
 }
 
@@ -592,7 +595,8 @@ void WhippleParameter::gyroSaveAsSlot()
   if (!fdirname.isEmpty())
   {
     gyrofdirname = fdirname;
-    bike->writeParameters( gyrofdirname.toStdString().c_str() );
+    qbikes->at(0)->getBike()->writeParameters(
+        gyrofdirname.toStdString().c_str() );
     QFontMetrics qfm1(font());
     gyroFileLabel->setText("<b>" + qfm1.elidedText(gyrofdirname,Qt::ElideLeft,int(.9*gyroFileLabel->width())) + "</b>");
   }
@@ -687,11 +691,6 @@ void WhippleParameter::defineGyroStrings()
     gyroParamToolTips[i] = "EDIT";
   }
 } 
-
-int WhippleParameter::getNbikes()
-{
-  return Nbikes;
-}
 
 
 

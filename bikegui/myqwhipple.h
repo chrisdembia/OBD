@@ -105,10 +105,10 @@ class MyQWhipple
   public:
   MyQWhipple(std::string);
   ~MyQWhipple();
-  void MotionUpdate();
-  Whipple* GetBike();
+  void SimUpdate();
+  Whipple* getBike();
   vtkSmartPointer<vtkTable> GetSimTable();
-  void MotionSetValues(int rowidx);
+  void SimSetValues(int rowidx);
   void initSim(vtkSmartPointer<vtkRenderer> ren);
 
   private:

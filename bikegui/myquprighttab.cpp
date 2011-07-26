@@ -35,10 +35,9 @@
 
 #include "myquprighttab.h"
 
-MyQUprightTab::MyQUprightTab(std::vector<MyQWhipple*>* qb, Whipple* b, QWidget *parent) : QWidget(parent)
+MyQUprightTab::MyQUprightTab(std::vector<MyQWhipple*>* qb, QWidget *parent) : QWidget(parent)
 {
 
-  bike = b;
   qbikes = qb;
   // upOpts is a structure for run parameters for upright stability eigenvalue plots
   upOpts.outfolder[0] = '\0';
@@ -132,7 +131,7 @@ void MyQUprightTab::saveEigSlot(void)
 void MyQUprightTab::updateEigPlotSlot(void)
 {
   // THIS STUFF BELOW IS MOSTLY COPIED
-eigPlotVTKView = vtkSmartPointer<vtkContextView>::New();
+  eigPlotVTKView = vtkSmartPointer<vtkContextView>::New();
   eigPlotVTKView->SetInteractor(eigPlotQVTKW->GetInteractor());
   eigPlotQVTKW->SetRenderWindow(eigPlotVTKView->GetRenderWindow());
 eigPlotVTKTable = vtkSmartPointer<vtkTable>::New();
@@ -181,14 +180,14 @@ arrX = vtkSmartPointer<vtkFloatArray>::New();
 
 // TIME TO GRAB PARAMETERS FROM PARAMETER WIDGET!! must validate them, yo.
 
-  bike->evalConstants();
-  bike->eoms();
-  bike->computeOutputs();
+  qbikes->at(0)->getBike()->evalConstants();
+  qbikes->at(0)->getBike()->eoms();
+  qbikes->at(0)->getBike()->computeOutputs();
 
   // Write parameters
 
   filename = upOpts.outfolder; filename += "eigenvalue_parameters.txt";
-  bike->writeParameters(filename.c_str());
+  qbikes->at(0)->getBike()->writeParameters(filename.c_str());
   // Write data record file. the function is orphaned from whipple.h currently
   // allows the evaluation of data by python
 //  filename = upOpts.outfolder; filename += "eval_record.py";
@@ -200,25 +199,25 @@ arrX = vtkSmartPointer<vtkFloatArray>::New();
   // Vector to store range of speeds to calculate eigenvalues
   gsl_vector * speed = linspaceN( upOpts.vi, upOpts.vf, upOpts.N);
 
-  bike->u1 = 0.0;
-  bike->u3 = 0.0;
-  bike->evalConstants();
+  qbikes->at(0)->getBike()->u1 = 0.0;
+  qbikes->at(0)->getBike()->u3 = 0.0;
+  qbikes->at(0)->getBike()->evalConstants();
 
 //  eigPlotQVTKW->GetRenderWindow()->Finalize();
   eigPlotVTKTable->SetNumberOfRows(upOpts.N);
   for (int i = 0; i < upOpts.N; ++i) {
-    bike->u5 = -gsl_vector_get(speed, i)/(bike->rf+bike->rft);
-    bike->calcEvals();
+    qbikes->at(0)->getBike()->u5 = -gsl_vector_get(speed,
+        i)/(qbikes->at(0)->getBike()->rf+qbikes->at(0)->getBike()->rft);
+    qbikes->at(0)->getBike()->calcEvals();
     OutputFile << *gsl_vector_ptr(speed,i);
     eigPlotVTKTable->SetValue(i, 0, *gsl_vector_ptr(speed,i) );
     for (int j = 0; j < 4; ++j)
     {
-      OutputFile << " " << bike->fourValues[j];
-      eigPlotVTKTable->SetValue(i, j+1, bike->fourValues[j]);
+      OutputFile << " " << qbikes->at(0)->getBike()->fourValues[j];
+      eigPlotVTKTable->SetValue(i, j+1,
+          qbikes->at(0)->getBike()->fourValues[j]);
     }
     OutputFile << std::endl;
-//    OutputFile.write((char *) gsl_vector_ptr(speed, i), sizeof(double));
-//    OutputFile.write((char *) bike->fourValues, 4*sizeof(double));  
   } // for i
 
 

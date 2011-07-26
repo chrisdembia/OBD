@@ -48,8 +48,7 @@ class MyQUprightTab : public QWidget
   Q_OBJECT;
 
   public:
-    MyQUprightTab(std::vector<MyQWhipple*>* qb, Whipple* b, QWidget *parent);
-//    MyQWhipple* qbikes;
+    MyQUprightTab(std::vector<MyQWhipple*>* qb, QWidget *parent = 0);
 // bike
   private slots:
 
@@ -57,7 +56,6 @@ class MyQUprightTab : public QWidget
     void saveEigSlot(void);
 
   private:
-    Whipple *bike;
     std::vector<MyQWhipple*>* qbikes;
   // upOpts is a structure for run parameters for upright stability eigenvalue plots
   uprightOptions upOpts;

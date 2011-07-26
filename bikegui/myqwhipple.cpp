@@ -235,7 +235,7 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren)
   // source
   frontConeRightSource = vtkConeSource::New();
   frontConeRightSource->SetHeight(hubhalfwidth);
-  frontConeRightSource->SetRadius(bike->rr);
+  frontConeRightSource->SetRadius(bike->rf);
   frontConeRightSource->SetResolution(100);
   frontConeRightSource->Update();
   // transform
@@ -259,7 +259,7 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren)
   // source
   frontConeLeftSource = vtkConeSource::New();
   frontConeLeftSource->SetHeight(hubhalfwidth);
-  frontConeLeftSource->SetRadius(bike->rr);
+  frontConeLeftSource->SetRadius(bike->rf);
   frontConeLeftSource->SetResolution(100);
   frontConeLeftSource->Update();
   // transform
@@ -284,8 +284,8 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren)
   // source
   frontTorusSource = vtkParametricFunctionSource::New();
   frontTorusSource->SetParametricFunction(frontTorus);
-  frontTorus->SetRingRadius(bike->rr);
-  frontTorus->SetCrossSectionRadius(bike->rrt);
+  frontTorus->SetRingRadius(bike->rf);
+  frontTorus->SetCrossSectionRadius(bike->rft);
   frontTorusSource->Update();
   // transform
   frontTorusTransform = vtkTransform::New();
@@ -392,12 +392,12 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren)
   simTable->SetNumberOfRows(100);
 }
 
-Whipple* MyQWhipple::GetBike()
+Whipple* MyQWhipple::getBike()
 {
   return bike;
 }
 
-void MyQWhipple::MotionUpdate()
+void MyQWhipple::SimUpdate()
 {
   double YAW = bike->q0;
   double LEAN = bike->q1;
@@ -480,7 +480,7 @@ void MyQWhipple::MotionUpdate()
 //  simRenderer->GetActiveCamera()->SetFocalPoint(frontFrameAssy->GetPosition());
 }
 
-void MyQWhipple::MotionSetValues(int rowidx)
+void MyQWhipple::SimSetValues(int rowidx)
 {
    // do some nice memory managemen here to control the size of the array
   //simTable->InsertNextBlankRow();

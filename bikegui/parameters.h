@@ -20,9 +20,8 @@ public:
   /**
    * Constructor for the GUI's left panel for parameter inputs.
    * */
-  WhippleParameter(std::vector<MyQWhipple*>* qb, Whipple * b, QWidget *parent = 0);
+  WhippleParameter(std::vector<MyQWhipple*>* qb, QWidget *parent = 0);
 
-  int getNbikes();
 private slots:
   /**
    *
@@ -110,14 +109,8 @@ private:
   /**
    * Pointer to a whipple bike created in the MainWindow class. We have a pointer here so that we can modify the parameters that the bicycle(s) use(s).
    * */
-  Whipple * bike;
 
   std::vector<MyQWhipple*>* qbikes;
-
-  /**
-   *
-   * */
-  int Nbikes;  
 
   // Gyrostat parameter stuffs
 

@@ -57,9 +57,9 @@
 #include "myqwhipple.h"
 
 
-myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, Whipple* b, QWidget *parent) : QWidget(parent)
+myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
+  QWidget(parent)
 {
-  bike = b;
   qbikes = qb;
   simLSetBox = new QGroupBox("Parameters",this);
   simLSetLayout = new QGridLayout(simLSetBox);
@@ -90,11 +90,10 @@ myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, Whipple* b, QWidget *parent) 
   simRenderWindow->AddRenderer(simRenderer);
   simQVTKW->SetRenderWindow(simRenderWindow);
   // USE CMAKE TO IDENTIFY TYPE OF COMPUTER? FOR VIDEO AVI OUTPUT
-  qbike1 = new MyQWhipple("bike1",bike);
-  qbike1->initSim(simRenderer);
+  qbikes->at(0)->initSim(simRenderer);
 
   simCallback = vtkSmartPointer<vtkTimerCallback2>::New();
-  simCallback->qbike = qbike1;
+  simCallback->qbike = qbikes->at(0);
   simQVTKW->GetInteractor()->AddObserver(vtkCommand::TimerEvent, simCallback);
 //  VTK_CREATE(vtkWindowToImageFilter,w2i);
 //  VTK_CREATE(vtkJPEGWriter,writer);
@@ -115,7 +114,7 @@ myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, Whipple* b, QWidget *parent) 
   vtkPlot* simPlotVTKLine;
   for (int i = 1; i < NMOTIONVARS; i++) {
     simPlotVTKLine = simPlotVTKChart->AddPlot(vtkChart::LINE);
-    simPlotVTKLine->SetInput(qbike1->GetSimTable(), 0, i);
+    simPlotVTKLine->SetInput(qbikes->at(0)->GetSimTable(), 0, i);
     simPlotVTKLine->SetColor(255,0,0,255);
     // ideally, create 32 vtkPlot simPlotVTKLines
 
@@ -140,28 +139,19 @@ myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, Whipple* b, QWidget *parent) 
 void myQSimTab::startsimSlot(void)
 {
   // WHIPPLE CODE
-  bike->evalConstants();
-  bike->eoms();
-  bike->computeOutputs();
-  double state[10] = {bike->q0, bike->q1, bike->q3, bike->q4, bike->q5,
-                          bike->q6, bike->q7, bike->u1, bike->u3, bike->u5};
+  qbikes->at(0)->getBike()->evalConstants();
+  qbikes->at(0)->getBike()->eoms();
+  qbikes->at(0)->getBike()->computeOutputs();
+  double state[10] = {qbikes->at(0)->getBike()->q0,
+    qbikes->at(0)->getBike()->q1, qbikes->at(0)->getBike()->q3,
+    qbikes->at(0)->getBike()->q4, qbikes->at(0)->getBike()->q5,
+    qbikes->at(0)->getBike()->q6, qbikes->at(0)->getBike()->q7,
+    qbikes->at(0)->getBike()->u1, qbikes->at(0)->getBike()->u3,
+    qbikes->at(0)->getBike()->u5};
   std::string outfolder = "";
   std::string filename = outfolder; filename += "simulation.dat";
-  std::ofstream OutputFile(filename.c_str(), std::ios::binary);
-/*
-  OutputFile << bike;
-  double tj, state[10] = {bike->q0, bike->q1, bike->q3, bike->q4, bike->q5,
-                          bike->q6, bike->q7, bike->u1, bike->u3, bike->u5};
-
-  for (int j = 1; j < bike->fps*bike->tf + 1; ++j) {
-    tj = ((double) j) / ((double) bike->fps);
-    while (bike->t < tj)
-      bike->evolve(tj, state);
-    bike->computeOutputs();
-    OutputFile << bike;
-  } // for j
-*/
-  OutputFile.close();
+//  std::ofstream OutputFile(filename.c_str(), std::ios::binary);
+//  OutputFile.close();
   std::cout << "Simulation completed. Simulation output written to "
     << outfolder << '\n';
 /*
@@ -202,8 +192,8 @@ void myQSimTab::startsimSlot(void)
   groundActor->GetProperty()->SetColor(0,0,0);
   groundActor->GetProperty()->SetOpacity(0.5);
   // draw a bike
-  qbike1->MotionUpdate();
-//  qbike1->MotionSetValues(0);
+  qbikes->at(0)->SimUpdate();
+//  qbikes->at(0)->SimSetValues(0);
   simRenderer->SetBackground(.8,1,.8);
   simQVTKW->GetInteractor()->Initialize();
  
@@ -221,12 +211,12 @@ void myQSimTab::startsimSlot(void)
 //  simCallback->w2i = w2i;
  
   int timerId = simQVTKW->GetInteractor()->
-      CreateRepeatingTimer(1000/bike->fps);
+      CreateRepeatingTimer(1000/qbikes->at(0)->getBike()->fps);
   std::cout << "timerId: " << timerId << std::endl;
  
   // Start the interaction and timer
   simQVTKW->GetInteractor()->Start();
-//  delete qbike1;
+//  delete qbikes->at(0);
 
 }
 

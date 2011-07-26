@@ -48,7 +48,6 @@ MainWindow::MainWindow()
   setWindowTitle(tr("Open Bicycle Dynamics"));
 
   // Allocate space for a Whipple object
-  bike = new Whipple();
   qbikes = new std::vector<MyQWhipple*>;
 
   // Set version string
@@ -130,7 +129,7 @@ void MainWindow::initDockWindows(void)
   QDockWidget *dock = new QDockWidget(tr("Bike Definitions"));
   dock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
   addDockWidget(Qt::LeftDockWidgetArea, dock);
-  paramWidget = new WhippleParameter(qbikes, bike, dock);
+  paramWidget = new WhippleParameter(qbikes, dock);
   dock->setWidget(paramWidget);
   
 }
@@ -164,9 +163,9 @@ void MainWindow::initTabs(void)
 //  msgLabel = new QLabel;
 
   tabWidget = new QTabWidget();
-  uprightTab = new MyQUprightTab(qbikes, bike, tabWidget);
+  uprightTab = new MyQUprightTab(qbikes, tabWidget);
   steadyTurningTab = new QWidget;
-  simTab = new myQSimTab(qbikes, bike,tabWidget);
+  simTab = new myQSimTab(qbikes,tabWidget);
   
   tabWidget->addTab( uprightTab, tr("Upright stability"));
   tabWidget->addTab( steadyTurningTab, tr("Steady turning"));
