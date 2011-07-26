@@ -1,16 +1,19 @@
 #include <string>
+#include <vector>
 #include <QtGui>
 #include "whipple.h"
 #include "whippleutils.h"
 #include "parameters.h"
+#include "myqwhipple.h"
 
-WhippleParameter::WhippleParameter( Whipple *b, QWidget *parent)
+WhippleParameter::WhippleParameter(std::vector<MyQWhipple*>* qb, Whipple *b, QWidget *parent)
   : QWidget(parent)
 {
 
   // bring the bike pointer(s) from mainwindow over to parameters.
   Nbikes = 1;
   bike = b;
+  qbikes = qb;
 
   initBikeBox();
 

@@ -57,9 +57,10 @@
 #include "myqwhipple.h"
 
 
-myQSimTab::myQSimTab(Whipple* b, QWidget *parent) : QWidget(parent)
+myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, Whipple* b, QWidget *parent) : QWidget(parent)
 {
   bike = b;
+  qbikes = qb;
   simLSetBox = new QGroupBox("Parameters",this);
   simLSetLayout = new QGridLayout(simLSetBox);
 //  QGroupBox* simRSetBox = new
@@ -74,6 +75,9 @@ myQSimTab::myQSimTab(Whipple* b, QWidget *parent) : QWidget(parent)
   startsimButton->setText("Start simulation");
   connect(startsimButton, SIGNAL(clicked()), this, SLOT(startsimSlot()) );
 
+  stopsimButton = new QToolButton(simLSetBox);
+  stopsimButton->setText("Stop simulation");
+  connect(stopsimButton, SIGNAL(clicked()), this, SLOT(stopsimSlot()));
 
 // CAN HAVE MULTIPLE RENDERERS IN ONE RENDERWINDOW, DIFF BACKGROUNDS
 // AND CAMERA ANGLES
@@ -86,7 +90,8 @@ myQSimTab::myQSimTab(Whipple* b, QWidget *parent) : QWidget(parent)
   simRenderWindow->AddRenderer(simRenderer);
   simQVTKW->SetRenderWindow(simRenderWindow);
   // USE CMAKE TO IDENTIFY TYPE OF COMPUTER? FOR VIDEO AVI OUTPUT
-  qbike1 = new MyQWhipple(simRenderer,bike);
+  qbike1 = new MyQWhipple("bike1",bike);
+  qbike1->initSim(simRenderer);
 
   simCallback = vtkSmartPointer<vtkTimerCallback2>::New();
   simCallback->qbike = qbike1;
@@ -122,6 +127,7 @@ myQSimTab::myQSimTab(Whipple* b, QWidget *parent) : QWidget(parent)
   // simLSetBox Widgets to simLayout
   simLSetLayout->addWidget(label1);
   simLSetLayout->addWidget(startsimButton);
+  simLSetLayout->addWidget(stopsimButton);
   
   simLayout->addWidget(simLSetBox,0,0);
   simLayout->addWidget(simQVTKW,0,1);
@@ -222,6 +228,11 @@ void myQSimTab::startsimSlot(void)
   simQVTKW->GetInteractor()->Start();
 //  delete qbike1;
 
+}
+
+void myQSimTab::stopsimSlot(void)
+{
+  simQVTKW->GetInteractor()->DestroyTimer();
 }
 
 void myQSimTab::updatePlotSlot(void)

@@ -32,9 +32,10 @@
 #include "whippleutils.h"
 #include "OBDConfig.h"
 
-#include "parameters.h"
-#include "myquprighttab.h"
 #include "mainwindow.h"
+#include "parameters.h"
+#include "myqwhipple.h"
+#include "myquprighttab.h"
 #include "myqsimtab.h"
 
 std::ostream &operator<<(std::ostream &outfile, const Whipple * discs);
@@ -48,6 +49,7 @@ MainWindow::MainWindow()
 
   // Allocate space for a Whipple object
   bike = new Whipple();
+  qbikes = new std::vector<MyQWhipple*>;
 
   // Set version string
   versionString = QString(tr("Version %1.%2 commit %3"))
@@ -128,7 +130,7 @@ void MainWindow::initDockWindows(void)
   QDockWidget *dock = new QDockWidget(tr("Bike Definitions"));
   dock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
   addDockWidget(Qt::LeftDockWidgetArea, dock);
-  paramWidget = new WhippleParameter(bike, dock);
+  paramWidget = new WhippleParameter(qbikes, bike, dock);
   dock->setWidget(paramWidget);
   
 }
@@ -162,9 +164,9 @@ void MainWindow::initTabs(void)
 //  msgLabel = new QLabel;
 
   tabWidget = new QTabWidget();
-  uprightTab = new MyQUprightTab(bike, tabWidget);
+  uprightTab = new MyQUprightTab(qbikes, bike, tabWidget);
   steadyTurningTab = new QWidget;
-  simTab = new myQSimTab(bike,tabWidget);
+  simTab = new myQSimTab(qbikes, bike,tabWidget);
   
   tabWidget->addTab( uprightTab, tr("Upright stability"));
   tabWidget->addTab( steadyTurningTab, tr("Steady turning"));

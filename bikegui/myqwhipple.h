@@ -62,7 +62,6 @@
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
-#include "parameters.h"
 
 #include <vtkPlaneSource.h>
 #include <vtkParametricFunctionSource.h>
@@ -97,21 +96,24 @@
 #include <vtkJPEGWriter.h>
 #include <vtkPostScriptWriter.h>
 
+#include "whipple.h"
 #include "myvtkTriad.h"
 
 
 class MyQWhipple
 {
   public:
-  MyQWhipple(vtkSmartPointer<vtkRenderer>,Whipple*);
+  MyQWhipple(std::string,Whipple*);
   ~MyQWhipple();
   void MotionUpdate();
   Whipple* GetBike();
   vtkSmartPointer<vtkTable> GetSimTable();
   void MotionSetValues(int rowidx);
+  void initSim(vtkSmartPointer<vtkRenderer> ren);
 
   private:
-  vtkSmartPointer<vtkRenderer> renderer;
+  std::string name;
+  vtkSmartPointer<vtkRenderer> simRenderer;
   Whipple* bike;
   // rear wheel: two cones and a torus
   // rear cone right

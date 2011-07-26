@@ -3,8 +3,10 @@
 
 #define NMEIJPARAMS 29
 #define NGYROPARAMS 24
+#include <vector>
 #include <QtGui>
 #include "whipple.h"
+#include "myqwhipple.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -18,7 +20,7 @@ public:
   /**
    * Constructor for the GUI's left panel for parameter inputs.
    * */
-  WhippleParameter(Whipple * b, QWidget *parent = 0);
+  WhippleParameter(std::vector<MyQWhipple*>* qb, Whipple * b, QWidget *parent = 0);
 
   int getNbikes();
 private slots:
@@ -109,6 +111,8 @@ private:
    * Pointer to a whipple bike created in the MainWindow class. We have a pointer here so that we can modify the parameters that the bicycle(s) use(s).
    * */
   Whipple * bike;
+
+  std::vector<MyQWhipple*>* qbikes;
 
   /**
    *

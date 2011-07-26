@@ -35,10 +35,11 @@
 
 #include "myquprighttab.h"
 
-MyQUprightTab::MyQUprightTab(Whipple* b, QWidget *parent) : QWidget(parent)
+MyQUprightTab::MyQUprightTab(std::vector<MyQWhipple*>* qb, Whipple* b, QWidget *parent) : QWidget(parent)
 {
 
   bike = b;
+  qbikes = qb;
   // upOpts is a structure for run parameters for upright stability eigenvalue plots
   upOpts.outfolder[0] = '\0';
   upOpts.N = 201;
@@ -170,7 +171,7 @@ arrX = vtkSmartPointer<vtkFloatArray>::New();
 
 //  int Nbikes = 1;
 
-// WHIPPLE WHIPPLE WHIPPLE WHIPPLE 
+// WHIPPLE WHIPPLE WHIPPLE WHIPPLE
   std::string filename;
   upOpts.outfolder = saveEigFilenameEdit->text().toStdString();
   upOpts.N = nEvalPointsEdit->text().toInt();

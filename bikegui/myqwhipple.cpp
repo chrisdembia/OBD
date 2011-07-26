@@ -52,10 +52,23 @@
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 #define NMOTIONVARS 32
 
-MyQWhipple::MyQWhipple(vtkSmartPointer<vtkRenderer> ren,Whipple* b)
+MyQWhipple::MyQWhipple(std::string n, Whipple* b)
 {
-  renderer = ren;
+  name = n;
   bike = b;
+}
+  
+MyQWhipple::~MyQWhipple()
+{
+    delete triad1;
+    delete triad2;
+    delete triad3;
+    delete triad4;
+  }
+
+void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren)
+{
+  simRenderer = ren;
   // rear wheel: two cones and a torus
   double hubhalfwidth = .1;
   // rear cone right
@@ -315,22 +328,22 @@ MyQWhipple::MyQWhipple(vtkSmartPointer<vtkRenderer> ren,Whipple* b)
   frontWheelAssy->AddPart(frontConeLeftActor);
 
   // vector coordinate system triads
-  triad0 = new myvtkTriad(renderer);
+  triad0 = new myvtkTriad(simRenderer);
   triad0->SetScale(.4,.4,.4);
-  triad1 = new myvtkTriad(renderer);
+  triad1 = new myvtkTriad(simRenderer);
   triad1->SetScale(.2,.2,.2);
-  triad2 = new myvtkTriad(renderer);
+  triad2 = new myvtkTriad(simRenderer);
   triad2->SetScale(.2,.2,.2);
-  triad3 = new myvtkTriad(renderer);
+  triad3 = new myvtkTriad(simRenderer);
   triad3->SetScale(.2,.2,.2);
-  triad4 = new myvtkTriad(renderer);
+  triad4 = new myvtkTriad(simRenderer);
   triad4->SetScale(.2,.2,.2);
 
   // render
-  renderer->AddActor(rearWheelAssy);
-  renderer->AddActor(rearFrameAssy);
-  renderer->AddActor(frontFrameAssy);
-  renderer->AddActor(frontWheelAssy);
+  simRenderer->AddActor(rearWheelAssy);
+  simRenderer->AddActor(rearFrameAssy);
+  simRenderer->AddActor(frontFrameAssy);
+  simRenderer->AddActor(frontWheelAssy);
 
   // sim data storage
   simVarNames.resize(NMOTIONVARS);
@@ -378,14 +391,6 @@ MyQWhipple::MyQWhipple(vtkSmartPointer<vtkRenderer> ren,Whipple* b)
   }
   simTable->SetNumberOfRows(100);
 }
-  
-MyQWhipple::~MyQWhipple()
-{
-    delete triad1;
-    delete triad2;
-    delete triad3;
-    delete triad4;
-  }
 
 Whipple* MyQWhipple::GetBike()
 {
@@ -453,7 +458,7 @@ void MyQWhipple::MotionUpdate()
   triad4->SetPosition(frontWheelAssy->GetPosition());
   triad4->SetOrientation(frontWheelAssy->GetOrientation());
 //      iren->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
-//    renderer->ResetCameraClippingRange();
+//    simRenderer->ResetCameraClippingRange();
 //
   double d = 1;
   double pos[3];
@@ -461,18 +466,18 @@ void MyQWhipple::MotionUpdate()
   pos[1] = frontFrameAssy->GetPosition()[1];
   pos[2] = frontFrameAssy->GetPosition()[2];
 //  double bounds[6] = frontFrameAssy->GetBounds();
-  renderer->ResetCamera(pos[0]-d,pos[0]+d,
+  simRenderer->ResetCamera(pos[0]-d,pos[0]+d,
       pos[1]-d,pos[1]+d,
       pos[2]-d,pos[2]+d);
-//  renderer->GetActiveCamera()->Dolly(.5);
+//  simRenderer->GetActiveCamera()->Dolly(.5);
 
- // renderer->GetActiveCamera()->SetFocalPoint(frontFrameAssy->GetPosition());
+ // simRenderer->GetActiveCamera()->SetFocalPoint(frontFrameAssy->GetPosition());
   //frontFrameAssy->AddPosition(0,5,-2);
-  //renderer->GetActiveCamera()->SetPosition(frontFrameAssy->GetPosition());
-//  renderer->GetActiveCamera()->SetDistance(5);
-//  renderer->GetActiveCamera()->SetViewUp(0,0,-1);
+  //simRenderer->GetActiveCamera()->SetPosition(frontFrameAssy->GetPosition());
+//  simRenderer->GetActiveCamera()->SetDistance(5);
+//  simRenderer->GetActiveCamera()->SetViewUp(0,0,-1);
 //  simRenderer->GetActiveCamera()->Elevation(-95);
-//  renderer->GetActiveCamera()->SetFocalPoint(frontFrameAssy->GetPosition());
+//  simRenderer->GetActiveCamera()->SetFocalPoint(frontFrameAssy->GetPosition());
 }
 
 void MyQWhipple::MotionSetValues(int rowidx)

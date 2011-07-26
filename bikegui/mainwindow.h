@@ -55,7 +55,7 @@ public:
   MainWindow();
   // need the destructor too
   ~MainWindow();
-  
+
 private slots:
   void about(void);
 
@@ -86,12 +86,12 @@ private:
 
   // Tab widget
   QTabWidget *tabWidget;
-  
+
   // Tabs
   MyQUprightTab* uprightTab;
   QWidget *steadyTurningTab;
   myQSimTab *simTab;
-  
+
 
   // sim visualization
 
@@ -99,7 +99,8 @@ private:
   WhippleParameter *paramWidget;
 
   // A Whipple bike object
-  Whipple *bike;
+  Whipple * bike;
+  std::vector<MyQWhipple*> *qbikes;
   uprightOptions upOpts;
 };
 #endif

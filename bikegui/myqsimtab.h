@@ -120,15 +120,17 @@ class myQSimTab : public QWidget
   Q_OBJECT;
 
   public:
-  myQSimTab(Whipple* b, QWidget*parent);
+  myQSimTab(std::vector<MyQWhipple*>* qb, Whipple* b, QWidget*parent);
 
   private slots:
   void startsimSlot(void);
+  void stopsimSlot(void);
   void updatePlotSlot(void);
 
   private:
   Whipple* bike;
   MyQWhipple* qbike1;
+  std::vector<MyQWhipple*>* qbikes;
 
   QGroupBox *simLSetBox;
   QGridLayout *simLSetLayout;
@@ -138,6 +140,7 @@ class myQSimTab : public QWidget
   // simLSetBox
   QLabel *label1;
   QToolButton* startsimButton;
+  QToolButton* stopsimButton;
 
   // animation
   QVTKWidget *simQVTKW; 

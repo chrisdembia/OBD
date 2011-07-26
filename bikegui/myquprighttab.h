@@ -34,7 +34,7 @@
 #include "whipple.h"
 #include "whippleutils.h"
 #include "OBDConfig.h"
-
+#include "myqwhipple.h"
 
 struct uprightOptions {
   std::string outfolder;
@@ -48,7 +48,7 @@ class MyQUprightTab : public QWidget
   Q_OBJECT;
 
   public:
-    MyQUprightTab(Whipple* bikes, QWidget *parent);
+    MyQUprightTab(std::vector<MyQWhipple*>* qb, Whipple* b, QWidget *parent);
 //    MyQWhipple* qbikes;
 // bike
   private slots:
@@ -58,6 +58,7 @@ class MyQUprightTab : public QWidget
 
   private:
     Whipple *bike;
+    std::vector<MyQWhipple*>* qbikes;
   // upOpts is a structure for run parameters for upright stability eigenvalue plots
   uprightOptions upOpts;
   
