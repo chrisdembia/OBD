@@ -99,7 +99,6 @@ private:
   WhippleParameter *paramWidget;
 
   // A Whipple bike object
-  Whipple * bike;
   std::vector<MyQWhipple*> *qbikes;
   uprightOptions upOpts;
 };

@@ -103,7 +103,7 @@
 class MyQWhipple
 {
   public:
-  MyQWhipple(std::string,Whipple*);
+  MyQWhipple(std::string);
   ~MyQWhipple();
   void MotionUpdate();
   Whipple* GetBike();

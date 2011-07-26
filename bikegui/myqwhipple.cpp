@@ -52,10 +52,10 @@
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 #define NMOTIONVARS 32
 
-MyQWhipple::MyQWhipple(std::string n, Whipple* b)
+MyQWhipple::MyQWhipple(std::string n)
 {
   name = n;
-  bike = b;
+  bike = new Whipple();
 }
   
 MyQWhipple::~MyQWhipple()
