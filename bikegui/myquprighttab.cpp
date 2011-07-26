@@ -237,7 +237,8 @@ void MainWindow::updateEigPlotSlot(void)
     }
   }
 
-
+  eigPlotQVTKW->GetInteractor()->Initialize();
+  eigPlotQVTKW->GetInteractor()->Start();
 
 
 

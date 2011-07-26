@@ -56,10 +56,10 @@
 #include "myvtkTriad.h"
 #include "myqwhipple.h"
 
+
 myQSimTab::myQSimTab(Whipple* b, QWidget *parent) : QWidget(parent)
 {
   bike = b;
-  qbike1 = new MyQWhipple(simRenderer,bike);
   simLSetBox = new QGroupBox("Parameters",this);
   simLSetLayout = new QGridLayout(simLSetBox);
 //  QGroupBox* simRSetBox = new
@@ -81,12 +81,22 @@ myQSimTab::myQSimTab(Whipple* b, QWidget *parent) : QWidget(parent)
 
   //setup window
   simRenderWindow = vtkRenderWindow::New();
-
   //setup renderer
   simRenderer = vtkRenderer::New();
   simRenderWindow->AddRenderer(simRenderer);
   simQVTKW->SetRenderWindow(simRenderWindow);
   // USE CMAKE TO IDENTIFY TYPE OF COMPUTER? FOR VIDEO AVI OUTPUT
+  qbike1 = new MyQWhipple(simRenderer,bike);
+
+  simCallback = vtkSmartPointer<vtkTimerCallback2>::New();
+  simCallback->qbike = qbike1;
+  simQVTKW->GetInteractor()->AddObserver(vtkCommand::TimerEvent, simCallback);
+//  VTK_CREATE(vtkWindowToImageFilter,w2i);
+//  VTK_CREATE(vtkJPEGWriter,writer);
+//  VTK_CREATE(vtkPostScriptWriter,writer);
+//  simRenderWindow->SetAAFrames(2);
+  // Sign up to receive TimerEvent
+ // VTK_CREATE(vtkTimerCallback2,callback);
 
   // plot
   simPlotQVTKW = new QVTKWidget(this);
@@ -96,15 +106,17 @@ myQSimTab::myQSimTab(Whipple* b, QWidget *parent) : QWidget(parent)
   simPlotVTKChart = vtkSmartPointer<vtkChartXY>::New();
   simPlotVTKView->GetScene()->AddItem(simPlotVTKChart);
 //  VTK_CREATE(vtkPlot,simPlotVTKLine);
+  
   vtkPlot* simPlotVTKLine;
-  for (int i = 0; i < NMOTIONVARS-1; i++) {
+  for (int i = 1; i < NMOTIONVARS; i++) {
     simPlotVTKLine = simPlotVTKChart->AddPlot(vtkChart::LINE);
-    simPlotVTKLine->SetInput(qbike1->GetSimTable(), 0, i+1);
-    simPlotVTKLine->SetColor(0,255,0,255);
+    simPlotVTKLine->SetInput(qbike1->GetSimTable(), 0, i);
+    simPlotVTKLine->SetColor(255,0,0,255);
     // ideally, create 32 vtkPlot simPlotVTKLines
 
   }
 
+  simCallback->plotrenwin = simPlotQVTKW->GetRenderWindow();
   // arrange layouts
   // simLSetBox Widgets to simLayout
   simLSetLayout->addWidget(label1);
@@ -116,76 +128,7 @@ myQSimTab::myQSimTab(Whipple* b, QWidget *parent) : QWidget(parent)
   setLayout(simLayout);
   
 }
-/* 
- * need simPlotVTKView
- * simPlotVTKChart
- * simPlotVTKLine
- * // QVTK QVTK QVTK QVTK 
-  eigPlotVTKTable->Update();
-  
-  // Add multiple line plots, setting the colors etc
-  vtkSmartPointer<vtkChartXY> eigPlotVTKChart = vtkSmartPointer<vtkChartXY>::New();
-  eigPlotVTKView->GetScene()->AddItem(eigPlotVTKChart);
-  vtkPlot *eigPlotVTKLine;
 
-  for (int i = 0; i < paramWidget->getNbikes(); i++)
-  {
-    for (int j = 0; j < 4; j++)
-    {
-      idx = j + i*paramWidget->getNbikes();
-      eigPlotVTKLine = eigPlotVTKChart->AddPlot(vtkChart::LINE);
-      eigPlotVTKLine->SetInput(eigPlotVTKTable, 0, j+1);
-      eigPlotVTKLine->SetColor(0, 255, 0, 255);
-  }*/
-
-class vtkTimerCallback2 : public vtkCommand
-{
-  public:
-    static vtkTimerCallback2 *New()
-    {
-      vtkTimerCallback2 *cb = new vtkTimerCallback2;
-      cb->TimerCount = 0;
-      return cb;
-    }
- 
-    virtual void Execute(vtkObject *caller, unsigned long eventId,
-                         void * vtkNotUsed(callData))
-    {
-      if (vtkCommand::TimerEvent == eventId) {
-        ++this->TimerCount;
-      }
-      std::cout << this->TimerCount << std::endl;
-      // UPDATE
-      time = (double)TimerCount/(double)qbike->GetBike()->fps; 
-      while (qbike->GetBike()->t < time) {
-        qbike->GetBike()->evolve(time,state);
-      }
-
-      qbike->MotionUpdate();
-//      qbike->MotionSetValues(TimerCount);
-      // render
-      vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::SafeDownCast(caller);
-      iren->GetRenderWindow()->Render();
-//  w2i->SetInput(iren->GetRenderWindow());
-//  writer->SetInput(w2i->GetOutput());
-//  writer->SetFileName(QString("cld72qtvtkbike" + QString("%1").arg(TimerCount) + ".ps").toStdString().c_str());
-//  writer->Write();
-    }
- 
-  public:
-    MyQWhipple *qbike;
-    void SetState(double s[10]) {
-      for (int i = 0; i < 10; i++) {
-        state[i] = s[i];
-      }
-    }
-    vtkSmartPointer<vtkPostScriptWriter> writer;
-    vtkSmartPointer<vtkWindowToImageFilter> w2i;
-  private:
-    int TimerCount;
-    double time;
-    double state[10];
-};
 
 void myQSimTab::startsimSlot(void)
 {
@@ -257,10 +200,6 @@ void myQSimTab::startsimSlot(void)
   simRenderer->SetBackground(.8,1,.8);
   simQVTKW->GetInteractor()->Initialize();
  
-  VTK_CREATE(vtkWindowToImageFilter,w2i);
-//  VTK_CREATE(vtkJPEGWriter,writer);
-  VTK_CREATE(vtkPostScriptWriter,writer);
-//  simRenderWindow->SetAAFrames(2);
   // camera settings
   simRenderer->ResetCamera();
   simRenderer->AddActor(groundActor);
@@ -270,13 +209,9 @@ void myQSimTab::startsimSlot(void)
   // Render and interact
   simQVTKW->GetRenderWindow()->Render();
  
-  // Sign up to receive TimerEvent
-  VTK_CREATE(vtkTimerCallback2,callback);
-  callback->qbike = qbike1;
-  callback->SetState(state);
-  callback->writer = writer;
-  callback->w2i = w2i;
-  simQVTKW->GetInteractor()->AddObserver(vtkCommand::TimerEvent, callback);
+  simCallback->SetState(state);
+//  simCallback->writer = writer;
+//  simCallback->w2i = w2i;
  
   int timerId = simQVTKW->GetInteractor()->
       CreateRepeatingTimer(1000/bike->fps);
@@ -285,8 +220,11 @@ void myQSimTab::startsimSlot(void)
   // Start the interaction and timer
   simQVTKW->GetInteractor()->Start();
 //  delete qbike1;
+  simPlotQVTKW->GetInteractor()->Initialize();
+  simPlotQVTKW->GetInteractor()->Start();
 
 }
+
 void myQSimTab::updatePlotSlot(void)
 {
 }

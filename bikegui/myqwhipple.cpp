@@ -369,7 +369,6 @@ MyQWhipple::MyQWhipple(vtkSmartPointer<vtkRenderer> ren,Whipple* b)
   simTable = vtkSmartPointer<vtkTable>::New();
   // need animation runtime control. max time or add to the array somehow.
   // maybe set so that the filesize of output jpgs etc is < 1GB.
-  simTable->SetNumberOfRows(100000);
   simArrays.resize(NMOTIONVARS);
 
   for (uint i = 0; i < simArrays.size(); i++) {
@@ -377,6 +376,7 @@ MyQWhipple::MyQWhipple(vtkSmartPointer<vtkRenderer> ren,Whipple* b)
     simArrays[i]->SetName(simVarNames[i].c_str());
     simTable->AddColumn(simArrays[i]);
   }
+  simTable->SetNumberOfRows(100);
 }
   
 MyQWhipple::~MyQWhipple()
@@ -478,41 +478,43 @@ void MyQWhipple::MotionUpdate()
 void MyQWhipple::MotionSetValues(int rowidx)
 {
    // do some nice memory managemen here to control the size of the array
-  for (uint i = 0; i < simArrays.size(); i++) {
-    simTable->SetValue(rowidx,i,bike->t);
-    simTable->SetValue(rowidx,i,bike->q0);
-    simTable->SetValue(rowidx,i,bike->q1);
-    simTable->SetValue(rowidx,i,bike->q2);
-    simTable->SetValue(rowidx,i,bike->q3);
-    simTable->SetValue(rowidx,i,bike->q4);
-    simTable->SetValue(rowidx,i,bike->q5);
-    simTable->SetValue(rowidx,i,bike->q6);
-    simTable->SetValue(rowidx,i,bike->q7);
-    simTable->SetValue(rowidx,i,bike->u0);
-    simTable->SetValue(rowidx,i,bike->u1);
-    simTable->SetValue(rowidx,i,bike->u2);
-    simTable->SetValue(rowidx,i,bike->u3);
-    simTable->SetValue(rowidx,i,bike->u4);
-    simTable->SetValue(rowidx,i,bike->u5);
-    simTable->SetValue(rowidx,i,bike->no_fn[0]);
-    simTable->SetValue(rowidx,i,bike->no_fn[1]);
-    simTable->SetValue(rowidx,i,bike->no_fn[2]);
-    simTable->SetValue(rowidx,i,bike->Rx);
-    simTable->SetValue(rowidx,i,bike->Ry);
-    simTable->SetValue(rowidx,i,bike->Rz);
-    simTable->SetValue(rowidx,i,bike->Fx);
-    simTable->SetValue(rowidx,i,bike->Fy);
-    simTable->SetValue(rowidx,i,bike->Fz);
-    simTable->SetValue(rowidx,i,bike->ke);
-    simTable->SetValue(rowidx,i,bike->pe);
-    simTable->SetValue(rowidx,i,bike->fa_yaw);
-    simTable->SetValue(rowidx,i,bike->fa_lean);
-    simTable->SetValue(rowidx,i,bike->fa_pitch);
-    simTable->SetValue(rowidx,i,bike->constraints[0]);
-    simTable->SetValue(rowidx,i,bike->constraints[1]);
-    simTable->SetValue(rowidx,i,bike->constraints[2]);
-    simTable->Update();
+  //simTable->InsertNextBlankRow();
+  if (rowidx > simTable->GetNumberOfRows()) {
+    simTable->SetNumberOfRows(10000+simTable->GetNumberOfRows());
   }
+  simTable->SetValue(rowidx,0,bike->t);
+  simTable->SetValue(rowidx,1,bike->q0);
+  simTable->SetValue(rowidx,2,bike->q1);
+  simTable->SetValue(rowidx,3,bike->q2);
+  simTable->SetValue(rowidx,4,bike->q3);
+  simTable->SetValue(rowidx,5,bike->q4);
+  simTable->SetValue(rowidx,6,bike->q5);
+  simTable->SetValue(rowidx,7,bike->q6);
+  simTable->SetValue(rowidx,8,bike->q7);
+  simTable->SetValue(rowidx,9,bike->u0);
+  simTable->SetValue(rowidx,10,bike->u1);
+  simTable->SetValue(rowidx,11,bike->u2);
+  simTable->SetValue(rowidx,12,bike->u3);
+  simTable->SetValue(rowidx,13,bike->u4);
+  simTable->SetValue(rowidx,14,bike->u5);
+  simTable->SetValue(rowidx,15,bike->no_fn[0]);
+  simTable->SetValue(rowidx,16,bike->no_fn[1]);
+  simTable->SetValue(rowidx,17,bike->no_fn[2]);
+  simTable->SetValue(rowidx,18,bike->Rx);
+  simTable->SetValue(rowidx,19,bike->Ry);
+  simTable->SetValue(rowidx,20,bike->Rz);
+  simTable->SetValue(rowidx,21,bike->Fx);
+  simTable->SetValue(rowidx,22,bike->Fy);
+  simTable->SetValue(rowidx,23,bike->Fz);
+  simTable->SetValue(rowidx,24,bike->ke);
+  simTable->SetValue(rowidx,25,bike->pe);
+  simTable->SetValue(rowidx,26,bike->fa_yaw);
+  simTable->SetValue(rowidx,27,bike->fa_lean);
+  simTable->SetValue(rowidx,28,bike->fa_pitch);
+  simTable->SetValue(rowidx,29,bike->constraints[0]);
+  simTable->SetValue(rowidx,30,bike->constraints[1]);
+  simTable->SetValue(rowidx,31,bike->constraints[2]);
+  simTable->Update();
 }
 
 vtkSmartPointer<vtkTable> MyQWhipple::GetSimTable()

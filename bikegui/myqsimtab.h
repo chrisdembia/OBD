@@ -58,6 +58,58 @@
 #include "myvtkTriad.h"
 #include "myqwhipple.h"
 
+class vtkTimerCallback2 : public vtkCommand
+{
+  public:
+    static vtkTimerCallback2 *New()
+    {
+      vtkTimerCallback2 *cb = new vtkTimerCallback2;
+      cb->TimerCount = 0;
+      return cb;
+    }
+ 
+    virtual void Execute(vtkObject *caller, unsigned long eventId,
+                         void * vtkNotUsed(callData))
+    {
+      if (vtkCommand::TimerEvent == eventId) {
+        ++this->TimerCount;
+      }
+      std::cout << this->TimerCount << std::endl;
+      // UPDATE
+      time = (double)TimerCount/(double)qbike->GetBike()->fps; 
+      while (qbike->GetBike()->t < time) {
+        qbike->GetBike()->evolve(time,state);
+      }
+
+      qbike->MotionUpdate();
+      qbike->MotionSetValues(TimerCount);
+      plotrenwin->Render();
+      std::cout << "simtableval" << qbike->GetSimTable()->GetValue(TimerCount,0) << std::endl;
+      // render
+      vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::SafeDownCast(caller);
+      iren->GetRenderWindow()->Render();
+//  w2i->SetInput(iren->GetRenderWindow());
+//  writer->SetInput(w2i->GetOutput());
+//  writer->SetFileName(QString("cld72qtvtkbike" + QString("%1").arg(TimerCount) + ".ps").toStdString().c_str());
+//  writer->Write();
+    }
+ 
+  public:
+    MyQWhipple *qbike;
+    void SetState(double s[10]) {
+      for (int i = 0; i < 10; i++) {
+        state[i] = s[i];
+      }
+    }
+    vtkSmartPointer<vtkPostScriptWriter> writer;
+    vtkSmartPointer<vtkWindowToImageFilter> w2i;
+    vtkSmartPointer<vtkRenderWindow> plotrenwin;
+  private:
+    int TimerCount;
+    double time;
+    double state[10];
+};
+
 class myQSimTab : public QWidget
 {
   Q_OBJECT;
@@ -86,6 +138,7 @@ class myQSimTab : public QWidget
   QVTKWidget *simQVTKW; 
   vtkSmartPointer<vtkRenderer> simRenderer;
   vtkSmartPointer<vtkRenderWindow> simRenderWindow;
+  vtkSmartPointer<vtkTimerCallback2> simCallback;
 
   // plot
   QVTKWidget *simPlotQVTKW; 
