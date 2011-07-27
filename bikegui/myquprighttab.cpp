@@ -35,7 +35,8 @@
 
 #include "myquprighttab.h"
 
-MyQUprightTab::MyQUprightTab(std::vector<MyQWhipple*>* qb, QWidget *parent) : QWidget(parent)
+MyQUprightTab::MyQUprightTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
+  QWidget(parent)
 {
 
   qbikes = qb;
@@ -134,35 +135,33 @@ void MyQUprightTab::updateEigPlotSlot(void)
   eigPlotVTKView = vtkSmartPointer<vtkContextView>::New();
   eigPlotVTKView->SetInteractor(eigPlotQVTKW->GetInteractor());
   eigPlotQVTKW->SetRenderWindow(eigPlotVTKView->GetRenderWindow());
-eigPlotVTKTable = vtkSmartPointer<vtkTable>::New();
-arrX = vtkSmartPointer<vtkFloatArray>::New();
+  eigPlotVTKTable = vtkSmartPointer<vtkTable>::New();
+  arrX = vtkSmartPointer<vtkFloatArray>::New();
   arrX->SetName("forward velocity (m/s)");
   eigPlotVTKTable->AddColumn(arrX);
 //    return 0; for errors?
   int NeigPerBike = 4;
-  std::vector<std::string> bikenames(1*NeigPerBike);
-  bikenames[0] = "eig1";
-  bikenames[1] = "eig2";
-  bikenames[2] = "eig3";
-  bikenames[3] = "eig4";
-
+  std::vector<std::string> eignames(NeigPerBike);
+  eignames[0] = "eig1";
+  eignames[1] = "eig2";
+  eignames[2] = "eig3";
+  eignames[3] = "eig4";
+  std::string bikename;
   arrY.resize(1*NeigPerBike);
   int idx;
-  for (int i = 0; i < 1; i++)
+  for (uint i = 0; i < qbikes->size(); i++)
   {
-    for (int j = 0; j < 4; j++)
+    for (int j = 0; j < NeigPerBike; j++)
     {
-      idx = j + i*1;
+      idx = j + i*NeigPerBike;
+      bikename = qbikes->at(i)->getName() + "-" + eignames[j]; 
       arrY[idx] = vtkSmartPointer<vtkFloatArray>::New();
-      arrY[idx]->SetName(bikenames[j].c_str());
+      arrY[idx]->SetName(bikename.c_str());
       eigPlotVTKTable->AddColumn(arrY[idx]);
     }
   }
   eigPlotVTKChart = vtkSmartPointer<vtkChartXY>::New();
   eigPlotVTKView->GetScene()->AddItem(eigPlotVTKChart);
-//  eigPlotQVTKW->GetInteractor()->Initialize();
-//  eigPlotQVTKW->GetInteractor()->Start();
-//  eigPlotQVTKW->GetRenderWindow()->Render();
   eigPlotQVTKW->GetRenderWindow()->LineSmoothingOn();
   // Set up my 2D world...
 
@@ -190,7 +189,6 @@ arrX = vtkSmartPointer<vtkFloatArray>::New();
   qbikes->at(0)->getBike()->writeParameters(filename.c_str());
   // Write data record file. the function is orphaned from whipple.h currently
   // allows the evaluation of data by python
-//  filename = upOpts.outfolder; filename += "eval_record.py";
 //  writeEvalRecord_dt(filename.c_str());
   // Open data file
   filename = upOpts.outfolder; filename += "eigenvalues.dat";

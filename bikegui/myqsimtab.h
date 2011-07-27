@@ -76,21 +76,27 @@ class vtkTimerCallback2 : public vtkCommand
       }
       std::cout << this->TimerCount << std::endl;
       // UPDATE
-      time = (double)TimerCount/(double)qbike->getBike()->fps; 
-      while (qbike->getBike()->t < time) {
-        qbike->getBike()->evolve(time,state);
+      time = (double)TimerCount/(double)qbikes->at(0)->getBike()->fps; 
+      while (qbikes->at(0)->getBike()->t < time) {
+        if (TimerCount > 100 && TimerCount < 110) {
+          qbikes->at(0)->getBike()->Ts = 5;
+        }
+        else { qbikes->at(0)->getBike()->Ts = 0; }
+        qbikes->at(0)->getBike()->evolve(time,state);
       }
-
-      qbike->SimUpdate();
-      qbike->SimSetValues(TimerCount);
-      if (TimerCount == 100) {
-  simPlotQVTKW->GetInteractor()->Initialize();
-  simPlotQVTKW->GetInteractor()->Start();
+      qbikes->at(0)->SimUpdate();
+      qbikes->at(0)->SetSimValues(TimerCount);
+  //simPlotQVTKW->GetInteractor()->Initialize();
+  //simPlotQVTKW->GetInteractor()->Start();
+//  simPlotVTKChart->Paint(simPlotVTKView->GetContext());
+   simPlotVTKView->GetScene()->GetItem(0)->Paint(simPlotVTKView->GetContext());
+  // simPlotVTKView->GetScene()->Paint(simPlotVTKView->GetContext());
       plotrenwin->Render();
-      }
-      std::cout << "simtableval" << qbike->GetSimTable()->GetValue(TimerCount,1) << std::endl;
+      std::cout << "simtableval " <<
+        qbikes->at(0)->GetSimTable()->GetValue(TimerCount,1) << std::endl;
       // render
-      vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::SafeDownCast(caller);
+      vtkRenderWindowInteractor *iren =
+        vtkRenderWindowInteractor::SafeDownCast(caller);
       iren->GetRenderWindow()->Render();
 //  w2i->SetInput(iren->GetRenderWindow());
 //  writer->SetInput(w2i->GetOutput());
@@ -99,7 +105,7 @@ class vtkTimerCallback2 : public vtkCommand
     }
  
   public:
-    MyQWhipple *qbike;
+    std::vector<MyQWhipple*>* qbikes;
     void SetState(double s[10]) {
       for (int i = 0; i < 10; i++) {
         state[i] = s[i];
@@ -109,10 +115,49 @@ class vtkTimerCallback2 : public vtkCommand
     vtkSmartPointer<vtkWindowToImageFilter> w2i;
     vtkSmartPointer<vtkRenderWindow> plotrenwin;
     QVTKWidget* simPlotQVTKW;
+    vtkSmartPointer<vtkChartXY> simPlotVTKChart;
+    vtkSmartPointer<vtkContextView> simPlotVTKView;
   private:
     int TimerCount;
     double time;
     double state[10];
+};
+
+class vtkTimerCallback3 : public vtkCommand
+{
+  public:
+    static vtkTimerCallback3 *New()
+    {
+      vtkTimerCallback3 *cb = new vtkTimerCallback3;
+      cb->TimerCount = 0;
+      return cb;
+    }
+ 
+    virtual void Execute(vtkObject *caller, unsigned long eventId,
+                         void * vtkNotUsed(callData))
+    {
+      if (vtkCommand::TimerEvent == eventId) {
+        ++this->TimerCount;
+      }
+      std::cout << "count3 " << this->TimerCount << std::endl;
+      // UPDATE
+//      qbikes->at(0)->SimSetValues(TimerCount);
+  //simPlotQVTKW->GetInteractor()->Initialize();
+  //simPlotQVTKW->GetInteractor()->Start();
+      //plotrenwin->Render();
+      vtkRenderWindowInteractor *iren =
+        vtkRenderWindowInteractor::SafeDownCast(caller);
+      iren->GetRenderWindow()->Render();
+      // render
+    }
+ 
+  public:
+    std::vector<MyQWhipple*>* qbikes;
+    vtkSmartPointer<vtkRenderWindow> plotrenwin;
+    QVTKWidget* simPlotQVTKW;
+  private:
+    int TimerCount;
+    double time;
 };
 
 class myQSimTab : public QWidget
@@ -126,6 +171,8 @@ class myQSimTab : public QWidget
   void startsimSlot(void);
   void stopsimSlot(void);
   void updatePlotSlot(void);
+  void forceCheckSlot(int);
+  void writeSimSlot(void);
 
   private:
   std::vector<MyQWhipple*>* qbikes;
@@ -136,20 +183,25 @@ class myQSimTab : public QWidget
 	QGridLayout *simLayout;
 
   // simLSetBox
-  QLabel *label1;
+  QLabel *speedLabel;
+  QLineEdit *speedEdit;
   QToolButton* startsimButton;
   QToolButton* stopsimButton;
+  QCheckBox* forceCheck;
+  QToolButton* writesimButton;
 
   // animation
   QVTKWidget *simQVTKW; 
   vtkSmartPointer<vtkRenderer> simRenderer;
   vtkSmartPointer<vtkRenderWindow> simRenderWindow;
   vtkSmartPointer<vtkTimerCallback2> simCallback;
+  vtkSmartPointer<vtkTimerCallback3> simPlotCallback;
 
   // plot
   QVTKWidget *simPlotQVTKW; 
-  vtkSmartPointer<vtkContextView> simPlotVTKView; // This contains a chart object
+  vtkSmartPointer<vtkContextView> simPlotVTKView; 
   vtkSmartPointer<vtkChartXY> simPlotVTKChart;
+//  std::vector<vtkSmartPointer<vtkPlot> > simPlotVTKLines;
   
 };
 

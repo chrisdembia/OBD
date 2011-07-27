@@ -1,7 +1,46 @@
 -- get python plotting library installed a proper location
 -- Add animation code
--- GUI work:
-    -- parameter form
-    -- tab widget for eigenvalues, steady turning, animation
-    -- eigenvalue line plot
-    -- port animation code to work with QVTK widget
+
+-- GUI work (last revised 110726 by chris):
+    -- general
+        -- win32 build
+        -- win64 build
+        -- thread management (mandlebrot example)
+        -- database storage/ file IO, PostgreSQL
+        -- update to work with new Gryostat whipple structure
+    -- parameters
+        -- make a separate window
+        -- multiple bikes
+        -- franke parameters
+        -- remove parameters e.g. v, g
+        -- draw a bike in 2D (lines and mass centres)
+        -- selector for which bikes show up in the upright eig plot
+        -- tooltip to explain what all the parameters are
+    -- upright stability
+        -- list of roots/intersections (bifurcation speed) (Meij.2007)
+        -- draw vertical lines on the eigplot at intersections
+        -- save image (gl2ps)
+        -- save data
+        -- reset view
+        -- help tooltip to show interactor keys
+    -- steady turning
+
+    -- simulation
+        -- plot update
+        -- data to txt file
+        -- draw force vectors
+        -- display multiple bikes in popup windows
+        -- input forcing
+        -- line/wheel trace
+        -- video output (save to vid)
+        -- finish interface
+            -- save images
+            -- force input
+            -- save data
+            -- video controls (rewind)
+        -- text annotation on video
+        -- multiple camera angles
+        -- shift transformations from rot steps to a single 4x4 matrix push
+        -- crash detection, using tire forces: lateral to normal force ratio)
+        
+

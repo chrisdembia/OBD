@@ -69,18 +69,27 @@ myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   simQVTKW = new QVTKWidget(this);
 //  simQVTKW->resize(256,256);
 
+  // initial velocity
+  speedLabel = new QLabel( tr("initial speed (m/s)"), simLSetBox); 
+  speedEdit = new QLineEdit(simLSetBox);
+// connect here
+  
   // simLSetBox
-  label1 = new QLabel("test");
   startsimButton = new QToolButton(simLSetBox);
-  startsimButton->setText("Start simulation");
+  startsimButton->setText( tr("Start simulation") );
   connect(startsimButton, SIGNAL(clicked()), this, SLOT(startsimSlot()) );
 
   stopsimButton = new QToolButton(simLSetBox);
-  stopsimButton->setText("Stop simulation");
+  stopsimButton->setText( tr("Stop simulation") );
   connect(stopsimButton, SIGNAL(clicked()), this, SLOT(stopsimSlot()));
 
-// CAN HAVE MULTIPLE RENDERERS IN ONE RENDERWINDOW, DIFF BACKGROUNDS
-// AND CAMERA ANGLES
+  // include force vectors
+  forceCheck = new QCheckBox("draw force vectors",simLSetBox);
+  connect(forceCheck, SIGNAL(stateChanged(int)), this, SLOT(forceCheckSlot(int)));
+
+  writesimButton = new QToolButton(simLSetBox);
+  writesimButton->setText( tr("Save simulation data") );
+  connect(writesimButton, SIGNAL(clicked()), this, SLOT(writeSimSlot()));
   // DELETE THE POINTERS DELEETE THE POINTERS!:w
 
   //setup window
@@ -93,7 +102,7 @@ myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   qbikes->at(0)->initSim(simRenderer);
 
   simCallback = vtkSmartPointer<vtkTimerCallback2>::New();
-  simCallback->qbike = qbikes->at(0);
+  simCallback->qbikes = qbikes;
   simQVTKW->GetInteractor()->AddObserver(vtkCommand::TimerEvent, simCallback);
 //  VTK_CREATE(vtkWindowToImageFilter,w2i);
 //  VTK_CREATE(vtkJPEGWriter,writer);
@@ -110,23 +119,40 @@ myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   simPlotVTKChart = vtkSmartPointer<vtkChartXY>::New();
   simPlotVTKView->GetScene()->AddItem(simPlotVTKChart);
 //  VTK_CREATE(vtkPlot,simPlotVTKLine);
-  
-  vtkPlot* simPlotVTKLine;
-  for (int i = 1; i < NMOTIONVARS; i++) {
-    simPlotVTKLine = simPlotVTKChart->AddPlot(vtkChart::LINE);
-    simPlotVTKLine->SetInput(qbikes->at(0)->GetSimTable(), 0, i);
-    simPlotVTKLine->SetColor(255,0,0,255);
-    // ideally, create 32 vtkPlot simPlotVTKLines
 
+    simCallback->simPlotVTKChart = simPlotVTKChart;
+    simCallback->simPlotVTKView = simPlotVTKView;
+
+  simPlotCallback = vtkSmartPointer<vtkTimerCallback3>::New();
+  simPlotCallback->qbikes = qbikes;
+  simPlotQVTKW->GetInteractor()->AddObserver(vtkCommand::TimerEvent, simPlotCallback);
+  
+//  vtkPlot* simPlotVTKLine;
+//  simPlotVTKLines.resize(NMOTIONVARS);
+  simPlotVTKChart->ClearPlots();
+  for (int i = 1; i < NMOTIONVARS; i++) {
+/*    simPlotVTKLine = simPlotVTKChart->AddPlot(vtkChart::LINE);
+    simPlotVTKLine->SetInput(qbikes->at(0)->GetSimTable(), 0, i);
+    simPlotVTKLine->SetColor(255,0,0,255);*/
+    // ideally, create 32 vtkPlot simPlotVTKLines
+    simPlotVTKChart->AddPlot(vtkChart::LINE);
+    simPlotVTKChart->GetPlot(i-1)->SetInput(qbikes->at(0)->GetSimTable(),0,i);
+    simPlotVTKChart->GetPlot(i-1)->SetColor(255,0,0,255);
   }
+  simPlotVTKChart->Update();
+
+  simPlotVTKChart->Paint(simPlotVTKView->GetContext());
 
   simCallback->plotrenwin = simPlotQVTKW->GetRenderWindow();
   simCallback->simPlotQVTKW = simPlotQVTKW;
   // arrange layouts
   // simLSetBox Widgets to simLayout
-  simLSetLayout->addWidget(label1);
-  simLSetLayout->addWidget(startsimButton);
-  simLSetLayout->addWidget(stopsimButton);
+  simLSetLayout->addWidget(speedLabel,0,0,1,1);
+  simLSetLayout->addWidget(speedEdit,0,1,1,1);
+  simLSetLayout->addWidget(startsimButton,1,0);
+  simLSetLayout->addWidget(stopsimButton,2,0);
+  simLSetLayout->addWidget(forceCheck,3,0);
+  simLSetLayout->addWidget(writesimButton,4,0);
   
   simLayout->addWidget(simLSetBox,0,0);
   simLayout->addWidget(simQVTKW,0,1);
@@ -148,26 +174,7 @@ void myQSimTab::startsimSlot(void)
     qbikes->at(0)->getBike()->q6, qbikes->at(0)->getBike()->q7,
     qbikes->at(0)->getBike()->u1, qbikes->at(0)->getBike()->u3,
     qbikes->at(0)->getBike()->u5};
-  std::string outfolder = "";
-  std::string filename = outfolder; filename += "simulation.dat";
-//  std::ofstream OutputFile(filename.c_str(), std::ios::binary);
-//  OutputFile.close();
-  std::cout << "Simulation completed. Simulation output written to "
-    << outfolder << '\n';
 /*
-  cyl->SetResolution(8);
-
-  vtkPolyDataMapper *cylMapper = vtkPolyDataMapper::New();
-  cylMapper->SetInputConnection(cyl->GetOutputPort());
-
-  vtkActor *cylActor = vtkActor::New();
-  cylActor->SetMapper(cylMapper);
-  cylActor->GetProperty()->SetColor(1.000,0.3882,0.2784);
-  cylActor->RotateX(30.0);
-  cylActor->RotateY(-45.0);
-
-
-
   // MAKE HUD-DISPLAY, TEXTACTOR:w
   VTK_CREATE(vtkTextProperty,text1Propr);
   text1Propr->SetFontSize(10);
@@ -193,18 +200,19 @@ void myQSimTab::startsimSlot(void)
   groundActor->GetProperty()->SetOpacity(0.5);
   // draw a bike
   qbikes->at(0)->SimUpdate();
-//  qbikes->at(0)->SimSetValues(0);
+//  qbikes->at(0)->SetSimValues(0);
   simRenderer->SetBackground(.8,1,.8);
   simQVTKW->GetInteractor()->Initialize();
  
+  simRenderer->AddActor(groundActor);
+
   // camera settings
   simRenderer->ResetCamera();
-  simRenderer->AddActor(groundActor);
   simRenderer->GetActiveCamera()->SetPosition(0,1,-.5);
   simRenderer->GetActiveCamera()->SetViewUp(0,0,-1);
 //  simRenderer->GetActiveCamera()->Elevation(-95);
   // Render and interact
-  simQVTKW->GetRenderWindow()->Render();
+  //simQVTKW->GetRenderWindow()->Render();
  
   simCallback->SetState(state);
 //  simCallback->writer = writer;
@@ -217,20 +225,44 @@ void myQSimTab::startsimSlot(void)
   // Start the interaction and timer
   simQVTKW->GetInteractor()->Start();
 //  delete qbikes->at(0);
-
+/*
+  int timerId3 = simPlotQVTKW->GetInteractor()->
+      CreateRepeatingTimer(1000/qbikes->at(0)->getBike()->fps);
+  std::cout << "timerId3: " << timerId3 << std::endl;
+ 
+  // Start the interaction and timer*/
+  simPlotQVTKW->GetInteractor()->Initialize();
+  simPlotQVTKW->GetInteractor()->Start();
 }
 
 void myQSimTab::stopsimSlot(void)
 {
   simQVTKW->GetInteractor()->DestroyTimer();
+  qbikes->at(0)->GetSimTable()->Update();
+  simPlotVTKChart->Update();
+
+  //simPlotVTKChart->Paint(simPlotVTKView->GetContext());
 }
 
 void myQSimTab::updatePlotSlot(void)
 {
 }
 
-
-
-
-
 // CAN'T HIT START ANIMATION TWICE!!
+void myQSimTab::forceCheckSlot(int state)
+{
+  if (state == Qt::Checked) {
+
+  } else if (state == Qt::Unchecked) {
+
+  }
+}
+
+void myQSimTab::writeSimSlot(void)
+{
+  QString fname = QFileDialog::getSaveFileName(this, tr("Save File"),
+      QDir::currentPath(), tr("Text file (*, *.txt, *.dat,...);;Any file (*)")
+      );
+  qbikes->at(0)->writeSim(fname.toStdString());
+}
+

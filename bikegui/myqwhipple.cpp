@@ -12,6 +12,7 @@
 #include <vtkPlaneSource.h>
 #include <vtkParametricFunctionSource.h>
 #include <vtkParametricTorus.h>
+#include <vtkPoints.h>
 // vtk filters
 #include <vtkTransformPolyDataFilter.h>
 // vtk mappers
@@ -38,7 +39,10 @@
 #include <vtkPolyData.h>
 #include <vtkCommand.h>
 // vtk data
+#include <vtkPolyData.h>
+#include <vtkPolyLine.h>
 #include <vtkTable.h>
+#include <vtkCellArray.h>
 #include <vtkFloatArray.h>
 
 #include <vtkWindowToImageFilter.h>
@@ -339,11 +343,30 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren)
   triad4 = new myvtkTriad(simRenderer);
   triad4->SetScale(.2,.2,.2);
 
+  // wheel traces
+  rearPoints = vtkSmartPointer<vtkPoints>::New();
+  rearPoints->InsertNextPoint(0,0,0);
+  rearPoints->InsertNextPoint(3,0,0);
+  rearPointsLine = vtkSmartPointer<vtkPolyLine>::New();
+//  rearPointsLine->SetNumberOfIds(2);
+  rearPointsLine->GetPointIds()->InsertNextId(0);
+  rearPointsLine->GetPointIds()->InsertNextId(1);
+  rearPointsCell = vtkSmartPointer<vtkCellArray>::New();
+  rearPointsCell->InsertNextCell(rearPointsLine);
+  rearPointsData = vtkSmartPointer<vtkPolyData>::New();
+  rearPointsData->SetPoints(rearPoints);
+  rearPointsData->SetLines(rearPointsCell);
+  rearPointsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  rearPointsMapper->SetInput(rearPointsData);
+  rearPointsActor = vtkSmartPointer<vtkActor>::New();
+  rearPointsActor->SetMapper(rearPointsMapper);
+  rearPointsActor->GetProperty()->SetColor(1,0,0);
   // render
   simRenderer->AddActor(rearWheelAssy);
   simRenderer->AddActor(rearFrameAssy);
   simRenderer->AddActor(frontFrameAssy);
   simRenderer->AddActor(frontWheelAssy);
+  simRenderer->AddActor(rearPointsActor);
 
   // sim data storage
   simVarNames.resize(NMOTIONVARS);
@@ -389,12 +412,19 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren)
     simArrays[i]->SetName(simVarNames[i].c_str());
     simTable->AddColumn(simArrays[i]);
   }
-  simTable->SetNumberOfRows(100);
+  simTable->InsertNextBlankRow();
+  simTable->InsertNextBlankRow(1);
+//  simTable->SetNumberOfRows(100);
 }
 
 Whipple* MyQWhipple::getBike()
 {
   return bike;
+}
+
+std::string MyQWhipple::getName()
+{
+  return name;
 }
 
 void MyQWhipple::SimUpdate()
@@ -460,6 +490,15 @@ void MyQWhipple::SimUpdate()
 //      iren->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->ResetCamera();
 //    simRenderer->ResetCameraClippingRange();
 //
+  // wheel traces
+//  for  get timer count, maybe
+  rearPoints->InsertNextPoint(X,Y,0);
+//  rearPointsLine->GetPointIds()->SetNumberOfIds(simTable->GetNumberOfRows());
+ // for (unsigned int i = 0; i < simTable->GetNumberOfRows(); i++) {
+    //rearPointsLine->GetPointIds()->SetId(i,i);
+rearPointsLine->GetPointIds()->InsertNextId(simTable->GetNumberOfRows());
+//  }
+  // camera
   double d = 1;
   double pos[3];
   pos[0] = frontFrameAssy->GetPosition()[0];
@@ -480,13 +519,13 @@ void MyQWhipple::SimUpdate()
 //  simRenderer->GetActiveCamera()->SetFocalPoint(frontFrameAssy->GetPosition());
 }
 
-void MyQWhipple::SimSetValues(int rowidx)
+void MyQWhipple::SetSimValues(int rowidx)
 {
    // do some nice memory managemen here to control the size of the array
-  //simTable->InsertNextBlankRow();
-  if (rowidx > simTable->GetNumberOfRows()) {
+  simTable->InsertNextBlankRow();
+ /* if (rowidx > simTable->GetNumberOfRows()) {
     simTable->SetNumberOfRows(10000+simTable->GetNumberOfRows());
-  }
+  } */
   simTable->SetValue(rowidx,0,bike->t);
   simTable->SetValue(rowidx,1,bike->q0);
   simTable->SetValue(rowidx,2,bike->q1);
@@ -527,3 +566,38 @@ vtkSmartPointer<vtkTable> MyQWhipple::GetSimTable()
   return simTable;
 }
 
+void MyQWhipple::writeSim(std::string fname)
+{
+  simTable->Update();
+  std::ofstream fid(fname.c_str());
+  for (int i = 0; i < simTable->GetNumberOfRows(); i++) {
+    for (int j = 0; j < NMOTIONVARS; j++) {
+      fid << simTable->GetValue(i,j) << " ";
+    }
+    fid << endl;
+  }
+  fid.close();
+}
+
+// use VTKCONTEXT2D TO DRAW 2D BIKE
+/*
+void MyQWhipple::draw2D()
+{
+  // must solve for q2
+  double rearrad = bike->rr+bike->rrt;
+context->DrawEllipse(0,rearrad,bike->rr,bike->rr);
+context->DrawEllipse(0,rearrad,rearrad,rearrad);
+double x1 = bike->lr*cos(bike->q2);
+double y1 = rearrad + bike->lr*sin(bike->q2);
+double x2 = x1 + bike->ls*cos(90-bike->q2);
+double y2 = y1 - bike->ls*sin(90-bike->q2);
+double x3 = x2 + bike->lf*cos(bike->q2);
+double y3 = y2 + bike->lf*sin(bike->q2);
+context->DrawLine(0,rearrad,x1,y1);
+context->DrawLine(x1,y1,x2,y2);
+context->DrawLine(x2,y2,x3,y3);
+double frontrad = bike->rf+bike->rft;
+context->DrawEllipse(x3,y3,bike->rf,bike->rf);
+context->DrawEllipse(x3,y3,frontrad,frontrad);
+//draw mass centres
+}*/
