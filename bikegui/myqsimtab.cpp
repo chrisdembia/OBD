@@ -85,12 +85,19 @@ myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
 
   // include force vectors
   forceCheck = new QCheckBox("draw force vectors",simLSetBox);
-  connect(forceCheck, SIGNAL(stateChanged(int)), this, SLOT(forceCheckSlot(int)));
+  forceCheck->setCheckState(Qt::Checked);
+  connect(forceCheck, SIGNAL(stateChanged(int)), this,
+      SLOT(forceCheckSlot(int)));
 
   writesimButton = new QToolButton(simLSetBox);
   writesimButton->setText( tr("Save simulation data") );
   connect(writesimButton, SIGNAL(clicked()), this, SLOT(writeSimSlot()));
   // DELETE THE POINTERS DELEETE THE POINTERS!:w
+  //
+  savesimagesButton = new QToolButton(simLSetBox);
+  savesimagesButton->setText( tr("Save simulation images") );
+  savesimagesButton->setToolTip( tr("Saves each frame of the animation as an image file. You can use a program like ffmpeg to create a video from the images.") );
+  connect(savesimagesButton, SIGNAL(clicked()), this, SLOT(saveSimagesSlot()));
 
   //setup window
   simRenderWindow = vtkRenderWindow::New();
@@ -112,39 +119,24 @@ myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
  // VTK_CREATE(vtkTimerCallback2,callback);
 
   // plot
+
   simPlotQVTKW = new QVTKWidget(this);
-  simPlotVTKView = vtkSmartPointer<vtkContextView>::New();
-  simPlotVTKView->SetInteractor(simPlotQVTKW->GetInteractor());
-  simPlotQVTKW->SetRenderWindow(simPlotVTKView->GetRenderWindow());
-  simPlotVTKChart = vtkSmartPointer<vtkChartXY>::New();
-  simPlotVTKView->GetScene()->AddItem(simPlotVTKChart);
-//  VTK_CREATE(vtkPlot,simPlotVTKLine);
+  simPlotQVTKW->GetRenderWindow()->Render();
+//    simCallback->simPlotVTKChart = simPlotVTKChart;
+ //   simCallback->simPlotVTKView = simPlotVTKView;
 
-    simCallback->simPlotVTKChart = simPlotVTKChart;
-    simCallback->simPlotVTKView = simPlotVTKView;
-
-  simPlotCallback = vtkSmartPointer<vtkTimerCallback3>::New();
-  simPlotCallback->qbikes = qbikes;
-  simPlotQVTKW->GetInteractor()->AddObserver(vtkCommand::TimerEvent, simPlotCallback);
+//  simPlotCallback = vtkSmartPointer<vtkTimerCallback3>::New();
+ // simPlotCallback->qbikes = qbikes;
+ // simPlotQVTKW->GetInteractor()->AddObserver(vtkCommand::TimerEvent,
+  //    simPlotCallback);
   
 //  vtkPlot* simPlotVTKLine;
 //  simPlotVTKLines.resize(NMOTIONVARS);
-  simPlotVTKChart->ClearPlots();
-  for (int i = 1; i < NMOTIONVARS; i++) {
-/*    simPlotVTKLine = simPlotVTKChart->AddPlot(vtkChart::LINE);
-    simPlotVTKLine->SetInput(qbikes->at(0)->GetSimTable(), 0, i);
-    simPlotVTKLine->SetColor(255,0,0,255);*/
-    // ideally, create 32 vtkPlot simPlotVTKLines
-    simPlotVTKChart->AddPlot(vtkChart::LINE);
-    simPlotVTKChart->GetPlot(i-1)->SetInput(qbikes->at(0)->GetSimTable(),0,i);
-    simPlotVTKChart->GetPlot(i-1)->SetColor(255,0,0,255);
-  }
-  simPlotVTKChart->Update();
 
-  simPlotVTKChart->Paint(simPlotVTKView->GetContext());
+//  simPlotVTKChart->Paint(simPlotVTKView->GetContext());
 
-  simCallback->plotrenwin = simPlotQVTKW->GetRenderWindow();
-  simCallback->simPlotQVTKW = simPlotQVTKW;
+//  simCallback->plotrenwin = simPlotQVTKW->GetRenderWindow();
+ // simCallback->simPlotQVTKW = simPlotQVTKW;
   // arrange layouts
   // simLSetBox Widgets to simLayout
   simLSetLayout->addWidget(speedLabel,0,0,1,1);
@@ -153,6 +145,7 @@ myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   simLSetLayout->addWidget(stopsimButton,2,0);
   simLSetLayout->addWidget(forceCheck,3,0);
   simLSetLayout->addWidget(writesimButton,4,0);
+  simLSetLayout->addWidget(savesimagesButton,5,0);
   
   simLayout->addWidget(simLSetBox,0,0);
   simLayout->addWidget(simQVTKW,0,1);
@@ -231,16 +224,37 @@ void myQSimTab::startsimSlot(void)
   std::cout << "timerId3: " << timerId3 << std::endl;
  
   // Start the interaction and timer*/
-  simPlotQVTKW->GetInteractor()->Initialize();
-  simPlotQVTKW->GetInteractor()->Start();
+  //simPlotQVTKW->GetInteractor()->Start();
 }
 
 void myQSimTab::stopsimSlot(void)
 {
   simQVTKW->GetInteractor()->DestroyTimer();
+  simPlotVTKView = vtkSmartPointer<vtkContextView>::New();
+  simPlotVTKView->SetInteractor(simPlotQVTKW->GetInteractor());
+  simPlotQVTKW->SetRenderWindow(simPlotVTKView->GetRenderWindow());
+  simPlotVTKChart = vtkSmartPointer<vtkChartXY>::New();
+  simPlotVTKView->GetScene()->AddItem(simPlotVTKChart);
+  simPlotVTKChart->ClearPlots();
+  qbikes->at(0)->GetSimTable()->RemoveRow(qbikes->at(0)->GetSimTable()->GetNumberOfRows());
+  for (int i = 1; i < NMOTIONVARS; i++) {
+/*    simPlotVTKLine = simPlotVTKChart->AddPlot(vtkChart::LINE);
+    simPlotVTKLine->SetInput(qbikes->at(0)->GetSimTable(), 0, i);
+    simPlotVTKLine->SetColor(255,0,0,255);*/
+    // ideally, create 32 vtkPlot simPlotVTKLines
+    simPlotVTKChart->AddPlot(vtkChart::LINE);
+    simPlotVTKChart->GetPlot(i-1)->SetInput(qbikes->at(0)->GetSimTable(),0,i);
+    simPlotVTKChart->GetPlot(i-1)->SetColor(255,0,0,255);
+  }
+
   qbikes->at(0)->GetSimTable()->Update();
   simPlotVTKChart->Update();
+  simPlotQVTKW->GetInteractor()->Initialize();
+  simPlotQVTKW->GetRenderWindow()->Render();
+  simPlotQVTKW->GetInteractor()->Start();
 
+  qbikes->at(0)->UpdateTrace();
+  simRenderWindow->Render();
   //simPlotVTKChart->Paint(simPlotVTKView->GetContext());
 }
 
@@ -252,9 +266,9 @@ void myQSimTab::updatePlotSlot(void)
 void myQSimTab::forceCheckSlot(int state)
 {
   if (state == Qt::Checked) {
-
+    qbikes->at(0)->TurnOnReactionTriads();
   } else if (state == Qt::Unchecked) {
-
+    qbikes->at(0)->TurnOffReactionTriads();
   }
 }
 
@@ -266,3 +280,10 @@ void myQSimTab::writeSimSlot(void)
   qbikes->at(0)->writeSim(fname.toStdString());
 }
 
+void myQSimTab::saveSimagesSlot(void)
+{
+  QString fname = QFileDialog::getSaveFileName(this, tr("Save File"),
+      QDir::currentPath(), tr("PNG file (*.png)"));
+
+
+}

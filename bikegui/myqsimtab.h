@@ -89,9 +89,9 @@ class vtkTimerCallback2 : public vtkCommand
   //simPlotQVTKW->GetInteractor()->Initialize();
   //simPlotQVTKW->GetInteractor()->Start();
 //  simPlotVTKChart->Paint(simPlotVTKView->GetContext());
-   simPlotVTKView->GetScene()->GetItem(0)->Paint(simPlotVTKView->GetContext());
+  // simPlotVTKView->GetScene()->GetItem(0)->Paint(simPlotVTKView->GetContext());
   // simPlotVTKView->GetScene()->Paint(simPlotVTKView->GetContext());
-      plotrenwin->Render();
+   //   plotrenwin->Render();
       std::cout << "simtableval " <<
         qbikes->at(0)->GetSimTable()->GetValue(TimerCount,1) << std::endl;
       // render
@@ -113,10 +113,10 @@ class vtkTimerCallback2 : public vtkCommand
     }
     vtkSmartPointer<vtkPostScriptWriter> writer;
     vtkSmartPointer<vtkWindowToImageFilter> w2i;
-    vtkSmartPointer<vtkRenderWindow> plotrenwin;
-    QVTKWidget* simPlotQVTKW;
-    vtkSmartPointer<vtkChartXY> simPlotVTKChart;
-    vtkSmartPointer<vtkContextView> simPlotVTKView;
+  //  vtkSmartPointer<vtkRenderWindow> plotrenwin;
+   // QVTKWidget* simPlotQVTKW;
+   // vtkSmartPointer<vtkChartXY> simPlotVTKChart;
+   // vtkSmartPointer<vtkContextView> simPlotVTKView;
   private:
     int TimerCount;
     double time;
@@ -173,6 +173,7 @@ class myQSimTab : public QWidget
   void updatePlotSlot(void);
   void forceCheckSlot(int);
   void writeSimSlot(void);
+  void saveSimagesSlot(void);
 
   private:
   std::vector<MyQWhipple*>* qbikes;
@@ -189,6 +190,7 @@ class myQSimTab : public QWidget
   QToolButton* stopsimButton;
   QCheckBox* forceCheck;
   QToolButton* writesimButton;
+  QToolButton* savesimagesButton;
 
   // animation
   QVTKWidget *simQVTKW; 

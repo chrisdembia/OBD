@@ -116,6 +116,7 @@ uprightTopLayout = new QHBoxLayout;
     uprightTopLayout->addWidget(eigPlotQVTKW);  
   setLayout(uprightTopLayout);
 
+eigPlotQVTKW->GetRenderWindow()->Render();
 eigPlotQVTKW->setMinimumSize(500,200);
 }
 
@@ -261,4 +262,13 @@ void MyQUprightTab::updateEigPlotSlot(void)
 
   // SHOULD MAKE DESTRUCTORS
 
+}
+
+void MyQUprightTab::calcIntersections(void)
+{
+  // for each qbikeobject
+  // store intersections IN the qbike
+  // bifurcations
+  // zero passings
+  // draw in the corresponding lines
 }

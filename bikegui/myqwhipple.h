@@ -70,6 +70,10 @@ class MyQWhipple
     void initSim(vtkSmartPointer<vtkRenderer> ren);
     void writeSim(std::string);
 
+    void UpdateTrace();
+    void TurnOnReactionTriads();
+    void TurnOffReactionTriads();
+
   private:
     std::string name;
     vtkSmartPointer<vtkRenderer> simRenderer;
@@ -206,7 +210,10 @@ class MyQWhipple
     myvtkTriad *triad2;
     myvtkTriad *triad3;
     myvtkTriad *triad4;
-  
+ 
+    // ground reaction force triads
+    myvtkTriad *rearReaction;
+
     // render the actor assemblies
     vtkSmartPointer<vtkAssembly> rearWheelAssy;
     vtkSmartPointer<vtkAssembly> rearFrameAssy;

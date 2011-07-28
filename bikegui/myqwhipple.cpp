@@ -1,7 +1,8 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
-
+#include <algorithm>
+#include <cmath>
 
 // vtk sources
 #include <vtkSmartPointer.h>
@@ -343,14 +344,22 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren)
   triad4 = new myvtkTriad(simRenderer);
   triad4->SetScale(.2,.2,.2);
 
+  // ground reaction forces
+  rearReaction = new myvtkTriad(simRenderer);
+//  rearReaction->SetScale(2,2,2);
+  rearReaction->SetColor(0,0,0);
+
   // wheel traces
   rearPoints = vtkSmartPointer<vtkPoints>::New();
-  rearPoints->InsertNextPoint(0,0,0);
-  rearPoints->InsertNextPoint(3,0,0);
+  rearPoints->SetNumberOfPoints(1000);
+//  rearPoints->InsertNextPoint(3,0,0);
   rearPointsLine = vtkSmartPointer<vtkPolyLine>::New();
-//  rearPointsLine->SetNumberOfIds(2);
-  rearPointsLine->GetPointIds()->InsertNextId(0);
-  rearPointsLine->GetPointIds()->InsertNextId(1);
+  rearPointsLine->GetPointIds()->SetNumberOfIds(1000);
+  for (unsigned int i = 0; i < 1000; i++) {
+    rearPoints->SetPoint(i,i,0,0);
+    rearPointsLine->GetPointIds()->SetId(i,i);
+  }
+//  rearPointsLine->GetPointIds()->InsertNextId(1);
   rearPointsCell = vtkSmartPointer<vtkCellArray>::New();
   rearPointsCell->InsertNextCell(rearPointsLine);
   rearPointsData = vtkSmartPointer<vtkPolyData>::New();
@@ -444,6 +453,13 @@ void MyQWhipple::SimUpdate()
                              -bike->rrt - bike->rr*cos(LEAN));
   rearWheelAssy->SetOrientation(0,0,0);
   rearWheelAssy->RotateZ(180/M_PI*YAW);// NEGATIVE? IS RIGHTWARD AS IS
+
+  rearReaction->SetPosition(X,Y,0);
+  rearReaction->SetOrientation(rearWheelAssy->GetOrientation());
+  rearReaction->SetRelScale(0,bike->Rx/bike->mr/bike->g);
+  rearReaction->SetRelScale(1,bike->Ry/bike->mr/bike->g);
+  rearReaction->SetRelScale(2,bike->Rz/bike->mr/bike->g);
+  
   rearWheelAssy->RotateX(180/M_PI*LEAN);
   rearWheelAssy->RotateY(180/M_PI*RWSPIN);
   
@@ -492,11 +508,13 @@ void MyQWhipple::SimUpdate()
 //
   // wheel traces
 //  for  get timer count, maybe
-  rearPoints->InsertNextPoint(X,Y,0);
+ // rearPoints->InsertNextPoint(X,Y,0);
+ rearPoints->SetPoint(simTable->GetNumberOfRows(),X,Y,0);
+ rearPointsMapper->Update();
 //  rearPointsLine->GetPointIds()->SetNumberOfIds(simTable->GetNumberOfRows());
  // for (unsigned int i = 0; i < simTable->GetNumberOfRows(); i++) {
     //rearPointsLine->GetPointIds()->SetId(i,i);
-rearPointsLine->GetPointIds()->InsertNextId(simTable->GetNumberOfRows());
+//rearPointsLine->GetPointIds()->InsertNextId(simTable->GetNumberOfRows());
 //  }
   // camera
   double d = 1;
@@ -601,3 +619,21 @@ context->DrawEllipse(x3,y3,bike->rf,bike->rf);
 context->DrawEllipse(x3,y3,frontrad,frontrad);
 //draw mass centres
 }*/
+  void MyQWhipple::UpdateTrace()
+  {
+    for (int i = 0; i < simTable->GetNumberOfRows(); i++)
+    {
+      rearPoints->SetPoint(i,simTable->GetValue(i,7).ToDouble(),simTable->GetValue(i,8).ToDouble(),0.0);
+    }
+    rearPointsMapper->Update();
+  }
+
+void MyQWhipple::TurnOffReactionTriads()
+{
+  rearReaction->SetOpacity(0);
+}
+
+void MyQWhipple::TurnOnReactionTriads()
+{
+  rearReaction->SetOpacity(1);
+}

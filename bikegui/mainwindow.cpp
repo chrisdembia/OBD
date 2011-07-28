@@ -59,7 +59,7 @@ MainWindow::MainWindow()
   // Set up Actions, Menus, Tabs, Docks
   initActions();
   initMenus();
-  initDockWindows();
+  //initDockWindows();
   initStatusBar();
   initTabs();
 
@@ -123,7 +123,7 @@ void MainWindow::initActions(void)
   aboutQtAction->setStatusTip(tr("About Qt"));
   connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 }
-
+/*
 void MainWindow::initDockWindows(void)
 {
   QDockWidget *dock = new QDockWidget(tr("Bike Definitions"));
@@ -132,7 +132,7 @@ void MainWindow::initDockWindows(void)
   paramWidget = new WhippleParameter(qbikes, dock);
   dock->setWidget(paramWidget);
   
-}
+}*/
 
 void MainWindow::initMenus(void)
 {
@@ -163,10 +163,12 @@ void MainWindow::initTabs(void)
 //  msgLabel = new QLabel;
 
   tabWidget = new QTabWidget();
+  paramWidget = new WhippleParameter(qbikes, tabWidget);
   uprightTab = new MyQUprightTab(qbikes, tabWidget);
   steadyTurningTab = new QWidget;
   simTab = new myQSimTab(qbikes,tabWidget);
   
+  tabWidget->addTab( paramWidget, tr("Bicycle Definitions"));
   tabWidget->addTab( uprightTab, tr("Upright stability"));
   tabWidget->addTab( steadyTurningTab, tr("Steady turning"));
   tabWidget->addTab( simTab, tr("Simulation"));

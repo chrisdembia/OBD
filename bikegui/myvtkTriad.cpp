@@ -1,6 +1,7 @@
 // cstd
 #include <cstdlib>
 #include <vector>
+#include <algorithm>
 // qt
 // vtk sources
 #include <vtkSmartPointer.h>
@@ -126,7 +127,38 @@ void myvtkTriad::AddPosition(double p[3])
 
 void myvtkTriad::SetScale(double sx,double sy,double sz)
 {
+  scalex = sx;
+  scaley = sy;
+  scalez = sz;
   for (int i = 0; i < 3; i++) {
     triadActors[i]->SetScale(sx,sy,sz);
+  }
+}
+
+void myvtkTriad::SetRelScale(int dir, double s)
+{
+  //s = fabs(s);
+  if (s < 0) {
+    triadActors[dir]->RotateY(180);
+    s = -s;
+  }
+  double d = 1.0;
+  if (s < .1) {
+    d = s;
+  }
+  triadActors[dir]->SetScale(s*scalex,d*scaley,d*scalez);
+}
+
+void myvtkTriad::SetColor(double r,double g,double b)
+{
+  for (int i = 0; i < 3; i++) {
+    triadActors[i]->GetProperty()->SetColor(r,g,b);
+  }
+}
+
+void myvtkTriad::SetOpacity(double o)
+{
+  for (int i = 0; i < 3; i++) {
+    triadActors[i]->GetProperty()->SetOpacity(o);
   }
 }

@@ -8,6 +8,8 @@
         -- thread management (mandlebrot example)
         -- database storage/ file IO, PostgreSQL
         -- update to work with new Gryostat whipple structure
+        -- documentation
+        -- good usage instructions IN the program (tooltips)
     -- parameters
         -- make a separate window
         -- multiple bikes
@@ -42,5 +44,5 @@
         -- multiple camera angles
         -- shift transformations from rot steps to a single 4x4 matrix push
         -- crash detection, using tire forces: lateral to normal force ratio)
-        
+        -- text showing x,y distance traveled, show 10m lines on the "ground"    
 

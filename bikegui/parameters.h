@@ -82,8 +82,11 @@ private:
   /**
    * Qt Vertical layout holding the QtComboBox and parameter QtGroupBox
    * */
-  QVBoxLayout *layout;
+  QHBoxLayout *layout;
   
+  QGroupBox* bikeBox;
+
+  QGroupBox* drawBox;
   /**
    * QtComboBox to allow a user to select which types of parameters to use.
    * */
@@ -93,6 +96,8 @@ private:
    *
    * */
   void initBikeBox(void);
+
+  void initDrawBox(void);
   
   /**
    * QtGroupBox where a user can load, save, or modify parameters.

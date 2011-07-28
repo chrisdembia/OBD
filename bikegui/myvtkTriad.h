@@ -43,11 +43,17 @@ class myvtkTriad
   void AddPosition(double v[3]);
   void SetPosition(double v[3]);
   void SetScale(double,double,double);
+  void SetRelScale(int dir, double s);
+  void SetColor(double,double,double);
+  void SetOpacity(double);
   private:
   // unit vector arrows
   std::vector< vtkSmartPointer<vtkArrowSource> > triadSources;
   std::vector< vtkSmartPointer<vtkPolyDataMapper> > triadMappers;
   std::vector< vtkSmartPointer<vtkActor> > triadActors;
+  double scalex;
+  double scaley;
+  double scalez;
 };
 
 #endif

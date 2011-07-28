@@ -14,7 +14,6 @@ WhippleParameter::WhippleParameter(std::vector<MyQWhipple*>* qb, QWidget *parent
   qbikes = qb;
   qbikes->push_back( new MyQWhipple("bike1") );
 
-  initBikeBox();
 
   // struct from whipple.h, to hold the parambox values
   gswp = new WhippleParams; // gyrostat whipple parameters
@@ -25,24 +24,38 @@ WhippleParameter::WhippleParameter(std::vector<MyQWhipple*>* qb, QWidget *parent
   wasGyroSelectedBefore = false; 
   wasMeijSelectedBefore = false;
 
+
   paramComboBox = new QComboBox(this);
   paramComboBox->addItem(tr("Gyrostat parameters"));
-  paramComboBox->addItem(tr("Franke parameters"));
+//  paramComboBox->addItem(tr("Franke parameters"));
   paramComboBox->addItem(tr("Meijaard parameters"));
 
-  layout = new QVBoxLayout(this);
-  layout->addWidget(paramComboBox);
+
+  layout = new QHBoxLayout(this);
+  setLayout(layout);
+  initBikeBox();
 
   initParamBox();
   drawGyroParamBox();
-    
+  
   connect(paramComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(
         paramBoxSlot(int)) );
+  
+  initDrawBox();
 }
 
 void WhippleParameter::initBikeBox()
 {
 //  bikeComboBox = new QComboBox(
+  bikeBox = new QGroupBox( tr("Bicycle list"), this);
+  layout->addWidget(bikeBox);
+
+}
+
+void WhippleParameter::initDrawBox()
+{
+  drawBox = new QGroupBox( tr("Drawing"), this);
+  layout->addWidget(drawBox);
 }
 
 
@@ -51,6 +64,7 @@ void WhippleParameter::initParamBox()
   paramBox = new QGroupBox( tr("Set parameter values"), this);
   paramBox->setMinimumSize(300,600);
   layout->addWidget(paramBox);
+  layout->addWidget(paramComboBox);
 }
 
 void WhippleParameter::paramBoxSlot(int index)
@@ -64,9 +78,9 @@ void WhippleParameter::paramBoxSlot(int index)
   }
   else if (index == 1)
   { // Franke parameters
-    QGridLayout * frankeParamLayout = new QGridLayout;
-    frankeParamLayout->addWidget(new QLabel( tr("Not available. Bug the developers!") ),0,0);
-    paramBox->setLayout(frankeParamLayout);
+   // QGridLayout * frankeParamLayout = new QGridLayout;
+  //  frankeParamLayout->addWidget(new QLabel( tr("Not available. Bug the developers!") ),0,0);
+   // paramBox->setLayout(frankeParamLayout);
   }
   else if (index == 2)
   { // Meijaard parameters

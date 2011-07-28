@@ -49,6 +49,7 @@ class MyQUprightTab : public QWidget
 
   public:
     MyQUprightTab(std::vector<MyQWhipple*>* qb, QWidget *parent = 0);
+    void calcIntersections();
 // bike
   private slots:
 
