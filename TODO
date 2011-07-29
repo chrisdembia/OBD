@@ -25,6 +25,8 @@
         -- save data
         -- reset view
         -- help tooltip to show interactor keys
+        -- USE JASON'S SORTING ALGORITHM
+        -- OR USE DOTS INSTEAD OF LINES, NEGATE THE NEG UNREAL TO BE POS
     -- steady turning
 
     -- simulation

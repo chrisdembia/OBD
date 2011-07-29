@@ -284,6 +284,8 @@ void myQSimTab::saveSimagesSlot(void)
 {
   QString fname = QFileDialog::getSaveFileName(this, tr("Save File"),
       QDir::currentPath(), tr("PNG file (*.png)"));
-
+// page 247 of vtkusermanual: OffScreenRenderingOn(), and RenderLargeImage,
+// specify magnification/ there is a
+// Examples/Rendering/Tcl/RenderLargeImage.tcl example
 
 }

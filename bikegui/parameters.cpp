@@ -1,10 +1,14 @@
 #include <string>
 #include <vector>
+#include <QVTKWidget.h>
 #include <QtGui>
 #include "whipple.h"
 #include "whippleutils.h"
 #include "parameters.h"
 #include "myqwhipple.h"
+#include <vtkContextView.h>
+#include <vtkContextScene.h>
+#include <vtkContext2D.h>
 
 WhippleParameter::WhippleParameter(std::vector<MyQWhipple*>* qb, QWidget *parent)
   : QWidget(parent)
@@ -24,16 +28,23 @@ WhippleParameter::WhippleParameter(std::vector<MyQWhipple*>* qb, QWidget *parent
   wasGyroSelectedBefore = false; 
   wasMeijSelectedBefore = false;
 
+  layout = new QGridLayout(this);
+  setLayout(layout);
 
+
+  initBikeBox();
+  
+  paramTypeBox = new QGroupBox( tr("Choose parameter type"), this);
+  paramTypeLayout = new QVBoxLayout(paramTypeBox);
+  paramTypeBox->setLayout(paramTypeLayout);
   paramComboBox = new QComboBox(this);
+  paramTypeLayout->addWidget(paramComboBox);
+  layout->addWidget(paramTypeBox,0,1,1,1);
+
   paramComboBox->addItem(tr("Gyrostat parameters"));
 //  paramComboBox->addItem(tr("Franke parameters"));
   paramComboBox->addItem(tr("Meijaard parameters"));
 
-
-  layout = new QHBoxLayout(this);
-  setLayout(layout);
-  initBikeBox();
 
   initParamBox();
   drawGyroParamBox();
@@ -41,30 +52,96 @@ WhippleParameter::WhippleParameter(std::vector<MyQWhipple*>* qb, QWidget *parent
   connect(paramComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(
         paramBoxSlot(int)) );
   
-  initDrawBox();
+  initQDrawBox();
 }
 
 void WhippleParameter::initBikeBox()
 {
 //  bikeComboBox = new QComboBox(
   bikeBox = new QGroupBox( tr("Bicycle list"), this);
-  layout->addWidget(bikeBox);
+  layout->addWidget(bikeBox,0,0,1,1);
+
+  bikeLayout = new QGridLayout(bikeBox);
+  bikeBox->setLayout(bikeLayout);
+
+  addBikeButton = new QToolButton(bikeBox);
+  addBikeButton->setText( tr("Add bike"));
+  connect(addBikeButton, SIGNAL(clicked()), this, SLOT(addBikeSlot()));
+  removeBikeButton = new QToolButton(bikeBox);
+  removeBikeButton->setText( tr("Remove bike"));
+  connect(removeBikeButton, SIGNAL(clicked()), this, SLOT(removeBikeSlot()));
+
+  bikeLayout->addWidget(addBikeButton,1,0);
+  bikeLayout->addWidget(removeBikeButton,1,1);
 
 }
 
-void WhippleParameter::initDrawBox()
+void WhippleParameter::addBikeSlot()
 {
-  drawBox = new QGroupBox( tr("Drawing"), this);
-  layout->addWidget(drawBox);
+  bool ok;
+  QString text = QInputDialog::getText(this, tr("New bicycle"), tr("Enter the name for a new bicycle:"), QLineEdit::Normal, "bike" + QString("%1").arg(qbikes->size()+1), &ok);
+
+  if (ok) {
+    qbikes->push_back( new MyQWhipple(text.toStdString()));
+  }
 }
 
+void WhippleParameter::removeBikeSlot()
+{
+  QMessageBox::StandardButton clickedbutton = QMessageBox::question(this, tr("Removing a bicycle"), tr("Are you sure you want to delete the bicycle EDIT?"), QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
+  if (clickedbutton == QMessageBox::Ok) {
+// remove a vector from the vectors
+  } 
+}
 
 void WhippleParameter::initParamBox()
 {
   paramBox = new QGroupBox( tr("Set parameter values"), this);
   paramBox->setMinimumSize(300,600);
-  layout->addWidget(paramBox);
-  layout->addWidget(paramComboBox);
+  layout->addWidget(paramBox,1,1,1,1);
+}
+
+void WhippleParameter::initDrawBox()
+{
+  drawBox = new QGroupBox( tr("Drawing"), this);
+  layout->addWidget(drawBox,0,2,1,1);
+  QVBoxLayout* drawLayout = new QVBoxLayout;
+  drawBox->setLayout(drawLayout);
+
+  QVTKWidget* qvtkWidget = new QVTKWidget(drawBox);
+  qvtkWidget->GetInteractor()->Initialize();
+  vtkSmartPointer<vtkContextView> drawVTKView = vtkSmartPointer<vtkContextView>::New();
+  drawVTKView->SetInteractor(qvtkWidget->GetInteractor());
+  qvtkWidget->SetRenderWindow(drawVTKView->GetRenderWindow());
+  qbikes->at(0)->Draw2D(drawVTKView->GetContext());
+
+  drawLayout->addWidget(qvtkWidget);
+
+  qvtkWidget->GetRenderWindow()->Render();
+
+  qvtkWidget->GetInteractor()->Start();
+
+  
+}
+
+void WhippleParameter::initQDrawBox()
+{
+  drawBox = new QGroupBox( tr("Drawing"), this);
+  layout->addWidget(drawBox,0,2,2,1);
+  drawLayout = new QVBoxLayout(drawBox);
+  drawBox->setLayout(drawLayout);
+  drawView = new QGraphicsView(this);
+  drawView->setRenderHints(QPainter::Antialiasing);
+  drawLayout->addWidget(drawView);
+  drawScene = new QGraphicsScene(drawView);
+  drawScene->setBackgroundBrush(Qt::white);
+  drawView->setScene(drawScene);
+  qbikes->at(0)->QDraw2D(drawScene);
+  drawView->setMinimumSize(400,200);
+  drawView->fitInView(drawView->sceneRect(),Qt::KeepAspectRatioByExpanding);
+  //drawView->scale(100,100);
+
+
 }
 
 void WhippleParameter::paramBoxSlot(int index)
@@ -110,6 +187,9 @@ void WhippleParameter::drawGyroParamBox()
   gyroParamFileBox->setLayout(gyroParamFileLayout);
   gyroParamModBox->setLayout(gyroParamModLayout);
   gyroParamLayout->addWidget(gyroParamFileBox);
+  gyroParamLayout->addWidget(gyroParamModScroll);  
+  
+  paramBox->setLayout(gyroParamLayout);
 
   defineGyroStrings();
   
@@ -187,10 +267,6 @@ void WhippleParameter::drawGyroParamBox()
   }
 
   gyroParamModScroll->setWidget(gyroParamModBox);
-  
-  gyroParamLayout->addWidget(gyroParamModScroll);  
-
-  paramBox->setLayout(gyroParamLayout);
 }
 
 void WhippleParameter::drawMeijParamBox()
@@ -210,6 +286,8 @@ void WhippleParameter::drawMeijParamBox()
   meijParamModBox->setLayout(meijParamModLayout);
   meijParamLayout->addWidget(meijParamFileBox);
   
+  meijParamLayout->addWidget(meijParamModScroll);  
+  paramBox->setLayout(meijParamLayout);
 
 //  meijParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
   // DO I NEED THE ABOVE?
@@ -294,9 +372,6 @@ void WhippleParameter::drawMeijParamBox()
 
   
   meijParamModScroll->setWidget(meijParamModBox);
-  
-  meijParamLayout->addWidget(meijParamModScroll);  
-  paramBox->setLayout(meijParamLayout);
 }
 
 void WhippleParameter::updateMeijParamEdits(void)
@@ -427,6 +502,10 @@ void WhippleParameter::sendMeijParamToBike()
     delete gswptemptemp;
   }
   updateMeijParamEdits();
+  if (wasMeijSelectedBefore) {
+    drawScene->clear();
+    qbikes->at(0)->QDraw2D(drawScene);
+  }
 }
 
 void WhippleParameter::meijLoadSlot()
@@ -574,6 +653,10 @@ void WhippleParameter::sendGyroParamToBike()
     gyroErrorText->setText( tr("Parameters set.") );
   }
   updateGyroParamEdits();
+  if (wasGyroSelectedBefore) {
+    drawScene->clear();
+    qbikes->at(0)->QDraw2D(drawScene);
+  }
 }
 
 void WhippleParameter::gyroLoadSlot()

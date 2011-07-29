@@ -26,6 +26,7 @@
 #include <vtkActor2D.h>
 #include <vtkAssembly.h>
 // vtk misc
+#include <vtkContext2D.h>
 #include <vtkTransform.h>
 #include <vtkImageViewer.h>
 #include <vtkRenderer.h>
@@ -70,6 +71,8 @@ class MyQWhipple
     void initSim(vtkSmartPointer<vtkRenderer> ren);
     void writeSim(std::string);
 
+    void Draw2D(vtkSmartPointer<vtkContext2D>);
+    void QDraw2D(QGraphicsScene* qscene);
     void UpdateTrace();
     void TurnOnReactionTriads();
     void TurnOffReactionTriads();

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include <QtGui>
 // vtk sources
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
@@ -24,6 +25,7 @@
 #include <vtkActor2D.h>
 #include <vtkAssembly.h>
 // vtk misc
+#include <vtkContext2D.h>
 #include <vtkTransform.h>
 #include <vtkImageViewer.h>
 #include <vtkRenderer.h>
@@ -40,6 +42,7 @@
 #include <vtkPolyData.h>
 #include <vtkCommand.h>
 // vtk data
+#include <vtkPen.h>
 #include <vtkPolyData.h>
 #include <vtkPolyLine.h>
 #include <vtkTable.h>
@@ -598,10 +601,11 @@ void MyQWhipple::writeSim(std::string fname)
 }
 
 // use VTKCONTEXT2D TO DRAW 2D BIKE
-/*
-void MyQWhipple::draw2D()
+void MyQWhipple::Draw2D(vtkSmartPointer<vtkContext2D> context)
 {
   // must solve for q2
+  context->GetPen()->SetColorF(1,1,1);
+  context->GetPen()->SetWidth(5);
   double rearrad = bike->rr+bike->rrt;
 context->DrawEllipse(0,rearrad,bike->rr,bike->rr);
 context->DrawEllipse(0,rearrad,rearrad,rearrad);
@@ -618,8 +622,37 @@ double frontrad = bike->rf+bike->rft;
 context->DrawEllipse(x3,y3,bike->rf,bike->rf);
 context->DrawEllipse(x3,y3,frontrad,frontrad);
 //draw mass centres
-}*/
-  void MyQWhipple::UpdateTrace()
+}
+
+void MyQWhipple::QDraw2D(QGraphicsScene* qscene)
+{
+
+  bike->calcPitch();
+  QPen qframePen(Qt::red);
+  qframePen.setWidthF(.09);
+  QPen qwheelPen(Qt::black);
+  qwheelPen.setWidthF(.05);
+
+  double rearrad = bike->rr+bike->rrt;
+qscene->addEllipse(-rearrad+bike->rrt,0,2*bike->rr,-2*bike->rr,qwheelPen);
+qscene->addEllipse(-rearrad-bike->rrt,0,2*rearrad,-2*rearrad,qwheelPen);
+double x1 = bike->lr*cos(bike->q2);
+double y1 = rearrad + bike->lr*sin(bike->q2);
+double x2 = x1 + bike->ls*cos(M_PI/2-bike->q2);
+double y2 = y1 - bike->ls*sin(M_PI/2-bike->q2);
+double x3 = x2 + bike->lf*cos(bike->q2);
+double y3 = y2 + bike->lf*sin(bike->q2);
+qscene->addLine(0,-rearrad,x1,-y1,qframePen);
+qscene->addLine(x1,-y1,x2,-y2,qframePen);
+qscene->addLine(x2,-y2,x3,-y3,qframePen);
+double frontrad = bike->rf+bike->rft;
+qscene->addEllipse(x3-frontrad,-y3+frontrad,2*bike->rf,-2*bike->rf,qwheelPen);
+qscene->addEllipse(x3-frontrad,-y3+frontrad,2*frontrad,-2*frontrad,qwheelPen);
+  qscene->addLine(-rearrad,0,x3+frontrad,0);
+
+}
+
+void MyQWhipple::UpdateTrace()
   {
     for (int i = 0; i < simTable->GetNumberOfRows(); i++)
     {

@@ -23,6 +23,11 @@ public:
   WhippleParameter(std::vector<MyQWhipple*>* qb, QWidget *parent = 0);
 
 private slots:
+
+  void addBikeSlot();
+
+  void removeBikeSlot();
+
   /**
    *
    * */
@@ -82,11 +87,18 @@ private:
   /**
    * Qt Vertical layout holding the QtComboBox and parameter QtGroupBox
    * */
-  QHBoxLayout *layout;
+  QGridLayout *layout;
   
   QGroupBox* bikeBox;
+  QGridLayout* bikeLayout;
+  QToolButton* addBikeButton;
+  QToolButton* removeBikeButton;
 
   QGroupBox* drawBox;
+  QVBoxLayout* drawLayout;
+  QGraphicsView* drawView;
+  QGraphicsScene* drawScene;
+
   /**
    * QtComboBox to allow a user to select which types of parameters to use.
    * */
@@ -98,11 +110,17 @@ private:
   void initBikeBox(void);
 
   void initDrawBox(void);
+
+  void initQDrawBox(void);
   
   /**
    * QtGroupBox where a user can load, save, or modify parameters.
    * */
   QGroupBox *paramBox;
+
+  QVBoxLayout* paramTypeLayout;
+
+  QGroupBox* paramTypeBox;
 
   /**
    *

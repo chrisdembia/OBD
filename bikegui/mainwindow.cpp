@@ -168,7 +168,7 @@ void MainWindow::initTabs(void)
   steadyTurningTab = new QWidget;
   simTab = new myQSimTab(qbikes,tabWidget);
   
-  tabWidget->addTab( paramWidget, tr("Bicycle Definitions"));
+  tabWidget->addTab( paramWidget, tr("Bicycle Library"));
   tabWidget->addTab( uprightTab, tr("Upright stability"));
   tabWidget->addTab( steadyTurningTab, tr("Steady turning"));
   tabWidget->addTab( simTab, tr("Simulation"));
