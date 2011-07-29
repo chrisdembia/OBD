@@ -9,6 +9,8 @@
 #include <vtkContourFilter.h>
 #include <vtkOutlineFilter.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkCubeAxesActor.h>
+#include <vtkAxesActor.h>
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
@@ -37,29 +39,30 @@ MyQSteadyTab::MyQSteadyTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   steadyLayout->addWidget(steadyQVTKW);
 
   holoFunc = vtkSmartPointer<myvtkHolonomic>::New();
+  holoFunc->SetBike(qbikes->at(0)->getBike());
 
   // Sample the function
   sample = vtkSmartPointer<vtkSampleFunction>::New();
   sample->SetSampleDimensions(100,100,100);
   sample->SetImplicitFunction(holoFunc);
-  double value = 2.0;
-  double xmin = -value, xmax = value, ymin = -value, ymax = value, zmin = -value, zmax = value;
-  sample->SetModelBounds(-M_PI/2.0, M_PI/2.0, M_PI/10.-M_PI, M_PI/10.+M_PI, 0.0, M_PI);
- // sample->SetModelBounds(xmin,xmax,ymin,ymax,zmin,zmax);
+  sample->SetModelBounds(-M_PI/2.0, M_PI/2.0,
+      M_PI/10.-M_PI, M_PI/10.+M_PI,
+      0.0, M_PI);
  
   // Create the 0 isosurface
   contours = vtkSmartPointer<vtkContourFilter>::New();
   contours->SetInput(sample->GetOutput());
-  contours->GenerateValues(1, 1, 1);
+  contours->GenerateValues(1, 0, 0);
  
   // Map the contours to graphical primitives
   contourMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   contourMapper->SetInput(contours->GetOutput());
-  contourMapper->SetScalarRange(0.0, 1.2);
+//  contourMapper->SetScalarRange(0.0, 1.2);
  
   // Create an actor for the contours
   contourActor = vtkSmartPointer<vtkActor>::New();
   contourActor->SetMapper(contourMapper);
+//  contourActor->GetProperty()->SetColor(0,0,0);
  
   // -- create a box around the function to indicate the sampling volume --
  
@@ -84,13 +87,29 @@ MyQSteadyTab::MyQSteadyTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
 //  interactor->SetRenderWindow(renderWindow);
  
   steadyQVTKW->SetRenderWindow(renderWindow);
-  myvtkTriad triad1(renderer);
+//  myvtkTriad triad1(renderer);
+  vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
+  renderer->AddActor(axes);
+  vtkSmartPointer<vtkCubeAxesActor> axes1 = vtkSmartPointer<vtkCubeAxesActor>::New();
+  axes1->SetCamera(renderer->GetActiveCamera());
+  axes1->SetXTitle("lean");
+  axes1->SetYTitle("pitch");
+  axes1->SetZTitle("steer");
+  axes1->SetBounds(sample->GetModelBounds());
+  renderer->AddActor(axes1);
+/*
+  vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
+  vtkSmartPointer<vtkPolyDataMapper> spheremap = vtkSmartPointer<vtkPolyDataMapper>::New();
+  spheremap->SetInput(sphere->GetOutput());
+  vtkSmartPointer<vtkActor> sphereact = vtkSmartPointer<vtkActor>::New();
+  sphereact->SetMapper(spheremap);
+  renderer->AddActor(sphereact);*/
 
   renderer->AddActor(contourActor);
   renderer->AddActor(outlineActor);
   renderer->SetBackground(.5,.5,.5); // Background color white
  
-  renderWindow->SetAAFrames(1);
+  renderWindow->SetAAFrames(2);
   renderWindow->Render();
   renderer->ResetCamera();
 

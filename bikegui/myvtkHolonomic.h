@@ -1,9 +1,9 @@
 #ifndef __myvtkHolonomic_h
 #define __myvtkHolonomic_h
 
-#include <vtkImplicitFunction.h>
 #include <cmath>
-
+#include <vtkImplicitFunction.h>
+#include "whipple.h"
 
 class VTK_FILTERING_EXPORT myvtkHolonomic : public vtkImplicitFunction
 {
@@ -12,9 +12,8 @@ class VTK_FILTERING_EXPORT myvtkHolonomic : public vtkImplicitFunction
         static myvtkHolonomic* New();
 
         double EvaluateFunction(double x[3]);
-        double EvaluateFunction(double x, double y, double z)
-        { return this->myvtkHolonomic::EvaluateFunction(x,y,z);};
         void EvaluateGradient(double x[3], double n[3]);
+        void SetBike(Whipple*bike);
     protected:
         myvtkHolonomic();
         ~myvtkHolonomic() {};
@@ -25,8 +24,6 @@ class VTK_FILTERING_EXPORT myvtkHolonomic : public vtkImplicitFunction
         double lr;
         double ls;
         double lf;
-        double Radius;
-        double Center[3];
     private:
         myvtkHolonomic(const myvtkHolonomic&);
         void operator=(const myvtkHolonomic&);

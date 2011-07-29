@@ -663,10 +663,10 @@ void MyQWhipple::UpdateTrace()
 
 void MyQWhipple::TurnOffReactionTriads()
 {
-  rearReaction->SetOpacity(0);
+  rearReaction->SetVisibility(0);
 }
 
 void MyQWhipple::TurnOnReactionTriads()
 {
-  rearReaction->SetOpacity(1);
+  rearReaction->SetVisibility(1);
 }

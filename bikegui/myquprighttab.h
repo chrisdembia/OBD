@@ -29,6 +29,11 @@
 #include <vtkContextView.h>
 #include <vtkContextScene.h>
 
+// for saving the plot
+#include <vtkPostScriptWriter.h>
+#include <vtkWindowToImageFilter.h>
+#include <vtkPNGWriter.h>
+
 #include <getopt.h>
 #include "gslVecUtils.h"
 #include "whipple.h"
@@ -40,7 +45,7 @@ struct uprightOptions {
   std::string outfolder;
   double pitchguess;
   int N; // number of points on plot (linspace between velocities)
-  double vi, vf; // initial and final velocity
+  double vi, vf; // first and last velocity
 } ;
 
 class MyQUprightTab : public QWidget
@@ -67,8 +72,8 @@ class MyQUprightTab : public QWidget
   QLineEdit *saveEigFilenameEdit;
   QLineEdit *nEvalPointsEdit;
   QLineEdit *pitchGuessEdit;
-  QLineEdit *initSpeedEdit;
-  QLineEdit *finalSpeedEdit;
+  QLineEdit *firstSpeedEdit;
+  QLineEdit *lastSpeedEdit;
 
   QToolButton * saveEigButton;
   QToolButton * updateEigButton;
@@ -84,5 +89,9 @@ class MyQUprightTab : public QWidget
   vtkSmartPointer<vtkChartXY> eigPlotVTKChart;
   vtkSmartPointer<vtkFloatArray> arrX;
   std::vector< vtkSmartPointer<vtkFloatArray> > arrY;
+
+  vtkSmartPointer<vtkWindowToImageFilter> w2i;
+  vtkSmartPointer<vtkPostScriptWriter> writerPS;
+  vtkSmartPointer<vtkPNGWriter> writerPNG;
 };
 #endif

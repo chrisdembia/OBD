@@ -156,9 +156,9 @@ void myvtkTriad::SetColor(double r,double g,double b)
   }
 }
 
-void myvtkTriad::SetOpacity(double o)
+void myvtkTriad::SetVisibility(double o)
 {
   for (int i = 0; i < 3; i++) {
-    triadActors[i]->GetProperty()->SetOpacity(o);
+    triadActors[i]->SetVisibility(o);
   }
 }

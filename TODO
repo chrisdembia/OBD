@@ -48,3 +48,11 @@
         -- crash detection, using tire forces: lateral to normal force ratio)
         -- text showing x,y distance traveled, show 10m lines on the "ground"    
 
+-- Conventions
+    -- space after comma
+    -- two space indents
+    -- order
+    -- header files arrange
+    -- limit includes: someone else using my class
+    -- member variable vtk objects; how often are they used?
+    -- 

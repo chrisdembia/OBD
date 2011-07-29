@@ -26,6 +26,10 @@
 #include <vtkFloatArray.h>
 #include <vtkContextView.h>
 #include <vtkContextScene.h>
+// for saving the plot
+#include <vtkPostScriptWriter.h>
+#include <vtkWindowToImageFilter.h>
+#include <vtkPNGWriter.h>
 
 #include <getopt.h>
 #include "gslVecUtils.h"
@@ -71,8 +75,9 @@ MyQUprightTab::MyQUprightTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   uprightSetLayout->addWidget(saveEigFilenameEdit,1,0,1,2);
   
   // Number of evaluation points
-  uprightSetLayout->addWidget(new QLabel( tr("number of evaluation points") ),3,0);
+  uprightSetLayout->addWidget(new QLabel( tr("number of speeds") ),3,0);
   nEvalPointsEdit = new QLineEdit;
+  nEvalPointsEdit->setToolTip( tr("The number of points, between the first and last speeds, at which the eigenvalues will be calculated and plotted."));
   nEvalPointsEdit->setText( QString("%1").arg(upOpts.N) );
   nEvalPointsEdit->setAlignment(Qt::AlignRight);
   uprightSetLayout->addWidget(nEvalPointsEdit,3,1);
@@ -85,18 +90,18 @@ MyQUprightTab::MyQUprightTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   uprightSetLayout->addWidget(pitchGuessEdit,2,1);
   
   // Initial speed
-  uprightSetLayout->addWidget(new QLabel( tr("initial speed v_i (m/s)") ), 4,0);
-  initSpeedEdit = new QLineEdit;
-  initSpeedEdit->setText( QString("%1").arg(upOpts.vi) );
-  initSpeedEdit->setAlignment(Qt::AlignRight);
-  uprightSetLayout->addWidget(initSpeedEdit,4,1);
+  uprightSetLayout->addWidget(new QLabel( tr("first speed (m/s)") ), 4,0);
+  firstSpeedEdit = new QLineEdit;
+  firstSpeedEdit->setText( QString("%1").arg(upOpts.vi) );
+  firstSpeedEdit->setAlignment(Qt::AlignRight);
+  uprightSetLayout->addWidget(firstSpeedEdit,4,1);
   
   // Final speed
-  uprightSetLayout->addWidget(new QLabel( tr("final speed v_f (m/s)") ), 5,0);
-  finalSpeedEdit = new QLineEdit;
-  finalSpeedEdit->setText( QString("%1").arg(upOpts.vf) );
-  finalSpeedEdit->setAlignment(Qt::AlignRight);
-  uprightSetLayout->addWidget(finalSpeedEdit,5,1);
+  uprightSetLayout->addWidget(new QLabel( tr("last speed (m/s)") ), 5,0);
+  lastSpeedEdit = new QLineEdit;
+  lastSpeedEdit->setText( QString("%1").arg(upOpts.vf) );
+  lastSpeedEdit->setAlignment(Qt::AlignRight);
+  uprightSetLayout->addWidget(lastSpeedEdit,5,1);
 
 uprightSetBox = new QGroupBox( tr("Settings") );
 
@@ -118,15 +123,28 @@ uprightTopLayout = new QHBoxLayout;
 
 eigPlotQVTKW->GetRenderWindow()->Render();
 eigPlotQVTKW->setMinimumSize(500,200);
+
+
+// vtk setup
+  writerPS = new vtkSmartPointer<vtkPostScriptWriter>::New();
+  writerPNG = new vtkSmartPointer<vtkPNGWriter>::New();
+  w2i = new vtkSmartPointer<vtkWindowToImageFilter>::New();
+  w2i->SetInput(eigPlotQVTKW->GetRenderWindow());
+  writerPS->SetInput(w2i->GetOutput());
+  writerPNG->SetInput(w2i->GetOutput());
+//  w2i->SetInput(iren->GetRenderWindow());
+//  writer->SetInput(w2i->GetOutput());
+//  writer->SetFileName(QString("cld72qtvtkbike" + QString("%1").arg(TimerCount) + ".ps").toStdString().c_str());
+//  writer->Write();
+  
 }
 
 void MyQUprightTab::saveEigSlot(void)
 {
-  /*QFileDialog *saveEigDirDial = new QFileDialog(uprightStabilityTab);
-  saveEigDirDial->setFileMode(QFileDialog::Directory);
-  saveEigDirDial->setViewMode(QFileDialog::List);
-  */
   QString dir = QFileDialog::getExistingDirectory(this,tr("Choose Directory"),QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+  eigPlotQVTKW->GetRenderWindow()->Render();
+  writer->SetFileName(dir.toStdString().c_str());
+  writer->Write();
 
 }
 
@@ -175,8 +193,8 @@ void MyQUprightTab::updateEigPlotSlot(void)
   upOpts.outfolder = saveEigFilenameEdit->text().toStdString();
   upOpts.N = nEvalPointsEdit->text().toInt();
   upOpts.pitchguess = pitchGuessEdit->text().toDouble();
-  upOpts.vi = initSpeedEdit->text().toDouble();
-  upOpts.vf = finalSpeedEdit->text().toDouble();
+  upOpts.vi = firstSpeedEdit->text().toDouble();
+  upOpts.vf = lastSpeedEdit->text().toDouble();
 
 // TIME TO GRAB PARAMETERS FROM PARAMETER WIDGET!! must validate them, yo.
 

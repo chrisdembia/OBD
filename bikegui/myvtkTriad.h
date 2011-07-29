@@ -45,7 +45,7 @@ class myvtkTriad
   void SetScale(double,double,double);
   void SetRelScale(int dir, double s);
   void SetColor(double,double,double);
-  void SetOpacity(double);
+  void SetVisibility(double);
   private:
   // unit vector arrows
   std::vector< vtkSmartPointer<vtkArrowSource> > triadSources;
