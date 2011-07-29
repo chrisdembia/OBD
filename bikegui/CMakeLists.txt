@@ -5,11 +5,11 @@ FIND_PACKAGE(VTK)
 INCLUDE(${VTK_USE_FILE})
 
 include_directories(${PROJECT_SOURCE_DIR}/whipple/include)
-set(obdgui_sources main.cpp mainwindow.cpp parameters.cpp
-    myqsimtab.cpp myqwhipple.cpp myvtkTriad.cpp myquprighttab.cpp)
-set(obdgui_headers mainwindow.h parameters.h myqsimtab.h myquprighttab.h
-    myqwhipple.h
-    myvtkTriad.h)
+set(obdgui_sources main.cpp mainwindow.cpp parameters.cpp myquprighttab.cpp
+    myqsteadytab.cpp myqsimtab.cpp myqwhipple.cpp myvtkTriad.cpp
+    myvtkHolonomic.cpp)
+set(obdgui_headers mainwindow.h parameters.h myqsimtab.h myqsteadytab.h
+    myquprighttab.h myqwhipple.h myvtkTriad.h myvtkHolonomic.h)
 
 qt4_wrap_cpp(obdgui_headers_moc ${obdgui_headers})
 

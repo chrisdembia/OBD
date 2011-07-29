@@ -59,10 +59,15 @@ void WhippleParameter::initBikeBox()
 {
 //  bikeComboBox = new QComboBox(
   bikeBox = new QGroupBox( tr("Bicycle list"), this);
-  layout->addWidget(bikeBox,0,0,1,1);
+  layout->addWidget(bikeBox,0,0,2,1);
 
   bikeLayout = new QGridLayout(bikeBox);
   bikeBox->setLayout(bikeLayout);
+
+  bikeListView = new QListView(this);
+  bikeList << "item1" << "item2" << "item3";
+  bikeListModel = new QStringListModel(bikeList);
+  bikeListView->setModel(bikeListModel);
 
   addBikeButton = new QToolButton(bikeBox);
   addBikeButton->setText( tr("Add bike"));
@@ -71,6 +76,7 @@ void WhippleParameter::initBikeBox()
   removeBikeButton->setText( tr("Remove bike"));
   connect(removeBikeButton, SIGNAL(clicked()), this, SLOT(removeBikeSlot()));
 
+  bikeLayout->addWidget(bikeListView,0,0);
   bikeLayout->addWidget(addBikeButton,1,0);
   bikeLayout->addWidget(removeBikeButton,1,1);
 
@@ -83,6 +89,7 @@ void WhippleParameter::addBikeSlot()
 
   if (ok) {
     qbikes->push_back( new MyQWhipple(text.toStdString()));
+    bikeList << text.toStdString().c_str();
   }
 }
 
@@ -130,6 +137,12 @@ void WhippleParameter::initQDrawBox()
   layout->addWidget(drawBox,0,2,2,1);
   drawLayout = new QVBoxLayout(drawBox);
   drawBox->setLayout(drawLayout);
+
+  saveDrawButton = new QToolButton(drawBox);
+  saveDrawButton->setText( tr("Save bicycle drawing"));
+  connect(saveDrawButton,SIGNAL(clicked()), this, SLOT(saveDrawSlot()));
+  drawLayout->addWidget(saveDrawButton);
+
   drawView = new QGraphicsView(this);
   drawView->setRenderHints(QPainter::Antialiasing);
   drawLayout->addWidget(drawView);
@@ -141,6 +154,16 @@ void WhippleParameter::initQDrawBox()
   drawView->fitInView(drawView->sceneRect(),Qt::KeepAspectRatioByExpanding);
   //drawView->scale(100,100);
 
+
+}
+
+void WhippleParameter::saveDrawSlot()
+{
+  QString fdirname = QFileDialog::getSaveFileName(this, tr("Save drawing"), QDir::currentPath(), tr("Postscript (*.ps)") );
+  // from whippleutils.h
+  if (!fdirname.isEmpty())
+  {
+  }
 
 }
 

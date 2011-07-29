@@ -28,6 +28,9 @@ private slots:
 
   void removeBikeSlot();
 
+
+  void saveDrawSlot();
+
   /**
    *
    * */
@@ -51,13 +54,13 @@ private slots:
   /**
    *
    * */
-  void gyroSaveAsSlot();  
+  void gyroSaveAsSlot();
 
   /**
    *
    * */
   void setGyroBenchParametersSlot();
-  
+
   /**
    *
    * */
@@ -76,7 +79,7 @@ private slots:
   /**
    *
    * */
-  void meijSaveAsSlot();  
+  void meijSaveAsSlot();
 
   /**
    * Called when a user clicks the button "Use benchmark parameters".
@@ -88,9 +91,13 @@ private:
    * Qt Vertical layout holding the QtComboBox and parameter QtGroupBox
    * */
   QGridLayout *layout;
-  
+
   QGroupBox* bikeBox;
   QGridLayout* bikeLayout;
+  QListView* bikeListView;
+  QStringList bikeList;
+  QStringListModel* bikeListModel;
+
   QToolButton* addBikeButton;
   QToolButton* removeBikeButton;
 
@@ -98,6 +105,8 @@ private:
   QVBoxLayout* drawLayout;
   QGraphicsView* drawView;
   QGraphicsScene* drawScene;
+  QToolButton* saveDrawButton;
+
 
   /**
    * QtComboBox to allow a user to select which types of parameters to use.
@@ -112,7 +121,8 @@ private:
   void initDrawBox(void);
 
   void initQDrawBox(void);
-  
+
+
   /**
    * QtGroupBox where a user can load, save, or modify parameters.
    * */
@@ -126,9 +136,9 @@ private:
    *
    * */
   void initParamBox();
-  
+
   // Whipple bicycle stuffs
-  
+
   /**
    * Pointer to a whipple bike created in the MainWindow class. We have a pointer here so that we can modify the parameters that the bicycle(s) use(s).
    * */

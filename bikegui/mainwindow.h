@@ -32,6 +32,7 @@
 #include "mainwindow.h"
 #include "myqwhipple.h"
 #include "myquprighttab.h"
+#include "myqsteadytab.h"
 #include "myqsimtab.h"
 // obd
 #include "whipple.h"
@@ -89,7 +90,7 @@ private:
 
   // Tabs
   MyQUprightTab* uprightTab;
-  QWidget *steadyTurningTab;
+  MyQSteadyTab *steadyTab;
   myQSimTab *simTab;
 
 

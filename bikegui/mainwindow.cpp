@@ -36,6 +36,7 @@
 #include "parameters.h"
 #include "myqwhipple.h"
 #include "myquprighttab.h"
+//#include "myqsteadytab.h"
 #include "myqsimtab.h"
 
 std::ostream &operator<<(std::ostream &outfile, const Whipple * discs);
@@ -163,34 +164,28 @@ void MainWindow::initTabs(void)
 //  msgLabel = new QLabel;
 
   tabWidget = new QTabWidget();
-  paramWidget = new WhippleParameter(qbikes, tabWidget);
   uprightTab = new MyQUprightTab(qbikes, tabWidget);
-  steadyTurningTab = new QWidget;
+  paramWidget = new WhippleParameter(qbikes, tabWidget);
+  steadyTab = new MyQSteadyTab(qbikes, tabWidget);
   simTab = new myQSimTab(qbikes,tabWidget);
   
   tabWidget->addTab( paramWidget, tr("Bicycle Library"));
   tabWidget->addTab( uprightTab, tr("Upright stability"));
-  tabWidget->addTab( steadyTurningTab, tr("Steady turning"));
+  tabWidget->addTab( steadyTab, tr("Steady turning"));
   tabWidget->addTab( simTab, tr("Simulation"));
-  /*
-  uprightTab->setParent(tabWidget);
-  steadyTurningWidget->setParent(tabWidget);
-  simVisualizationWidget->setParent(tabWidget);
-  */
   
-  initSteadyTurningTab();
 }
 
 void MainWindow::initSteadyTurningTab(void)
 {
-  QGridLayout *steadyLayout = new QGridLayout;
+/*  QGridLayout *steadyLayout = new QGridLayout;
 
   QComboBox *bikeDropDown = new QComboBox;
   bikeDropDown->addItem( tr("bike1") );
   
     
   steadyLayout->addWidget(bikeDropDown);
-  steadyTurningTab->setLayout(steadyLayout);
+  steadyTurningTab->setLayout(steadyLayout);*/
 }
 
 std::ostream &operator<<(std::ostream &file, const Whipple * discs)
