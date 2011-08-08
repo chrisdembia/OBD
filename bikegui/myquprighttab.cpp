@@ -126,9 +126,9 @@ eigPlotQVTKW->setMinimumSize(500,200);
 
 
 // vtk setup
-  writerPS = new vtkSmartPointer<vtkPostScriptWriter>::New();
-  writerPNG = new vtkSmartPointer<vtkPNGWriter>::New();
-  w2i = new vtkSmartPointer<vtkWindowToImageFilter>::New();
+  writerPS = vtkSmartPointer<vtkPostScriptWriter>::New();
+  writerPNG = vtkSmartPointer<vtkPNGWriter>::New();
+  w2i = vtkSmartPointer<vtkWindowToImageFilter>::New();
   w2i->SetInput(eigPlotQVTKW->GetRenderWindow());
   writerPS->SetInput(w2i->GetOutput());
   writerPNG->SetInput(w2i->GetOutput());
@@ -141,10 +141,11 @@ eigPlotQVTKW->setMinimumSize(500,200);
 
 void MyQUprightTab::saveEigSlot(void)
 {
-  QString dir = QFileDialog::getExistingDirectory(this,tr("Choose Directory"),QDir::currentPath(),QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-  eigPlotQVTKW->GetRenderWindow()->Render();
-  writer->SetFileName(dir.toStdString().c_str());
-  writer->Write();
+  QString dir = QFileDialog::getSaveFileName(this,tr("Save plot"),QDir::currentPath());
+//  eigPlotQVTKW->GetRenderWindow()->Render();
+  w2i->SetInput(eigPlotQVTKW->GetRenderWindow());
+  writerPS->SetFileName(dir.toStdString().c_str());
+  writerPS->Write();
 
 }
 
