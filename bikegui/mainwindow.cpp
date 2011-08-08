@@ -7,10 +7,6 @@
 
 #include <QVTKWidget.h>
 // plotting
-#include "vtkQtLineChartView.h"
-#include "vtkQtChartRepresentation.h"
-#include "vtkQtTableView.h"
-#include "vtkDataObjectToTable.h"
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 

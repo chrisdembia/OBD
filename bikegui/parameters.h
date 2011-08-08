@@ -28,6 +28,9 @@ private slots:
 
   void removeBikeSlot();
 
+  void bikeListSelectionSlot(const QItemSelection& selected, const QItemSelection& deselected);
+
+  void bikeListCurrentSlot(const QModelIndex& current, const QModelIndex& previous);
 
   void saveDrawSlot();
 
@@ -97,6 +100,7 @@ private:
   QListView* bikeListView;
   QStringList bikeList;
   QStringListModel* bikeListModel;
+  QItemSelectionModel *bikeListSelection;
 
   QToolButton* addBikeButton;
   QToolButton* removeBikeButton;

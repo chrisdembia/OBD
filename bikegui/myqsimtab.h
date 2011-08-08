@@ -97,6 +97,7 @@ class vtkTimerCallback2 : public vtkCommand
       // render
       vtkRenderWindowInteractor *iren =
         vtkRenderWindowInteractor::SafeDownCast(caller);
+    iren->GetRenderWindow()->Modified();
       iren->GetRenderWindow()->Render();
 //  w2i->SetInput(iren->GetRenderWindow());
 //  writer->SetInput(w2i->GetOutput());

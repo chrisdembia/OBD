@@ -10,6 +10,7 @@
         -- update to work with new Gryostat whipple structure
         -- documentation
         -- good usage instructions IN the program (tooltips)
+        -- eliminate most header files; use forward declaration
     -- parameters
         -- make a separate window
         -- multiple bikes
@@ -28,6 +29,9 @@
         -- USE JASON'S SORTING ALGORITHM
         -- OR USE DOTS INSTEAD OF LINES, NEGATE THE NEG UNREAL TO BE POS
     -- steady turning
+        -- precisely determine range of pitch variable; solve for lean pitch is zero, get both
+        -- solutions; 
+        -- default level curves color table
 
     -- simulation
         -- plot update
