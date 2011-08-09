@@ -116,6 +116,7 @@ private:
   QGraphicsScene* drawScene;
   QToolButton* saveDrawButton;
 
+  unsigned int bidx;
 
   /**
    * QtComboBox to allow a user to select which types of parameters to use.

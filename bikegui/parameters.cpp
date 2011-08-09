@@ -26,6 +26,7 @@ WhippleParameter::WhippleParameter(std::vector<MyQWhipple*>* qb, QWidget *parent
   // bring the bike pointer(s) from mainwindow over to parameters.
   qbikes = qb;
   qbikes->push_back( new MyQWhipple("bike1") );
+  bidx = 0;
 
 
   // struct from whipple.h, to hold the parambox values
@@ -147,7 +148,6 @@ void WhippleParameter::removeBikeSlot()
     bikeList.removeAt(bikeidx);
     bikeListModel->setStringList(bikeList);
     //bikeListModel->removeRows(bikeidx,1);
-
   } 
 }
 
@@ -188,8 +188,6 @@ void WhippleParameter::initDrawBox()
   qvtkWidget->GetRenderWindow()->Render();
 
   qvtkWidget->GetInteractor()->Start();
-
-  
 }
 
 void WhippleParameter::initQDrawBox()
