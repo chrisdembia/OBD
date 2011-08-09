@@ -1,9 +1,11 @@
-
-
-#include <vtkImplicitFunction.h>
-#include <vtkObjectFactory.h>
+// c
 #include <cmath>
 
+// vtk
+#include <vtkImplicitFunction.h>
+#include <vtkObjectFactory.h>
+
+// gui
 #include "myvtkHolonomic.h"
 
 vtkStandardNewMacro(myvtkHolonomic);

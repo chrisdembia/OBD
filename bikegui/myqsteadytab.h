@@ -1,31 +1,35 @@
 #ifndef MYQSTEADYTAB_H
 #define MYQSTEADYTAB_H
 
+// c
+#include <cmath>
 #include <cstdlib>
 #include <string>
 #include <vector>
+
+// qt
 #include <QtGui>
-#include <QVTKWidget.h>
+class QVTKWidget;
+
+// vtk
 #include <vtkSmartPointer.h>
-#include <vtkSampleFunction.h>
-#include <vtkContourFilter.h>
-#include <vtkOutlineFilter.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkActor.h>
-#include <vtkProperty.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkImageData.h>
+class vtkImplicitFunction;
+class vtkSampleFunction;
+class vtkContourFilter;
+class vtkOutlineFilter;
+class vtkPolyDataMapper;
+class vtkCubeAxesActor;
+class vtkAxesActor;
+class vtkActor;
+class vtkProperty;
+class vtkRenderer;
+class vtkRenderWindow;
+class vtkRenderWindowInteractor;
 
-#include <vtkSphere.h>
-#include <vtkImplicitFunction.h>
-#include <vtkObjectFactory.h>
-#include <cmath>
-
-#include "myqwhipple.h"
-#include "myvtkHolonomic.h"
-
+// gui
+class MyQWhipple;
+class myvtkHolonomic;
+class myvtkTriad;
 
 class MyQSteadyTab : public QWidget
 {

@@ -1,16 +1,21 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
+// c
+#include <vector>
+
+// qt
+#include <QtGui>
+
+// OBD
+#include "whipple.h"
+
+// gui
+class MyQWhipple;
+
+// define
 #define NMEIJPARAMS 29
 #define NGYROPARAMS 24
-#include <vector>
-#include <QtGui>
-#include "whipple.h"
-#include "myqwhipple.h"
-
-class QVBoxLayout;
-class QComboBox;
-class QGroupBox;
 
 class WhippleParameter : public QWidget
 {

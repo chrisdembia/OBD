@@ -1,8 +1,13 @@
 #ifndef __myvtkHolonomic_h
 #define __myvtkHolonomic_h
 
+// c
 #include <cmath>
-#include <vtkImplicitFunction.h>
+
+// vtk
+class vtkImplicitFunction;
+
+// OBD
 #include "whipple.h"
 
 class VTK_FILTERING_EXPORT myvtkHolonomic : public vtkImplicitFunction

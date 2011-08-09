@@ -1,52 +1,47 @@
 #ifndef MYQUPRIGHT_H
 #define MYQUPRIGHT_H
 
+// c
 #include <cstdlib>
 #include <string>
 #include <vector>
 
+// qt
 #include <QtGui>
-// graphics
+class QVTKWidget;
 
-#include <QVTKWidget.h>
-// plotting
-#include "vtkQtLineChartView.h"
-#include "vtkQtChartRepresentation.h"
-#include "vtkQtTableView.h"
-#include "vtkDataObjectToTable.h"
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
-
-#include <vtkMath.h>
+// vtk
 #include <vtkSmartPointer.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkChartXY.h>
-#include <vtkPlot.h>
-#include <vtkTable.h>
-#include <vtkFloatArray.h>
-#include <vtkContextView.h>
-#include <vtkContextScene.h>
+class vtkFloatArray;
+class vtkTable;
+class vtkPlot;
+class vtkChartXY;
+class vtkContextView;
+class vtkContextScene;
+class vtkRenderer;
+class vtkRenderWindow;
+class vtkRenderWindowInteractor;
+// vtk saving plot
+class vtkWindowToImageFilter;
+class vtkPostScriptWriter;
+class vtkPNGWriter;
 
-// for saving the plot
-#include <vtkPostScriptWriter.h>
-#include <vtkWindowToImageFilter.h>
-#include <vtkPNGWriter.h>
-
-#include <getopt.h>
-#include "gslVecUtils.h"
+// OBD
 #include "whipple.h"
 #include "whippleutils.h"
 #include "OBDConfig.h"
-#include "myqwhipple.h"
+#include "gslVecUtils.h"
+
+// gui
+class MyQWhipple;
+class MyQUprightTab;
 
 struct uprightOptions {
   std::string outfolder;
   double pitchguess;
   int N; // number of points on plot (linspace between velocities)
   double vi, vf; // first and last velocity
-} ;
+};
 
 class MyQUprightTab : public QWidget
 {

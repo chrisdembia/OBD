@@ -1,42 +1,36 @@
-
+// c
 #include <cstdlib>
 #include <string>
 #include <vector>
 
+// qt
 #include <QtGui>
-// graphics
-
 #include <QVTKWidget.h>
-// plotting
-#include "vtkQtLineChartView.h"
-#include "vtkQtChartRepresentation.h"
-#include "vtkQtTableView.h"
-#include "vtkDataObjectToTable.h"
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
-#include <vtkMath.h>
+// vtk
 #include <vtkSmartPointer.h>
+#include <vtkFloatArray.h>
+#include <vtkTable.h>
+#include <vtkPlot.h>
+#include <vtkChartXY.h>
+#include <vtkContextView.h>
+#include <vtkContextScene.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkChartXY.h>
-#include <vtkPlot.h>
-#include <vtkTable.h>
-#include <vtkFloatArray.h>
-#include <vtkContextView.h>
-#include <vtkContextScene.h>
-// for saving the plot
-#include <vtkPostScriptWriter.h>
+// vtk saving plot
 #include <vtkWindowToImageFilter.h>
+#include <vtkPostScriptWriter.h>
 #include <vtkPNGWriter.h>
 
-#include <getopt.h>
-#include "gslVecUtils.h"
+// OBD
 #include "whipple.h"
 #include "whippleutils.h"
 #include "OBDConfig.h"
+#include "gslVecUtils.h"
 
+// gui
+#include "myqwhipple.h"
 #include "myquprighttab.h"
 
 MyQUprightTab::MyQUprightTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :

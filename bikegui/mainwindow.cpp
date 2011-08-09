@@ -1,38 +1,20 @@
+// c
 #include <cstdlib>
 #include <string>
 #include <vector>
 
+// qt
 #include <QtGui>
-// graphics
 
-#include <QVTKWidget.h>
-// plotting
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
-
-#include <vtkMath.h>
-#include <vtkSmartPointer.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkChartXY.h>
-#include <vtkPlot.h>
-#include <vtkTable.h>
-#include <vtkFloatArray.h>
-#include <vtkContextView.h>
-#include <vtkContextScene.h>
-
-#include <getopt.h>
-#include "gslVecUtils.h"
+// OBD
 #include "whipple.h"
-#include "whippleutils.h"
-#include "OBDConfig.h"
 
+// gui
+#include "myqwhipple.h"
 #include "mainwindow.h"
 #include "parameters.h"
-#include "myqwhipple.h"
 #include "myquprighttab.h"
-//#include "myqsteadytab.h"
+#include "myqsteadytab.h"
 #include "myqsimtab.h"
 
 std::ostream &operator<<(std::ostream &outfile, const Whipple * discs);

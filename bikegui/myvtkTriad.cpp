@@ -1,38 +1,19 @@
-// cstd
+// c
 #include <cstdlib>
 #include <vector>
 #include <algorithm>
-// qt
-// vtk sources
-#include <vtkSmartPointer.h>
-#include <vtkArrowSource.h>
-// vtk filters
-#include <vtkTransformPolyDataFilter.h>
-// vtk mappers
-#include <vtkTextMapper.h>
-#include <vtkPolyDataMapper.h>
-// vtk actors
-#include <vtkActor.h>
-#include <vtkAssembly.h>
-// vtk misc
-#include <vtkTransform.h>
-#include <vtkRenderer.h>
-#include <vtkRendererCollection.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkInteractorStyleImage.h>
-//#include <vtkJPEGReader.h>
-#include <vtkProperty.h>
-#include <vtkCamera.h>
-#include <vtkTextProperty.h>
-#include <vtkProperty.h>
-#include <vtkMath.h>
-#include <vtkRenderWindow.h>
-#include <vtkPolyData.h>
-#include <vtkCommand.h>
 
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
-// obdgui
+// vtk
+#include <vtkSmartPointer.h>
+#include <vtkActor.h>
+#include <vtkArrowSource.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
+
+// gui
 #include "myvtkTriad.h"
 
 myvtkTriad::myvtkTriad(vtkSmartPointer<vtkRenderer> renderer)

@@ -1,23 +1,23 @@
+// c
 #include <string>
 #include <vector>
 
 // qt
 #include <QtGui>
 #include <QVTKWidget.h>
-/*
+
 // vtk, to be used possibly with plotting a 2D bike
 #include <vtkContextView.h>
 #include <vtkContextScene.h>
 #include <vtkContext2D.h>
-*/
 
 // whipple
 #include "whipple.h"
 #include "whippleutils.h"
 
 // gui
-#include "parameters.h"
 #include "myqwhipple.h"
+#include "parameters.h"
 
 WhippleParameter::WhippleParameter(std::vector<MyQWhipple*>* qb, QWidget *parent)
   : QWidget(parent)
@@ -74,7 +74,7 @@ void WhippleParameter::initBikeBox()
   bikeBox->setLayout(bikeLayout);
 
   bikeListView = new QListView(this);
-  bikeList << "test1" << "test2" << "test3" << qbikes->at(0)->getName().c_str();
+  bikeList << qbikes->at(0)->getName().c_str();
   bikeListModel = new QStringListModel(bikeList);
   bikeListView->setModel(bikeListModel);
 
@@ -85,10 +85,7 @@ void WhippleParameter::initBikeBox()
       SLOT(bikeListSelectionSlot(const QItemSelection& selected, const
           QItemSelection& deselected)));
           */
-  connect(bikeListSelection,SIGNAL(currentChanged(const QModelIndex&
-          current, const QModelIndex& previous)), this,
-      SLOT(bikeListCurrentSlot(const QModelIndex& current, const
-          QModelIndex& previous)));
+  connect(bikeListSelection,SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(bikeListCurrentSlot(const QModelIndex&, const QModelIndex&)));
 
   addBikeButton = new QToolButton(bikeBox);
   addBikeButton->setText( tr("Add bike"));
@@ -121,10 +118,17 @@ void WhippleParameter::addBikeSlot()
 void WhippleParameter::removeBikeSlot()
 {
 
-  QMessageBox::StandardButton clickedbutton = QMessageBox::question(this, tr("Removing a bicycle"), tr("Are you sure you want to delete the bicycle EDIT?"), QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
+  int bikeidx = bikeListView->selectionModel()->selectedRows().at(0).row();
+  std::string bikename = qbikes->at(bikeidx)->getName();
+  QMessageBox::StandardButton clickedbutton = QMessageBox::question(this, tr("Removing a bicycle"), tr("Are you sure you want to delete the bicycle ") + bikename.c_str() + " ?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel);
   if (clickedbutton == QMessageBox::Ok) {
-// remove a vector from the vectors
-//    qbikes->erase(
+    // remove a vector from the vectors
+    std::cout << bikeidx << std::endl;
+    //delete qbikes->at(bikeidx);
+    // MEMORY MANAGEMENT ISSUES. THE BIKE IS NOT PROPERLY DELETED.
+    qbikes->erase(qbikes->begin()+bikeidx);
+    // update the qlistmodel and the qlistview
+
   } 
 }
 
@@ -133,10 +137,11 @@ void WhippleParameter::bikeListSelectionSlot(const QItemSelection& selected, con
   std::cout << "heyyo" << std::endl;
   std::cout << selected.indexes().at(0).column() << std::endl;
 }
+
 void WhippleParameter::bikeListCurrentSlot(const QModelIndex& current, const QModelIndex& previous)
 {
-  std::cout << "heyyo" << std::endl;
-//  std::cout << selected.indexes().at(0).column() << std::endl;
+  std::cout << current.row() << std::endl;
+  // change the parameters and bike view
 }
 
 void WhippleParameter::initParamBox()

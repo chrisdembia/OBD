@@ -1,34 +1,20 @@
 #ifndef MYVTKTRIAD_H
 #define MYVTKTRIAD_H
+
+// c
 #include <cstdlib>
-#include <string>
 #include <vector>
-// vtk sources
+#include <algorithm>
+
+// vtk
 #include <vtkSmartPointer.h>
-#include <vtkArrowSource.h>
-// vtk filters
-#include <vtkTransformPolyDataFilter.h>
-// vtk mappers
-#include <vtkPolyDataMapper.h>
-// vtk actors
-#include <vtkActor.h>
-#include <vtkAssembly.h>
-// vtk misc
-#include <vtkMath.h>
-#include <vtkTransform.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkProperty.h>
-#include <vtkCommand.h>
-
-#include <vtkWindowToImageFilter.h>
-#include <vtkJPEGWriter.h>
-#include <vtkPostScriptWriter.h>
-
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
-// obdgui
+class vtkActor;
+class vtkArrowSource;
+class vtkRenderer;
+class vtkRenderWindow;
+class vtkRenderWindowInteractor;
+class vtkPolyDataMapper;
+class vtkProperty;
 
 class myvtkTriad
 {

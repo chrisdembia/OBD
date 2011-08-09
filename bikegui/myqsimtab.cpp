@@ -1,61 +1,56 @@
+// c
 #include <cstdlib>
 #include <string>
 #include <vector>
+
+// qt
 #include <QtGui>
 #include <QVTKWidget.h>
-// vtk sources
-#include <vtkSmartPointer.h>
-#include <vtkSphereSource.h>
-#include <vtkCylinderSource.h>
-#include <vtkConeSource.h>
+
+// vtk
+#include <vtkActor.h>
+#include <vtkActor2D.h>
 #include <vtkArrowSource.h>
+#include <vtkAssembly.h>
+#include <vtkCamera.h>
+#include <vtkChartXY.h>
+#include <vtkCommand.h>
+#include <vtkConeSource.h>
+#include <vtkContextView.h>
+#include <vtkContextScene.h>
+#include <vtkCylinderSource.h>
+#include <vtkJPEGWriter.h>
 #include <vtkPlaneSource.h>
 #include <vtkParametricFunctionSource.h>
 #include <vtkParametricTorus.h>
-// vtk filters
-#include <vtkTransformPolyDataFilter.h>
-// vtk mappers
-#include <vtkTextMapper.h>
+#include <vtkPlot.h>
+#include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
-// vtk actors
-#include <vtkActor.h>
-#include <vtkActor2D.h>
-#include <vtkAssembly.h>
-// vtk misc
-#include <vtkTransform.h>
-#include <vtkImageViewer.h>
+#include <vtkPostScriptWriter.h>
+#include <vtkProperty.h>
 #include <vtkRenderer.h>
-#include <vtkRendererCollection.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkProperty.h>
-#include <vtkCamera.h>
-#include <vtkTextProperty.h>
-#include <vtkProperty.h>
-#include <vtkMath.h>
-#include <vtkPolyData.h>
-#include <vtkCommand.h>
-// vtk plotting
+#include <vtkSmartPointer.h>
+#include <vtkSphereSource.h>
 #include <vtkTable.h>
-#include <vtkContextView.h>
-#include <vtkContextScene.h>
-#include <vtkChartXY.h>
-#include <vtkPlot.h>
-
+#include <vtkTransform.h>
+#include <vtkTextMapper.h>
+#include <vtkTextProperty.h>
 #include <vtkWindowToImageFilter.h>
-//#include <vtkJPEGReader.h>
-#include <vtkJPEGWriter.h>
-#include <vtkPostScriptWriter.h>
 
+// OBD
+#include "whipple.h"
+
+// gui
+#include "myqwhipple.h"
+#include "myqsimtab.h"
+#include "myvtkTriad.h"
+
+// define
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 #define NMOTIONVARS 32
-
-#include "whipple.h"
-#include "myqsimtab.h"
-#include "myvtkTriad.h"
-#include "myqwhipple.h"
-
 
 myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   QWidget(parent)

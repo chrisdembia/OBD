@@ -1,10 +1,17 @@
-
+// c
+#include <cmath>
 #include <cstdlib>
 #include <string>
 #include <vector>
+
+// qt
 #include <QtGui>
 #include <QVTKWidget.h>
+
+// vtk
 #include <vtkSmartPointer.h>
+#include <vtkImplicitFunction.h>
+//#include <vtkObjectFactory.h>
 #include <vtkSampleFunction.h>
 #include <vtkContourFilter.h>
 #include <vtkOutlineFilter.h>
@@ -13,16 +20,12 @@
 #include <vtkAxesActor.h>
 #include <vtkActor.h>
 #include <vtkProperty.h>
-#include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkImageData.h>
+//#include <vtkImageData.h>
 
-#include <vtkSphere.h>
-#include <vtkImplicitFunction.h>
-#include <vtkObjectFactory.h>
-#include <cmath>
-
+// gui
 #include "myqwhipple.h"
 #include "myqsteadytab.h"
 #include "myvtkHolonomic.h"

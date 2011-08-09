@@ -1,62 +1,53 @@
 #ifndef MYQSIMTAB_H
 #define MYQSIMTAB_H
 
+// c
 #include <cstdlib>
 #include <string>
 #include <vector>
 
+// qt
 #include <QtGui>
-#include <QVTKWidget.h>
+class QVTKWidget;
 
-// vtk sources
+// vtk
 #include <vtkSmartPointer.h>
-#include <vtkSphereSource.h>
-#include <vtkCylinderSource.h>
-#include <vtkConeSource.h>
-#include <vtkArrowSource.h>
-#include <vtkPlaneSource.h>
-#include <vtkParametricFunctionSource.h>
-#include <vtkParametricTorus.h>
-// vtk filters
-#include <vtkTransformPolyDataFilter.h>
-#include <vtkWindowToImageFilter.h>
-// vtk mappers
-#include <vtkTextMapper.h>
-#include <vtkPolyDataMapper.h>
-// vtk actors
-#include <vtkActor.h>
-#include <vtkActor2D.h>
-#include <vtkAssembly.h>
-// vtk misc
-#include <vtkTransform.h>
-#include <vtkImageViewer.h>
-#include <vtkRenderer.h>
-#include <vtkRendererCollection.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkProperty.h>
-#include <vtkCamera.h>
-#include <vtkTextProperty.h>
-#include <vtkProperty.h>
-#include <vtkMath.h>
-#include <vtkPolyData.h>
-#include <vtkCommand.h>
-// vtk plotting
-#include <vtkTable.h>
-#include <vtkContextView.h>
-#include <vtkContextScene.h>
-#include <vtkChartXY.h>
-//#include <vtkJPEGReader.h>
-#include <vtkJPEGWriter.h>
-#include <vtkPostScriptWriter.h>
+class vtkActor;
+class vtkActor2D;
+class vtkArrowSource;
+class vtkAssembly;
+class vtkCamera;
+class vtkChartXY;
+class vtkCommand;
+class vtkConeSource;
+class vtkContextView;
+class vtkContextScene;
+class vtkCylinderSource;
+class vtkJPEGWriter;
+class vtkPlaneSource;
+class vtkParametricFunctionSource;
+class vtkParametricTorus;
+class vtkPlot;
+class vtkPolyData;
+class vtkPolyDataMapper;
+class vtkPostScriptWriter;
+class vtkProperty;
+class vtkRenderer;
+class vtkRenderWindow;
+class vtkRenderWindowInteractor;
+class vtkSphereSource;
+class vtkTable;
+class vtkTransform;
+class vtkTextMapper;
+class vtkTextProperty;
+class vtkWindowToImageFilter;
 
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
-
-#include "parameters.h"
+// OBD
 #include "whipple.h"
-#include "myvtkTriad.h"
+
+// gui
 #include "myqwhipple.h"
+class myvtkTriad;
 
 class vtkTimerCallback2 : public vtkCommand
 {
