@@ -19,6 +19,7 @@
         -- draw a bike in 2D (lines and mass centres)
         -- selector for which bikes show up in the upright eig plot
         -- tooltip to explain what all the parameters are
+        -- error management if user attempts to have two bicycles with the same name
     -- upright stability
         -- list of roots/intersections (bifurcation speed) (Meij.2007)
         -- draw vertical lines on the eigplot at intersections

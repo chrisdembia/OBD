@@ -97,21 +97,37 @@ void WhippleParameter::initBikeBox()
   bikeLayout->addWidget(bikeListView,0,0,1,2);
   bikeLayout->addWidget(addBikeButton,1,0);
   bikeLayout->addWidget(removeBikeButton,1,1);
-
 }
 
 void WhippleParameter::addBikeSlot()
 {
+  // prevent suggesting duplicate filenames
+  int bikenum = qbikes->size();
+  QString bikename = QString("bike%1").arg(bikenum);
+  bool isunique = false;
+  while (!isunique) {
+    bikenum++;
+    bikename = QString("bike%1").arg(bikenum);
+    isunique = true;
+    for (unsigned int i = 0; i < qbikes->size(); i++) {
+      if (!bikename.compare( bikeList.at(i) )) {
+        isunique = false;
+      }
+    }
+  }
   bool ok;
   QString text = QInputDialog::getText(this, tr("New bicycle"),
       tr("Enter the name for a new bicycle:"), QLineEdit::Normal,
-      "bike" + QString("%1").arg(qbikes->size()+1), &ok);
+      bikename, &ok);
 
   if (ok) {
     qbikes->push_back( new MyQWhipple(text.toStdString()));
     bikeList << text.toStdString().c_str();
     // i'm not happy with this solution; the listview does not update otherwise
+ //   bikeListModel->insertRows(bikeListModel->rowCount(), 1);
+//    bikeListModel->setData(bikeListModel->rowCount(), QVariant(text.toStdString().c_str()));
     bikeListModel->setStringList(bikeList);
+
   }
 }
 
@@ -128,6 +144,9 @@ void WhippleParameter::removeBikeSlot()
     // MEMORY MANAGEMENT ISSUES. THE BIKE IS NOT PROPERLY DELETED.
     qbikes->erase(qbikes->begin()+bikeidx);
     // update the qlistmodel and the qlistview
+    bikeList.removeAt(bikeidx);
+    bikeListModel->setStringList(bikeList);
+    //bikeListModel->removeRows(bikeidx,1);
 
   } 
 }
@@ -140,7 +159,6 @@ void WhippleParameter::bikeListSelectionSlot(const QItemSelection& selected, con
 
 void WhippleParameter::bikeListCurrentSlot(const QModelIndex& current, const QModelIndex& previous)
 {
-  std::cout << current.row() << std::endl;
   // change the parameters and bike view
 }
 
