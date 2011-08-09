@@ -14,19 +14,15 @@ class QVTKWidget;
 #include <vtkSmartPointer.h>
 class vtkActor;
 class vtkActor2D;
-class vtkArrowSource;
 class vtkAssembly;
 class vtkCamera;
 class vtkChartXY;
-class vtkCommand;
-class vtkConeSource;
+#include <vtkCommand.h>
+//class vtkCommand;
 class vtkContextView;
 class vtkContextScene;
-class vtkCylinderSource;
 class vtkJPEGWriter;
 class vtkPlaneSource;
-class vtkParametricFunctionSource;
-class vtkParametricTorus;
 class vtkPlot;
 class vtkPolyData;
 class vtkPolyDataMapper;
@@ -35,11 +31,12 @@ class vtkProperty;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
-class vtkSphereSource;
 class vtkTable;
 class vtkTransform;
 class vtkTextMapper;
 class vtkTextProperty;
+#include <vtkVariant.h>
+//class vtkVariant;
 class vtkWindowToImageFilter;
 
 // OBD
@@ -47,6 +44,7 @@ class vtkWindowToImageFilter;
 
 // gui
 #include "myqwhipple.h"
+//class MyQWhipple;
 class myvtkTriad;
 
 class vtkTimerCallback2 : public vtkCommand

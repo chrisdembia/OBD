@@ -11,9 +11,9 @@
 // vtk
 #include <vtkSmartPointer.h>
 #include <vtkImplicitFunction.h>
-//#include <vtkObjectFactory.h>
 #include <vtkSampleFunction.h>
 #include <vtkContourFilter.h>
+#include <vtkCommand.h>
 #include <vtkOutlineFilter.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkCubeAxesActor.h>
@@ -23,13 +23,13 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-//#include <vtkImageData.h>
+#include <vtkImageData.h>
 
 // gui
-#include "myqwhipple.h"
 #include "myqsteadytab.h"
 #include "myvtkHolonomic.h"
 #include "myvtkTriad.h"
+#include "myqwhipple.h"
 
 MyQSteadyTab::MyQSteadyTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   QWidget(parent)

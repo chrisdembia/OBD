@@ -19,6 +19,7 @@ class vtkContourFilter;
 class vtkOutlineFilter;
 class vtkPolyDataMapper;
 class vtkCubeAxesActor;
+class vtkCommand;
 class vtkAxesActor;
 class vtkActor;
 class vtkProperty;

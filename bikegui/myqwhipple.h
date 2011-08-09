@@ -1,62 +1,55 @@
 #ifndef MYVTKBIKE_H
 #define MYVTKBIKE_H
+
+// c
+#include <cmath>
+#include <algorithm>
 #include <cstdlib>
 #include <string>
 #include <vector>
 
+// qt
 #include <QtGui>
-#include <QVTKWidget.h>
-// vtk sources
+
+// vtk
 #include <vtkSmartPointer.h>
-#include <vtkSphereSource.h>
-#include <vtkCylinderSource.h>
-#include <vtkConeSource.h>
-#include <vtkArrowSource.h>
-#include <vtkPlaneSource.h>
-#include <vtkParametricFunctionSource.h>
-#include <vtkParametricTorus.h>
-#include <vtkPoints.h>
-// vtk filters
-#include <vtkTransformPolyDataFilter.h>
-// vtk mappers
-#include <vtkTextMapper.h>
-#include <vtkPolyDataMapper.h>
-// vtk actors
-#include <vtkActor.h>
-#include <vtkActor2D.h>
-#include <vtkAssembly.h>
-// vtk misc
-#include <vtkContext2D.h>
-#include <vtkTransform.h>
-#include <vtkImageViewer.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkInteractorStyleImage.h>
-//#include <vtkJPEGReader.h>
-#include <vtkProperty.h>
-#include <vtkCamera.h>
-#include <vtkTextProperty.h>
-#include <vtkProperty.h>
-#include <vtkMath.h>
+class vtkActor;
+class vtkAssembly;
+class vtkCamera;
+class vtkCellArray;
 #include <vtkCommand.h>
-
-#include <vtkWindowToImageFilter.h>
-#include <vtkJPEGWriter.h>
-#include <vtkPostScriptWriter.h>
-// vtk data
-#include <vtkPolyData.h>
-#include <vtkPolyLine.h>
+class vtkConeSource;
+class vtkContext2D;
+class vtkCylinderSource;
+class vtkFloatArray;
+class vtkJPEGWriter;
+class vtkParametricFunctionSource;
+class vtkParametricTorus;
+class vtkPen;
+class vtkPoints;
+class vtkPolyData;
+class vtkPolyDataMapper;
+class vtkPolyLine;
+class vtkPostScriptWriter;
+class vtkProperty;
+class vtkRenderer;
+//class vtkRenderWindow;
+#include <vtkRenderWindow.h>
+//class vtkRenderWindowInteractor;
+#include <vtkRenderWindowInteractor.h>
+class vtkSphereSource;
+//class vtkTable;
 #include <vtkTable.h>
-#include <vtkCellArray.h>
-#include <vtkFloatArray.h>
+class vtkTransform;
+class vtkTransformPolyDataFilter;
+class vtkVariant;
+class vtkWindowToImageFilter;
 
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
-
+// OBD
 #include "whipple.h"
-#include "myvtkTriad.h"
 
+// gui
+class myvtkTriad;
 
 class MyQWhipple
 {

@@ -1,63 +1,47 @@
+// c
+#include <cmath>
+#include <algorithm>
 #include <cstdlib>
 #include <string>
 #include <vector>
-#include <algorithm>
-#include <cmath>
 
+// qt
 #include <QtGui>
-// vtk sources
+
+// vtk
 #include <vtkSmartPointer.h>
-#include <vtkSphereSource.h>
-#include <vtkCylinderSource.h>
+#include <vtkActor.h>
+#include <vtkAssembly.h>
+#include <vtkCamera.h>
+#include <vtkCellArray.h>
 #include <vtkConeSource.h>
-#include <vtkArrowSource.h>
-#include <vtkPlaneSource.h>
+#include <vtkContext2D.h>
+#include <vtkCylinderSource.h>
+#include <vtkFloatArray.h>
+#include <vtkJPEGWriter.h>
 #include <vtkParametricFunctionSource.h>
 #include <vtkParametricTorus.h>
-#include <vtkPoints.h>
-// vtk filters
-#include <vtkTransformPolyDataFilter.h>
-// vtk mappers
-#include <vtkTextMapper.h>
-#include <vtkPolyDataMapper.h>
-// vtk actors
-#include <vtkActor.h>
-#include <vtkActor2D.h>
-#include <vtkAssembly.h>
-// vtk misc
-#include <vtkContext2D.h>
-#include <vtkTransform.h>
-#include <vtkImageViewer.h>
-#include <vtkRenderer.h>
-#include <vtkRendererCollection.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkInteractorStyleImage.h>
-//#include <vtkJPEGReader.h>
-#include <vtkProperty.h>
-#include <vtkCamera.h>
-#include <vtkTextProperty.h>
-#include <vtkProperty.h>
-#include <vtkMath.h>
-#include <vtkRenderWindow.h>
-#include <vtkPolyData.h>
-#include <vtkCommand.h>
-// vtk data
 #include <vtkPen.h>
+#include <vtkPoints.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
 #include <vtkPolyLine.h>
-#include <vtkTable.h>
-#include <vtkCellArray.h>
-#include <vtkFloatArray.h>
-
-#include <vtkWindowToImageFilter.h>
-#include <vtkJPEGWriter.h>
 #include <vtkPostScriptWriter.h>
+#include <vtkProperty.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkSphereSource.h>
+#include <vtkTable.h>
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkWindowToImageFilter.h>
 
+// gui
 #include "myqwhipple.h"
 #include "myvtkTriad.h"
 
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+// define
 #define NMOTIONVARS 32
 
 MyQWhipple::MyQWhipple(std::string n)
@@ -627,6 +611,8 @@ context->DrawEllipse(x3,y3,frontrad,frontrad);
 void MyQWhipple::QDraw2D(QGraphicsScene* qscene)
 {
 
+  qscene->clear();
+
   bike->calcPitch();
   QPen qframePen(Qt::red);
   qframePen.setWidthF(.09);
@@ -634,20 +620,20 @@ void MyQWhipple::QDraw2D(QGraphicsScene* qscene)
   qwheelPen.setWidthF(.05);
 
   double rearrad = bike->rr+bike->rrt;
-qscene->addEllipse(-rearrad+bike->rrt,0,2*bike->rr,-2*bike->rr,qwheelPen);
-qscene->addEllipse(-rearrad-bike->rrt,0,2*rearrad,-2*rearrad,qwheelPen);
-double x1 = bike->lr*cos(bike->q2);
-double y1 = rearrad + bike->lr*sin(bike->q2);
-double x2 = x1 + bike->ls*cos(M_PI/2-bike->q2);
-double y2 = y1 - bike->ls*sin(M_PI/2-bike->q2);
-double x3 = x2 + bike->lf*cos(bike->q2);
-double y3 = y2 + bike->lf*sin(bike->q2);
-qscene->addLine(0,-rearrad,x1,-y1,qframePen);
-qscene->addLine(x1,-y1,x2,-y2,qframePen);
-qscene->addLine(x2,-y2,x3,-y3,qframePen);
-double frontrad = bike->rf+bike->rft;
-qscene->addEllipse(x3-frontrad,-y3+frontrad,2*bike->rf,-2*bike->rf,qwheelPen);
-qscene->addEllipse(x3-frontrad,-y3+frontrad,2*frontrad,-2*frontrad,qwheelPen);
+  qscene->addEllipse(-rearrad+bike->rrt,0,2*bike->rr,-2*bike->rr,qwheelPen);
+  qscene->addEllipse(-rearrad-bike->rrt,0,2*rearrad,-2*rearrad,qwheelPen);
+  double x1 = bike->lr*cos(bike->q2);
+  double y1 = rearrad + bike->lr*sin(bike->q2);
+  double x2 = x1 + bike->ls*cos(M_PI/2-bike->q2);
+  double y2 = y1 - bike->ls*sin(M_PI/2-bike->q2);
+  double x3 = x2 + bike->lf*cos(bike->q2);
+  double y3 = y2 + bike->lf*sin(bike->q2);
+  qscene->addLine(0,-rearrad,x1,-y1,qframePen);
+  qscene->addLine(x1,-y1,x2,-y2,qframePen);
+  qscene->addLine(x2,-y2,x3,-y3,qframePen);
+  double frontrad = bike->rf+bike->rft;
+  qscene->addEllipse(x3-frontrad,-y3+frontrad,2*bike->rf,-2*bike->rf,qwheelPen);
+  qscene->addEllipse(x3-frontrad,-y3+frontrad,2*frontrad,-2*frontrad,qwheelPen);
   qscene->addLine(-rearrad,0,x3+frontrad,0);
 
 }

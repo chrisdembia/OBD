@@ -75,7 +75,9 @@ void WhippleParameter::initBikeBox()
   bikeBox->setLayout(bikeLayout);
 
   bikeListView = new QListView(this);
-  bikeList << qbikes->at(0)->getName().c_str();
+  for (unsigned int i = 0; i < qbikes->size(); i++) {
+    bikeList << qbikes->at(i)->getName().c_str();
+  }
   bikeListModel = new QStringListModel(bikeList);
   bikeListView->setModel(bikeListModel);
 
@@ -160,7 +162,18 @@ void WhippleParameter::bikeListSelectionSlot(const QItemSelection& selected, con
 void WhippleParameter::bikeListCurrentSlot(const QModelIndex& current, const QModelIndex& previous)
 {
   // change the parameters and bike view
+  bidx = current.row();  
+//  *gswp = *qbikes->at(bidx)->
+  qbikes->at(bidx)->QDraw2D(drawScene);
+
 }
+
+/*
+void WhippleParameter::initBikePerBox()
+{
+
+}
+*/
 
 void WhippleParameter::initParamBox()
 {
@@ -173,7 +186,7 @@ void WhippleParameter::initDrawBox()
 {
   drawBox = new QGroupBox( tr("Drawing"), this);
   layout->addWidget(drawBox,0,2,1,1);
-  QVBoxLayout* drawLayout = new QVBoxLayout;
+  QVBoxLayout* drawLayout = new QVBoxLayout(drawBox);
   drawBox->setLayout(drawLayout);
 
   QVTKWidget* qvtkWidget = new QVTKWidget(drawBox);
@@ -181,7 +194,7 @@ void WhippleParameter::initDrawBox()
   vtkSmartPointer<vtkContextView> drawVTKView = vtkSmartPointer<vtkContextView>::New();
   drawVTKView->SetInteractor(qvtkWidget->GetInteractor());
   qvtkWidget->SetRenderWindow(drawVTKView->GetRenderWindow());
-  qbikes->at(0)->Draw2D(drawVTKView->GetContext());
+  qbikes->at(bidx)->Draw2D(drawVTKView->GetContext());
 
   drawLayout->addWidget(qvtkWidget);
 
@@ -208,7 +221,7 @@ void WhippleParameter::initQDrawBox()
   drawScene = new QGraphicsScene(drawView);
   drawScene->setBackgroundBrush(Qt::white);
   drawView->setScene(drawScene);
-  qbikes->at(0)->QDraw2D(drawScene);
+  qbikes->at(bidx)->QDraw2D(drawScene);
   drawView->setMinimumSize(400,200);
   drawView->fitInView(drawView->sceneRect(),Qt::KeepAspectRatioByExpanding);
   //drawView->scale(100,100);
@@ -567,7 +580,7 @@ void WhippleParameter::sendMeijParamToBike()
     convertParameters( gswptemptemp, mjwptemp);
     try
     {
-      validparameters = qbikes->at(0)->getBike()->setParameters( gswptemptemp,
+      validparameters = qbikes->at(bidx)->getBike()->setParameters( gswptemptemp,
           true);
     }
     catch (...)
@@ -586,7 +599,7 @@ void WhippleParameter::sendMeijParamToBike()
   updateMeijParamEdits();
   if (wasMeijSelectedBefore) {
     drawScene->clear();
-    qbikes->at(0)->QDraw2D(drawScene);
+    qbikes->at(bidx)->QDraw2D(drawScene);
   }
 }
 
@@ -717,7 +730,7 @@ void WhippleParameter::sendGyroParamToBike()
   bool validparameters = false;
   try
   {  // NOTE: QT WILL NOT CATCH EXCEPTIONS FOR US, SO ALL EXCEPTION-THROWING CODE MUST BE IN MY OWN TRY..CATCH
-    validparameters = qbikes->at(0)->getBike()->setParameters( gswptemp, true);
+    validparameters = qbikes->at(bidx)->getBike()->setParameters( gswptemp, true);
   }
   catch (const char * errmsg)
   {
@@ -737,7 +750,7 @@ void WhippleParameter::sendGyroParamToBike()
   updateGyroParamEdits();
   if (wasGyroSelectedBefore) {
     drawScene->clear();
-    qbikes->at(0)->QDraw2D(drawScene);
+    qbikes->at(bidx)->QDraw2D(drawScene);
   }
 }
 
@@ -762,7 +775,7 @@ void WhippleParameter::gyroSaveSlot()
     gyroSaveAsSlot();
   }
   else {
-  qbikes->at(0)->getBike()->writeParameters( gyrofdirname.toStdString().c_str()
+  qbikes->at(bidx)->getBike()->writeParameters( gyrofdirname.toStdString().c_str()
       );
   }
 }
@@ -774,7 +787,7 @@ void WhippleParameter::gyroSaveAsSlot()
   if (!fdirname.isEmpty())
   {
     gyrofdirname = fdirname;
-    qbikes->at(0)->getBike()->writeParameters(
+    qbikes->at(bidx)->getBike()->writeParameters(
         gyrofdirname.toStdString().c_str() );
     QFontMetrics qfm1(font());
     gyroFileLabel->setText("<b>" + qfm1.elidedText(gyrofdirname,Qt::ElideLeft,int(.9*gyroFileLabel->width())) + "</b>");

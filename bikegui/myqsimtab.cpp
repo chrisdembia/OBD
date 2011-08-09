@@ -10,19 +10,14 @@
 // vtk
 #include <vtkActor.h>
 #include <vtkActor2D.h>
-#include <vtkArrowSource.h>
 #include <vtkAssembly.h>
 #include <vtkCamera.h>
 #include <vtkChartXY.h>
 #include <vtkCommand.h>
-#include <vtkConeSource.h>
 #include <vtkContextView.h>
 #include <vtkContextScene.h>
-#include <vtkCylinderSource.h>
 #include <vtkJPEGWriter.h>
 #include <vtkPlaneSource.h>
-#include <vtkParametricFunctionSource.h>
-#include <vtkParametricTorus.h>
 #include <vtkPlot.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
@@ -32,7 +27,6 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSmartPointer.h>
-#include <vtkSphereSource.h>
 #include <vtkTable.h>
 #include <vtkTransform.h>
 #include <vtkTextMapper.h>
@@ -43,9 +37,9 @@
 #include "whipple.h"
 
 // gui
-#include "myqwhipple.h"
 #include "myqsimtab.h"
 #include "myvtkTriad.h"
+#include "myqwhipple.h"
 
 // define
 #define VTK_CREATE(type, name) \
