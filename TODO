@@ -20,6 +20,15 @@
         -- selector for which bikes show up in the upright eig plot
         -- tooltip to explain what all the parameters are
         -- error management if user attempts to have two bicycles with the same name
+        -- if a bike has only gswp params defined, looking at the meij tab will erase the gswp parameters
+                -- particularly relevant when switching bikes
+        -- make static the string names (put in cpp file)
+        -- make qlistview uneditable (can't change names of bikes)
+        -- "convert meij to gyro params" not implemented
+        -- TDO0810: MAKE filename a member of myqwhipple, update appropriately
+            -- FIX QLINEEDIT UPDATING WHEN SWITCHING BIKES
+        -- fix memory issue of deleting a bike from the vector
+        -- save qdrawing
     -- upright stability
         -- list of roots/intersections (bifurcation speed) (Meij.2007)
         -- draw vertical lines on the eigplot at intersections

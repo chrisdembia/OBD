@@ -37,6 +37,9 @@
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkWindowToImageFilter.h>
 
+// OBD
+#include "whippleutils.h"
+
 // gui
 #include "myqwhipple.h"
 #include "myvtkTriad.h"
@@ -48,6 +51,12 @@ MyQWhipple::MyQWhipple(std::string n)
 {
   name = n;
   bike = new Whipple();
+  paramtype = 0; // gyrostat
+  gswp = new WhippleParams;
+  mjwp = new MJWhippleParams;
+  setBenchmarkParameters(mjwp);
+  convertParameters( gswp, mjwp);
+
 }
   
 MyQWhipple::~MyQWhipple()
@@ -421,6 +430,30 @@ Whipple* MyQWhipple::getBike()
 std::string MyQWhipple::getName()
 {
   return name;
+}
+
+void MyQWhipple::setGyroParams( WhippleParams *p) {
+  *gswp = *p;
+}
+
+void MyQWhipple::setMeijParams( MJWhippleParams *p) {
+  *mjwp = *p;
+}
+
+WhippleParams* MyQWhipple::getGyroParams() {
+  return gswp;
+}
+
+MJWhippleParams* MyQWhipple::getMeijParams() {
+  return mjwp;
+}
+
+void MyQWhipple::setParamType( int p) {
+  paramtype = p;
+}
+
+int MyQWhipple::getParamType() {
+  return paramtype;
 }
 
 void MyQWhipple::SimUpdate()

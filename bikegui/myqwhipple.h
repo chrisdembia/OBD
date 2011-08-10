@@ -70,10 +70,25 @@ class MyQWhipple
     void TurnOnReactionTriads();
     void TurnOffReactionTriads();
 
+    void setGyroParams( WhippleParams* b);
+    void setMeijParams( MJWhippleParams* b);
+    WhippleParams* getGyroParams();
+    MJWhippleParams* getMeijParams();
+
+    void setParamType(int p);
+    int getParamType();
+
+
   private:
     std::string name;
     vtkSmartPointer<vtkRenderer> simRenderer;
     Whipple* bike;
+    int paramtype;
+    WhippleParams* gswp;
+    MJWhippleParams* mjwp;
+    QString gyrofdirname;
+    QString meijfdirname;
+
     // rear wheel: two cones and a torus
     // rear cone right
     // source
