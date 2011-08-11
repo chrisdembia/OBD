@@ -47,8 +47,7 @@
 // define
 #define NMOTIONVARS 32
 
-MyQWhipple::MyQWhipple(std::string n)
-{
+MyQWhipple::MyQWhipple(std::string n) {
   name = n;
   bike = new Whipple();
   paramtype = 0; // gyrostat
@@ -59,16 +58,14 @@ MyQWhipple::MyQWhipple(std::string n)
 
 }
   
-MyQWhipple::~MyQWhipple()
-{
+MyQWhipple::~MyQWhipple() {
     delete triad1;
     delete triad2;
     delete triad3;
     delete triad4;
   }
 
-void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren)
-{
+void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   simRenderer = ren;
   // rear wheel: two cones and a torus
   double hubhalfwidth = .1;
@@ -422,13 +419,11 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren)
 //  simTable->SetNumberOfRows(100);
 }
 
-Whipple* MyQWhipple::getBike()
-{
+Whipple* MyQWhipple::getBike() {
   return bike;
 }
 
-std::string MyQWhipple::getName()
-{
+std::string MyQWhipple::getName() {
   return name;
 }
 
@@ -456,8 +451,7 @@ int MyQWhipple::getParamType() {
   return paramtype;
 }
 
-void MyQWhipple::SimUpdate()
-{
+void MyQWhipple::SimUpdate() {
   double YAW = bike->q0;
   double LEAN = bike->q1;
   double PITCH = bike->q2;
@@ -557,8 +551,7 @@ void MyQWhipple::SimUpdate()
 //  simRenderer->GetActiveCamera()->SetFocalPoint(frontFrameAssy->GetPosition());
 }
 
-void MyQWhipple::SetSimValues(int rowidx)
-{
+void MyQWhipple::SetSimValues(int rowidx) {
    // do some nice memory managemen here to control the size of the array
   simTable->InsertNextBlankRow();
  /* if (rowidx > simTable->GetNumberOfRows()) {
@@ -599,13 +592,11 @@ void MyQWhipple::SetSimValues(int rowidx)
   simTable->Update();
 }
 
-vtkSmartPointer<vtkTable> MyQWhipple::GetSimTable()
-{
+vtkSmartPointer<vtkTable> MyQWhipple::GetSimTable() {
   return simTable;
 }
 
-void MyQWhipple::writeSim(std::string fname)
-{
+void MyQWhipple::writeSim(std::string fname) {
   simTable->Update();
   std::ofstream fid(fname.c_str());
   for (int i = 0; i < simTable->GetNumberOfRows(); i++) {
@@ -618,8 +609,7 @@ void MyQWhipple::writeSim(std::string fname)
 }
 
 // use VTKCONTEXT2D TO DRAW 2D BIKE
-void MyQWhipple::Draw2D(vtkSmartPointer<vtkContext2D> context)
-{
+void MyQWhipple::Draw2D(vtkSmartPointer<vtkContext2D> context) {
   // must solve for q2
   context->GetPen()->SetColorF(1,1,1);
   context->GetPen()->SetWidth(5);
@@ -641,8 +631,7 @@ context->DrawEllipse(x3,y3,frontrad,frontrad);
 //draw mass centres
 }
 
-void MyQWhipple::QDraw2D(QGraphicsScene* qscene)
-{
+void MyQWhipple::QDraw2D(QGraphicsScene* qscene) {
 
   qscene->clear();
 
@@ -668,24 +657,19 @@ void MyQWhipple::QDraw2D(QGraphicsScene* qscene)
   qscene->addEllipse(x3-frontrad,-y3+frontrad,2*bike->rf,-2*bike->rf,qwheelPen);
   qscene->addEllipse(x3-frontrad,-y3+frontrad,2*frontrad,-2*frontrad,qwheelPen);
   qscene->addLine(-rearrad,0,x3+frontrad,0);
-
 }
 
-void MyQWhipple::UpdateTrace()
-  {
-    for (int i = 0; i < simTable->GetNumberOfRows(); i++)
-    {
+void MyQWhipple::UpdateTrace() {
+    for (int i = 0; i < simTable->GetNumberOfRows(); i++) {
       rearPoints->SetPoint(i,simTable->GetValue(i,7).ToDouble(),simTable->GetValue(i,8).ToDouble(),0.0);
     }
     rearPointsMapper->Update();
   }
 
-void MyQWhipple::TurnOffReactionTriads()
-{
+void MyQWhipple::TurnOffReactionTriads() {
   rearReaction->SetVisibility(0);
 }
 
-void MyQWhipple::TurnOnReactionTriads()
-{
+void MyQWhipple::TurnOnReactionTriads() {
   rearReaction->SetVisibility(1);
 }

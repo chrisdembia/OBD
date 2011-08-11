@@ -17,8 +17,7 @@ class MyQWhipple;
 #define NMEIJPARAMS 29
 #define NGYROPARAMS 24
 
-class WhippleParameter : public QWidget
-{
+class WhippleParameter : public QWidget {
   Q_OBJECT
 
 public:
@@ -95,6 +94,8 @@ private slots:
   void setMeijBenchParametersSlot(void);
 
 private:
+  std::vector<MyQWhipple*>* qbikes;
+  unsigned int bidx;
   /**
    * Qt Vertical layout holding the QtComboBox and parameter QtGroupBox
    * */
@@ -116,7 +117,6 @@ private:
   QGraphicsScene* drawScene;
   QToolButton* saveDrawButton;
 
-  unsigned int bidx;
 
   /**
    * QtComboBox to allow a user to select which types of parameters to use.
@@ -153,7 +153,6 @@ private:
    * Pointer to a whipple bike created in the MainWindow class. We have a pointer here so that we can modify the parameters that the bicycle(s) use(s).
    * */
 
-  std::vector<MyQWhipple*>* qbikes;
 
   // Gyrostat parameter stuffs
 

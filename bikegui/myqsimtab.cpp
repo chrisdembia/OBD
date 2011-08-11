@@ -47,8 +47,8 @@
 #define NMOTIONVARS 32
 
 myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
-  QWidget(parent)
-{
+  QWidget(parent) {
+
   qbikes = qb;
   simLSetBox = new QGroupBox("Parameters",this);
   simLSetLayout = new QGridLayout(simLSetBox);
@@ -144,8 +144,7 @@ myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
 }
 
 
-void myQSimTab::startsimSlot(void)
-{
+void myQSimTab::startsimSlot(void) {
   // WHIPPLE CODE
   qbikes->at(0)->getBike()->evalConstants();
   qbikes->at(0)->getBike()->eoms();
@@ -216,8 +215,7 @@ void myQSimTab::startsimSlot(void)
   //simPlotQVTKW->GetInteractor()->Start();
 }
 
-void myQSimTab::stopsimSlot(void)
-{
+void myQSimTab::stopsimSlot(void) {
   simQVTKW->GetInteractor()->DestroyTimer();
   simPlotVTKView = vtkSmartPointer<vtkContextView>::New();
   simPlotVTKView->SetInteractor(simPlotQVTKW->GetInteractor());
@@ -247,13 +245,11 @@ void myQSimTab::stopsimSlot(void)
   //simPlotVTKChart->Paint(simPlotVTKView->GetContext());
 }
 
-void myQSimTab::updatePlotSlot(void)
-{
+void myQSimTab::updatePlotSlot(void) {
 }
 
 // CAN'T HIT START ANIMATION TWICE!!
-void myQSimTab::forceCheckSlot(int state)
-{
+void myQSimTab::forceCheckSlot(int state) {
   if (state == Qt::Checked) {
     qbikes->at(0)->TurnOnReactionTriads();
   } else if (state == Qt::Unchecked) {
@@ -261,16 +257,14 @@ void myQSimTab::forceCheckSlot(int state)
   }
 }
 
-void myQSimTab::writeSimSlot(void)
-{
+void myQSimTab::writeSimSlot(void) {
   QString fname = QFileDialog::getSaveFileName(this, tr("Save File"),
       QDir::currentPath(), tr("Text file (*, *.txt, *.dat,...);;Any file (*)")
       );
   qbikes->at(0)->writeSim(fname.toStdString());
 }
 
-void myQSimTab::saveSimagesSlot(void)
-{
+void myQSimTab::saveSimagesSlot(void) {
   QString fname = QFileDialog::getSaveFileName(this, tr("Save File"),
       QDir::currentPath(), tr("PNG file (*.png)"));
 // page 247 of vtkusermanual: OffScreenRenderingOn(), and RenderLargeImage,

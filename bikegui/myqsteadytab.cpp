@@ -32,8 +32,7 @@
 #include "myqwhipple.h"
 
 MyQSteadyTab::MyQSteadyTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
-  QWidget(parent)
-{
+  QWidget(parent) {
 
   qbikes = qb;
 

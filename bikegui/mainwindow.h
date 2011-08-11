@@ -20,8 +20,7 @@ class myQSimTab;
 // OBD
 #include "whipple.h"
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
   Q_OBJECT;
 
 public:

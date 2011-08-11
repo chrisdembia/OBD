@@ -22,13 +22,14 @@
         -- error management if user attempts to have two bicycles with the same name
         -- if a bike has only gswp params defined, looking at the meij tab will erase the gswp parameters
                 -- particularly relevant when switching bikes
-        -- make static the string names (put in cpp file)
+        -- make static the string names (put in cpp file): tried this; issues with private and type
         -- make qlistview uneditable (can't change names of bikes)
         -- "convert meij to gyro params" not implemented
-        -- TDO0810: MAKE filename a member of myqwhipple, update appropriately
-            -- FIX QLINEEDIT UPDATING WHEN SWITCHING BIKES
+        -- make sure that qlineedit is being set properly when changing bikes
         -- fix memory issue of deleting a bike from the vector
         -- save qdrawing
+        -- TDO 0810: CLEAN UP EIGENVALUE PLOT, TALK TO THE MAN, LISTEN TO VOICEMAIL!
+        -- create checkboxes to select which bikes are used in which tabs
     -- upright stability
         -- list of roots/intersections (bifurcation speed) (Meij.2007)
         -- draw vertical lines on the eigplot at intersections

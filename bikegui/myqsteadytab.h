@@ -32,8 +32,7 @@ class MyQWhipple;
 class myvtkHolonomic;
 class myvtkTriad;
 
-class MyQSteadyTab : public QWidget
-{
+class MyQSteadyTab : public QWidget {
   Q_OBJECT;
 
   public:

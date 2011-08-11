@@ -47,19 +47,16 @@ class vtkWindowToImageFilter;
 //class MyQWhipple;
 class myvtkTriad;
 
-class vtkTimerCallback2 : public vtkCommand
-{
+class vtkTimerCallback2 : public vtkCommand {
   public:
-    static vtkTimerCallback2 *New()
-    {
+    static vtkTimerCallback2 *New() {
       vtkTimerCallback2 *cb = new vtkTimerCallback2;
       cb->TimerCount = 0;
       return cb;
     }
  
     virtual void Execute(vtkObject *caller, unsigned long eventId,
-                         void * vtkNotUsed(callData))
-    {
+                         void * vtkNotUsed(callData)) {
       if (vtkCommand::TimerEvent == eventId) {
         ++this->TimerCount;
       }
@@ -113,19 +110,16 @@ class vtkTimerCallback2 : public vtkCommand
     double state[10];
 };
 
-class vtkTimerCallback3 : public vtkCommand
-{
+class vtkTimerCallback3 : public vtkCommand {
   public:
-    static vtkTimerCallback3 *New()
-    {
+    static vtkTimerCallback3 *New() {
       vtkTimerCallback3 *cb = new vtkTimerCallback3;
       cb->TimerCount = 0;
       return cb;
     }
  
     virtual void Execute(vtkObject *caller, unsigned long eventId,
-                         void * vtkNotUsed(callData))
-    {
+                         void * vtkNotUsed(callData)) {
       if (vtkCommand::TimerEvent == eventId) {
         ++this->TimerCount;
       }
@@ -150,8 +144,7 @@ class vtkTimerCallback3 : public vtkCommand
     double time;
 };
 
-class myQSimTab : public QWidget
-{
+class myQSimTab : public QWidget {
   Q_OBJECT;
 
   public:

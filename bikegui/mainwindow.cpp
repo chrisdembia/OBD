@@ -19,8 +19,7 @@
 
 std::ostream &operator<<(std::ostream &outfile, const Whipple * discs);
 // constructor
-MainWindow::MainWindow()
-{
+MainWindow::MainWindow() {
   // Set MainWindow parameterss
   setAnimated(true);
   setDockNestingEnabled(true);
@@ -50,8 +49,7 @@ MainWindow::~MainWindow() {
 
 }
 
-void MainWindow::about(void)
-{
+void MainWindow::about(void) {
   QString test = QString(tr("<h2>Open Bicycle Dynamics</h2>"
         "%1"
         "<p>Copyright &copy; 2010-2011 Dale Lukas Peterson</p>"
@@ -60,8 +58,7 @@ void MainWindow::about(void)
   QMessageBox::about(this, tr("About OBD"), test);
 }
 
-void MainWindow::initActions(void)
-{
+void MainWindow::initActions(void) {
   // New action
   newAction = new QAction(tr("&New"), this);
   newAction->setShortcut(QKeySequence::New);
@@ -103,8 +100,7 @@ void MainWindow::initActions(void)
   connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 }
 /*
-void MainWindow::initDockWindows(void)
-{
+void MainWindow::initDockWindows(void) {
   QDockWidget *dock = new QDockWidget(tr("Bike Definitions"));
   dock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
   addDockWidget(Qt::LeftDockWidgetArea, dock);
@@ -113,8 +109,7 @@ void MainWindow::initDockWindows(void)
   
 }*/
 
-void MainWindow::initMenus(void)
-{
+void MainWindow::initMenus(void) {
   // Add the file menu
   fileMenu = menuBar()->addMenu(tr("&File"));
   // Add actions to file menu
@@ -131,13 +126,11 @@ void MainWindow::initMenus(void)
   helpMenu->addAction(aboutQtAction);
 }
 
-void MainWindow::initStatusBar(void)
-{
+void MainWindow::initStatusBar(void) {
   statusBar()->showMessage(versionString);
 }
 
-void MainWindow::initTabs(void)
-{
+void MainWindow::initTabs(void) {
 
 //  msgLabel = new QLabel;
 
@@ -154,8 +147,7 @@ void MainWindow::initTabs(void)
   
 }
 
-void MainWindow::initSteadyTurningTab(void)
-{
+void MainWindow::initSteadyTurningTab(void) {
 /*  QGridLayout *steadyLayout = new QGridLayout;
 
   QComboBox *bikeDropDown = new QComboBox;
@@ -166,8 +158,7 @@ void MainWindow::initSteadyTurningTab(void)
   steadyTurningTab->setLayout(steadyLayout);*/
 }
 
-std::ostream &operator<<(std::ostream &file, const Whipple * discs)
-{
+std::ostream &operator<<(std::ostream &file, const Whipple * discs) {
   file.write((char *) &(discs->t), sizeof discs->t);
   file.write((char *) &discs->q0, sizeof discs->q0);
   file.write((char *) &discs->q1, sizeof discs->q1);
@@ -223,8 +214,7 @@ std::ostream &operator<<(std::ostream &file, const Whipple * discs)
   int numPoints = 69;
   float inc = 7.5 / (numPoints-1);
   table->SetNumberOfRows(numPoints);
-  for (int i = 0; i < numPoints; ++i)
-  {
+  for (int i = 0; i < numPoints; ++i) {
     table->SetValue(i, 0, i * inc);
     table->SetValue(i, 1, cos(i * inc));
     table->SetValue(i, 2, sin(i * inc));
@@ -279,8 +269,7 @@ std::ostream &operator<<(std::ostream &file, const Whipple * discs)
   // You can downcast to get the chart representation:
   vtkQtChartRepresentation* chartRep =
     vtkQtChartRepresentation::SafeDownCast(dataRep);
-  if (!chartRep)
-    {
+  if (!chartRep) {
     std::cerr << "Failed to get chart table representation." << std::endl;
 //    return 1;
     }

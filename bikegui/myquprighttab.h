@@ -43,8 +43,7 @@ struct uprightOptions {
   double vi, vf; // first and last velocity
 };
 
-class MyQUprightTab : public QWidget
-{
+class MyQUprightTab : public QWidget {
   Q_OBJECT;
 
   public:

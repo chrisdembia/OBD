@@ -51,8 +51,7 @@ class vtkWindowToImageFilter;
 // gui
 class myvtkTriad;
 
-class MyQWhipple
-{
+class MyQWhipple {
   public:
     MyQWhipple(std::string);
     ~MyQWhipple();
@@ -78,6 +77,8 @@ class MyQWhipple
     void setParamType(int p);
     int getParamType();
 
+    QString gyroFileLabelText;
+    QString meijFileLabelText;
 
   private:
     std::string name;
@@ -86,9 +87,11 @@ class MyQWhipple
     int paramtype;
     WhippleParams* gswp;
     MJWhippleParams* mjwp;
-    QString gyrofdirname;
-    QString meijfdirname;
 
+    // UPRIGHT
+     
+    
+    // SIM
     // rear wheel: two cones and a torus
     // rear cone right
     // source

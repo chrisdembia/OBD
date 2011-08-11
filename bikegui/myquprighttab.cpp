@@ -34,19 +34,20 @@
 #include "myquprighttab.h"
 
 MyQUprightTab::MyQUprightTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
-  QWidget(parent)
-{
+  QWidget(parent) {
 
   qbikes = qb;
-  // upOpts is a structure for run parameters for upright stability eigenvalue plots
+  // upOpts is a structure for run parameters for upright stability eigenvalue
+  // plots. initialize parameters to default values.
   upOpts.outfolder[0] = '\0';
   upOpts.N = 201;
   upOpts.pitchguess = 0.0;
   upOpts.vi = 0.0;
   upOpts.vf = 10.0;  
-  
+ 
+  // set up gui
   uprightSetLayout = new QGridLayout;
-//  uprightSetLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
+  //uprightSetLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
   uprightSetLayout->setVerticalSpacing(0);  
   updateEigButton = new QToolButton(this);
   updateEigButton->setText( tr("Update eigenvalue plot") );
@@ -54,7 +55,6 @@ MyQUprightTab::MyQUprightTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   uprightSetLayout->addWidget(updateEigButton,0,0);
   
   // manage options
-  
   uprightSetLayout->addWidget(new QLabel( tr("Save eigenvalue data"),0,0 ) );
   
   // Save button
@@ -97,10 +97,10 @@ MyQUprightTab::MyQUprightTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   lastSpeedEdit->setAlignment(Qt::AlignRight);
   uprightSetLayout->addWidget(lastSpeedEdit,5,1);
 
-uprightSetBox = new QGroupBox( tr("Settings") );
+  uprightSetBox = new QGroupBox( tr("Settings") );
 
-uprightSetBox->setLayout(uprightSetLayout);
-uprightSetBox->setMaximumWidth(200);
+  uprightSetBox->setLayout(uprightSetLayout);
+  uprightSetBox->setMaximumWidth(200);
  //QScrollArea *eigScroll = new QScrollArea;
  //eigScroll->setBackgroundRole(QPalette::Dark);
   
@@ -133,8 +133,7 @@ eigPlotQVTKW->setMinimumSize(500,200);
   
 }
 
-void MyQUprightTab::saveEigSlot(void)
-{
+void MyQUprightTab::saveEigSlot(void) {
   QString dir = QFileDialog::getSaveFileName(this,tr("Save plot"),QDir::currentPath());
 //  eigPlotQVTKW->GetRenderWindow()->Render();
   w2i->SetInput(eigPlotQVTKW->GetRenderWindow());
@@ -143,8 +142,7 @@ void MyQUprightTab::saveEigSlot(void)
 
 }
 
-void MyQUprightTab::updateEigPlotSlot(void)
-{
+void MyQUprightTab::updateEigPlotSlot(void) {
   // THIS STUFF BELOW IS MOSTLY COPIED
   eigPlotVTKView = vtkSmartPointer<vtkContextView>::New();
   eigPlotVTKView->SetInteractor(eigPlotQVTKW->GetInteractor());
@@ -163,10 +161,8 @@ void MyQUprightTab::updateEigPlotSlot(void)
   std::string bikename;
   arrY.resize(1*NeigPerBike);
   int idx;
-  for (uint i = 0; i < qbikes->size(); i++)
-  {
-    for (int j = 0; j < NeigPerBike; j++)
-    {
+  for (uint i = 0; i < qbikes->size(); i++) {
+    for (int j = 0; j < NeigPerBike; j++) {
       idx = j + i*NeigPerBike;
       bikename = qbikes->at(i)->getName() + "-" + eignames[j]; 
       arrY[idx] = vtkSmartPointer<vtkFloatArray>::New();
@@ -223,8 +219,7 @@ void MyQUprightTab::updateEigPlotSlot(void)
     qbikes->at(0)->getBike()->calcEvals();
     OutputFile << *gsl_vector_ptr(speed,i);
     eigPlotVTKTable->SetValue(i, 0, *gsl_vector_ptr(speed,i) );
-    for (int j = 0; j < 4; ++j)
-    {
+    for (int j = 0; j < 4; ++j) {
       OutputFile << " " << qbikes->at(0)->getBike()->fourValues[j];
       eigPlotVTKTable->SetValue(i, j+1,
           qbikes->at(0)->getBike()->fourValues[j]);
@@ -241,10 +236,8 @@ void MyQUprightTab::updateEigPlotSlot(void)
   // Add multiple line plots, setting the colors etc
   vtkPlot *eigPlotVTKLine;
  // int idx = 0;
-  for (int i = 0; i < 1; i++)
-  {
-    for (int j = 0; j < 4; j++)
-    {
+  for (int i = 0; i < 1; i++) {
+    for (int j = 0; j < 4; j++) {
       idx = j + i*1;
       eigPlotVTKLine = eigPlotVTKChart->AddPlot(vtkChart::LINE);
       eigPlotVTKLine->SetInput(eigPlotVTKTable, 0, j+1);
@@ -260,12 +253,10 @@ void MyQUprightTab::updateEigPlotSlot(void)
 
   // WHIPPLE WHIPPLE WHIPPLE
   std::cout << "Eigenvalue data written to ";
-  if ( upOpts.outfolder.empty() )
-  { 
+  if ( upOpts.outfolder.empty() ) { 
   	std::cout << "current directory." << std::endl;
   }
-  else
-  {
+  else {
   	std::cout << upOpts.outfolder << std::endl;
   }
 
@@ -277,8 +268,7 @@ void MyQUprightTab::updateEigPlotSlot(void)
 
 }
 
-void MyQUprightTab::calcIntersections(void)
-{
+void MyQUprightTab::calcIntersections(void) {
   // for each qbikeobject
   // store intersections IN the qbike
   // bifurcations
