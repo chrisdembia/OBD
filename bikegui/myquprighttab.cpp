@@ -150,36 +150,45 @@ void MyQUprightTab::updateEigPlotSlot(void) {
   upOpts.vf = lastSpeedEdit->text().toDouble();
   
   // call the qbikes
-  std::vector< vtkSmartPointer<vtkTable> > tables;
-  tables.resize(qbikes->size());
+  int NuprightBikes = 0;
   for (unsigned int i = 0; i < qbikes->size(); i++) {
-    qbikes->at(i)->calcUpright(upOpts);
-    tables[i] = qbikes->at(i)->GetUprightTable();
+    if (qbikes->at(i)->getDoUpright()) {
+      NuprightBikes++;
+    }
   } // for i
-  
+
   // Add multiple line plots, setting the colors etc
   int NeigPerBike = 4;
+  int red;
+  int green;
+  int blue;
   //eigPlotVTKChart->ClearPlots();
-  for (unsigned int i = 0; i < qbikes->size()*NeigPerBike; i++) {
+  unsigned int Nplots = eigPlotVTKChart->GetNumberOfPlots();
+  for (unsigned int i = 0; i < Nplots; i++) {
     eigPlotVTKChart->RemovePlot(i);
   }
   eigPlotQVTKW->GetRenderWindow()->Render();
   vtkSmartPointer<vtkPlot> lineplot;
+  int idx = 0;
   for (unsigned int i = 0; i < qbikes->size(); i++) {
-    for (int j = 0; j < NeigPerBike; j++) { // j < NeigPerBike
-      lineplot = eigPlotVTKChart->AddPlot(vtkChart::POINTS);
-      lineplot->SetInput(tables[i], 0, j+1);
-      lineplot->SetColor(0, 255, 0, 255);
-      lineplot->SetWidth(2.0);
+    if (qbikes->at(i)->getDoUpright()) {
+      qbikes->at(i)->calcUpright(upOpts);
+      red = 200*(idx/NuprightBikes - 1) + 50;
+      green = 200*idx/NuprightBikes + 50;
+      blue = 200*idx/NuprightBikes + 50;
+      for (int j = 0; j < NeigPerBike; j++) { // j < NeigPerBike
+        lineplot = eigPlotVTKChart->AddPlot(vtkChart::POINTS); // ::LINES
+        lineplot->SetInput(qbikes->at(i)->GetUprightTable(), 0, j+1);
+        lineplot->SetColor(red, green, blue);
+        //lineplot->SetWidth(.5);
+      }
+      idx++;
     }
   }
 
   eigPlotQVTKW->GetRenderWindow()->Render();
 
   // SHOULD MAKE DESTRUCTORS
-  /*for (unsigned int i = 0; i < qbikes->size(); i++) {
-    tables[i]->Delete();
-  }*/ // this was giving a segfault
 
 } // updateEigPlotSlot()
 

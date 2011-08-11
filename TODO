@@ -44,7 +44,7 @@
         -- USE JASON'S SORTING ALGORITHM
         -- OR USE DOTS INSTEAD OF LINES, NEGATE THE NEG UNREAL TO BE POS
         -- get rid of "pitch guess", preferred to have two options: upright bike and upsidedown bike
-        -- the code i added into myqwhipple to make upright stability causes an exception to be thrown when deleting the LAST BIKE; can delete non-last bikes just fine
+        -- the code i added into myqwhipple to make upright stability causes an exception to be thrown when deleting the LAST BIKE; can delete non-last bikes just fine. i think it's because vtkchart is hooked up to the table that is a member of the myqwhipple
     -- steady turning
         -- precisely determine range of pitch variable; solve for lean pitch is zero, get both
         -- solutions; 

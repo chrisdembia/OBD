@@ -88,6 +88,9 @@ class MyQWhipple {
     QString gyroFileLabelText;
     QString meijFileLabelText;
 
+    void setDoUpright(bool);
+    bool getDoUpright();
+
   private:
     std::string name;
     vtkSmartPointer<vtkRenderer> simRenderer;
@@ -97,6 +100,7 @@ class MyQWhipple {
     MJWhippleParams* mjwp;
 
     // UPRIGHT
+    bool doUpright;
     vtkSmartPointer<vtkTable> eigPlotVTKTable;
     vtkSmartPointer<vtkFloatArray> eigX;
     std::vector< vtkSmartPointer<vtkFloatArray> > eigY;

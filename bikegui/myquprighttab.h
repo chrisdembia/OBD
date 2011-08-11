@@ -80,10 +80,7 @@ class MyQUprightTab : public QWidget {
   QHBoxLayout *uprightTopLayout;
 
   vtkSmartPointer<vtkContextView> eigPlotVTKView;
-  vtkSmartPointer<vtkTable> eigPlotVTKTable;
   vtkSmartPointer<vtkChartXY> eigPlotVTKChart;
-  vtkSmartPointer<vtkFloatArray> arrX;
-  std::vector< vtkSmartPointer<vtkFloatArray> > arrY;
 
   vtkSmartPointer<vtkWindowToImageFilter> w2i;
   vtkSmartPointer<vtkPostScriptWriter> writerPS;

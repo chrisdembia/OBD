@@ -57,6 +57,7 @@ MyQWhipple::MyQWhipple(std::string n) {
   setBenchmarkParameters(mjwp);
   convertParameters( gswp, mjwp);
 
+  doUpright = true;
   initUprightTable();
 
 }
@@ -66,7 +67,15 @@ MyQWhipple::~MyQWhipple() {
     delete triad2;
     delete triad3;
     delete triad4;
-  }
+}
+
+void MyQWhipple::setDoUpright(bool b) {
+  doUpright = b;
+}
+
+bool MyQWhipple::getDoUpright() {
+  return doUpright;
+}
 
 void MyQWhipple::initUprightTable() {
 
@@ -115,9 +124,14 @@ void MyQWhipple::calcUpright(struct uprightOptions upOpts) {
     bike->calcEvals();
     eigPlotVTKTable->SetValue(i, 0, *gsl_vector_ptr(speed, i) );
 
-    for (int j = 0; j < 4; ++j) {
-      eigPlotVTKTable->SetValue(i, j+1, bike->fourValues[j]);
-    } // for j
+    eigPlotVTKTable->SetValue(i, 1, bike->fourValues[0]);
+    eigPlotVTKTable->SetValue(i, 2, bike->fourValues[1]);
+    if (bike->fourValues[1] >= 0) {
+      eigPlotVTKTable->SetValue(i, 3, fabs(bike->fourValues[2]));
+    } else {
+      eigPlotVTKTable->SetValue(i, 3, bike->fourValues[2]);
+    } // if
+    eigPlotVTKTable->SetValue(i, 4, bike->fourValues[3]);
   } // for i
 
   gsl_vector_free(speed);
