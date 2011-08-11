@@ -46,7 +46,7 @@
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 #define NMOTIONVARS 32
 
-myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
+MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   QWidget(parent) {
 
   qbikes = qb;
@@ -141,10 +141,10 @@ myQSimTab::myQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   simLayout->addWidget(simPlotQVTKW,1,0,1,2);
   setLayout(simLayout);
   
-}
+} // startsimSlot()
 
 
-void myQSimTab::startsimSlot(void) {
+void MyQSimTab::startsimSlot(void) {
   // WHIPPLE CODE
   qbikes->at(0)->getBike()->evalConstants();
   qbikes->at(0)->getBike()->eoms();
@@ -215,7 +215,7 @@ void myQSimTab::startsimSlot(void) {
   //simPlotQVTKW->GetInteractor()->Start();
 }
 
-void myQSimTab::stopsimSlot(void) {
+void MyQSimTab::stopsimSlot(void) {
   simQVTKW->GetInteractor()->DestroyTimer();
   simPlotVTKView = vtkSmartPointer<vtkContextView>::New();
   simPlotVTKView->SetInteractor(simPlotQVTKW->GetInteractor());
@@ -243,32 +243,31 @@ void myQSimTab::stopsimSlot(void) {
   qbikes->at(0)->UpdateTrace();
   simRenderWindow->Render();
   //simPlotVTKChart->Paint(simPlotVTKView->GetContext());
-}
+} // stopSimSlot()
 
-void myQSimTab::updatePlotSlot(void) {
-}
+void MyQSimTab::updatePlotSlot(void) {
+} // updatePlotSlot()
 
 // CAN'T HIT START ANIMATION TWICE!!
-void myQSimTab::forceCheckSlot(int state) {
+void MyQSimTab::forceCheckSlot(int state) {
   if (state == Qt::Checked) {
     qbikes->at(0)->TurnOnReactionTriads();
   } else if (state == Qt::Unchecked) {
     qbikes->at(0)->TurnOffReactionTriads();
   }
-}
+} // forceCheckSlot()
 
-void myQSimTab::writeSimSlot(void) {
+void MyQSimTab::writeSimSlot(void) {
   QString fname = QFileDialog::getSaveFileName(this, tr("Save File"),
       QDir::currentPath(), tr("Text file (*, *.txt, *.dat,...);;Any file (*)")
       );
   qbikes->at(0)->writeSim(fname.toStdString());
-}
+} // writeSimSlot()
 
-void myQSimTab::saveSimagesSlot(void) {
+void MyQSimTab::saveSimagesSlot(void) {
   QString fname = QFileDialog::getSaveFileName(this, tr("Save File"),
       QDir::currentPath(), tr("PNG file (*.png)"));
 // page 247 of vtkusermanual: OffScreenRenderingOn(), and RenderLargeImage,
 // specify magnification/ there is a
 // Examples/Rendering/Tcl/RenderLargeImage.tcl example
-
-}
+} // saveSimagesSlot()

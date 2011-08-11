@@ -15,7 +15,7 @@ class MainWindow;
 class WhippleParameter;
 #include "myquprighttab.h"
 class MyQSteadyTab;
-class myQSimTab;
+class MyQSimTab;
 
 // OBD
 #include "whipple.h"
@@ -38,7 +38,6 @@ private:
   void initMenus(void);
   void initStatusBar(void);
   void initTabs(void);
-  void initSteadyTurningTab(void);
 
   // Menus
   QMenu *fileMenu;
@@ -62,7 +61,7 @@ private:
   // Tabs
   MyQUprightTab* uprightTab;
   MyQSteadyTab *steadyTab;
-  myQSimTab *simTab;
+  MyQSimTab *simTab;
 
 
   // sim visualization

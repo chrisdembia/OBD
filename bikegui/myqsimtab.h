@@ -108,7 +108,7 @@ class vtkTimerCallback2 : public vtkCommand {
     int TimerCount;
     double time;
     double state[10];
-};
+}; // vtkTimerCallback2
 
 class vtkTimerCallback3 : public vtkCommand {
   public:
@@ -142,13 +142,13 @@ class vtkTimerCallback3 : public vtkCommand {
   private:
     int TimerCount;
     double time;
-};
+}; // vtkTimerCallback3
 
-class myQSimTab : public QWidget {
+class MyQSimTab : public QWidget {
   Q_OBJECT;
 
   public:
-  myQSimTab(std::vector<MyQWhipple*>* qb, QWidget*parent = 0);
+  MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget*parent = 0);
 
   private slots:
   void startsimSlot(void);
@@ -188,6 +188,6 @@ class myQSimTab : public QWidget {
   vtkSmartPointer<vtkChartXY> simPlotVTKChart;
 //  std::vector<vtkSmartPointer<vtkPlot> > simPlotVTKLines;
   
-};
+}; // MyQSimTab
 
 #endif

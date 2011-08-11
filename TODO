@@ -2,9 +2,7 @@
 -- Add animation code
 
 -- GUI work (last revised 110726 by chris):
-    -- formatting
-        -- spaces before commas
-        -- } // for i, if
+
     -- general
         -- win32 build
         -- win64 build
@@ -67,6 +65,7 @@
         -- shift transformations from rot steps to a single 4x4 matrix push
         -- crash detection, using tire forces: lateral to normal force ratio)
         -- text showing x,y distance traveled, show 10m lines on the "ground"    
+        -- prevent segfault when bike falls over, or when there are too many samples
 
 -- Conventions
     -- space after comma
@@ -75,4 +74,4 @@
     -- header files arrange
     -- limit includes: someone else using my class
     -- member variable vtk objects; how often are they used?
-    -- 
+    -- } // for i, if
