@@ -49,6 +49,7 @@ class vtkWindowToImageFilter;
 #include "whipple.h"
 
 // gui
+class myquprighttab;
 class myvtkTriad;
 
 class MyQWhipple {
@@ -58,6 +59,13 @@ class MyQWhipple {
     void SimUpdate();
     Whipple* getBike();
     std::string getName();
+
+    // upright
+    void initUprightTable();
+    void calcUpright(struct uprightOptions upOpts);
+    vtkSmartPointer<vtkTable> GetUprightTable();
+
+    // sim
     vtkSmartPointer<vtkTable> GetSimTable();
     void SetSimValues(int rowidx);
     void initSim(vtkSmartPointer<vtkRenderer> ren);
@@ -89,6 +97,9 @@ class MyQWhipple {
     MJWhippleParams* mjwp;
 
     // UPRIGHT
+    vtkSmartPointer<vtkTable> eigPlotVTKTable;
+    vtkSmartPointer<vtkFloatArray> eigX;
+    std::vector< vtkSmartPointer<vtkFloatArray> > eigY;
      
     
     // SIM

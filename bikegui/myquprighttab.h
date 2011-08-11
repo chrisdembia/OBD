@@ -37,7 +37,6 @@ class MyQWhipple;
 class MyQUprightTab;
 
 struct uprightOptions {
-  std::string outfolder;
   double pitchguess;
   int N; // number of points on plot (linspace between velocities)
   double vi, vf; // first and last velocity
@@ -48,12 +47,14 @@ class MyQUprightTab : public QWidget {
 
   public:
     MyQUprightTab(std::vector<MyQWhipple*>* qb, QWidget *parent = 0);
+    //~MyQUprightTab;
     void calcIntersections();
 // bike
   private slots:
 
     void updateEigPlotSlot(void);
-    void saveEigSlot(void);
+    void saveEigPlotSlot(void);
+    void saveEigDataSlot(void);
 
   private:
     std::vector<MyQWhipple*>* qbikes;
@@ -63,13 +64,13 @@ class MyQUprightTab : public QWidget {
   QGridLayout *uprightSetLayout;
   
   // upright stability
-  QLineEdit *saveEigFilenameEdit;
   QLineEdit *nEvalPointsEdit;
   QLineEdit *pitchGuessEdit;
   QLineEdit *firstSpeedEdit;
   QLineEdit *lastSpeedEdit;
 
-  QToolButton * saveEigButton;
+  QToolButton * saveEigPlotButton;
+  QToolButton * saveEigDataButton;
   QToolButton * updateEigButton;
 
   QVTKWidget *eigPlotQVTKW; 

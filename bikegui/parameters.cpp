@@ -237,9 +237,15 @@ void WhippleParameter::initQDrawBox() {
 }
 
 void WhippleParameter::saveDrawSlot() {
-  QString fdirname = QFileDialog::getSaveFileName(this, tr("Save drawing"), QDir::currentPath(), tr("Postscript (*.ps)") );
+  //QString fdirname = QFileDialog::getSaveFileName(this, tr("Save drawing"), QDir::currentPath(), tr("Postscript (*.ps)") );
   // from whippleutils.h
-  if (!fdirname.isEmpty()) {
+  //if (!fdirname.isEmpty()) {
+  //}
+  QPrinter printer;
+  if (QPrintDialog(&printer).exec() == QDialog::Accepted) {
+    QPainter painter(&printer);
+    painter.setRenderHint(QPainter::Antialiasing);
+    drawScene->render(&painter);
   }
 
 }

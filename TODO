@@ -2,6 +2,9 @@
 -- Add animation code
 
 -- GUI work (last revised 110726 by chris):
+    -- formatting
+        -- spaces before commas
+        -- } // for i, if
     -- general
         -- win32 build
         -- win64 build
@@ -11,6 +14,7 @@
         -- documentation
         -- good usage instructions IN the program (tooltips)
         -- eliminate most header files; use forward declaration
+        -- cannot have zero bikes? prevent deleting bike1
     -- parameters
         -- make a separate window
         -- multiple bikes
@@ -35,15 +39,16 @@
         -- draw vertical lines on the eigplot at intersections
         -- save image (gl2ps)
         -- save data
-        -- reset view
+        -- reset view; plot keeps overlapping on update! 
         -- help tooltip to show interactor keys
         -- USE JASON'S SORTING ALGORITHM
         -- OR USE DOTS INSTEAD OF LINES, NEGATE THE NEG UNREAL TO BE POS
+        -- get rid of "pitch guess", preferred to have two options: upright bike and upsidedown bike
+        -- the code i added into myqwhipple to make upright stability causes an exception to be thrown when deleting the LAST BIKE; can delete non-last bikes just fine
     -- steady turning
         -- precisely determine range of pitch variable; solve for lean pitch is zero, get both
         -- solutions; 
         -- default level curves color table
-
     -- simulation
         -- plot update
         -- data to txt file

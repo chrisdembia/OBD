@@ -287,7 +287,7 @@ std::ostream &operator<<(std::ostream &file, const Whipple * discs) {
 //     QLabel * eigPlot = new QLabel("HELLO");
 //  QImage image("human.png");
 //  eigPlot->setPixmap(QPixmap::fromImage(image));
-//         eigPlot->setMinimumSize(200,200);
+//         eigPlot->setMinimumSize(200, 200);
     /*QGraphicsScene scene;
     QGraphicsView view(&scene);
     QGraphicsPixmapItem item(QPixmap("yellow.gif"));
