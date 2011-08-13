@@ -68,6 +68,7 @@ MyQUprightTab::MyQUprightTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
 
   saveEigDataButton = new QToolButton(this);
   saveEigDataButton->setText( tr("Save data") );
+  saveEigDataButton->setToolTip( tr("Will create a space-delimited text file for each bicycle in the eigenvalue plot, with the name of the bicycles appended to the filename you provide.") );
   connect(saveEigDataButton, SIGNAL(clicked()), this, SLOT(saveEigDataSlot()));
   uprightSetLayout->addWidget(saveEigDataButton, 1, 1); //, Qt::AlignRight);
 
@@ -154,7 +155,7 @@ void MyQUprightTab::updateEigPlotSlot(void) {
   for (unsigned int i = 0; i < qbikes->size(); i++) {
     if (qbikes->at(i)->getDoUpright()) {
       NuprightBikes++;
-    }
+    } // if
   } // for i
 
   // Add multiple line plots, setting the colors etc
@@ -166,7 +167,7 @@ void MyQUprightTab::updateEigPlotSlot(void) {
   unsigned int Nplots = eigPlotVTKChart->GetNumberOfPlots();
   for (unsigned int i = 0; i < Nplots; i++) {
     eigPlotVTKChart->RemovePlot(i);
-  }
+  } // for i
   eigPlotQVTKW->GetRenderWindow()->Render();
   vtkSmartPointer<vtkPlot> lineplot;
   int idx = 0;
@@ -183,8 +184,8 @@ void MyQUprightTab::updateEigPlotSlot(void) {
         //lineplot->SetWidth(.5);
       }
       idx++;
-    }
-  }
+    } // if
+  } // for i
 
   eigPlotQVTKW->GetRenderWindow()->Render();
 
@@ -195,7 +196,6 @@ void MyQUprightTab::updateEigPlotSlot(void) {
 void MyQUprightTab::saveEigPlotSlot(void) {
   QString dir = QFileDialog::getSaveFileName(this, tr("Save plot"),
       QDir::currentPath());
-//  eigPlotQVTKW->GetRenderWindow()->Render();
   w2i->SetInput(eigPlotQVTKW->GetRenderWindow());
   writerPS->SetFileName(dir.toStdString().c_str());
   writerPS->Write();
@@ -203,29 +203,13 @@ void MyQUprightTab::saveEigPlotSlot(void) {
 } // saveEigPlotSlot()
 
 void MyQUprightTab::saveEigDataSlot(void) {
-/*
-  filename = upOpts.outfolder; filename += "eigenvalue_parameters.txt";
-  qbikes->at(0)->getBike()->writeParameters(filename.c_str());
-  // Write data record file. the function is orphaned from whipple.h currently
-  // allows the evaluation of data by python
-  // Open data file
-  filename = upOpts.outfolder; filename += "eigenvalues.dat";
-  std::ofstream OutputFile( filename.c_str() ); // std::ios::binary);
-  
-
-  for (int i = 0; i < upOpts.N; ++i) {
-    qbikes->at(0)->getBike()->u5 = -gsl_vector_get(speed,
-        i)/(qbikes->at(0)->getBike()->rf+qbikes->at(0)->getBike()->rft);
-    OutputFile << *gsl_vector_ptr(speed, i);
-    for (int j = 0; j < 4; ++j) {
-      OutputFile << " " << qbikes->at(0)->getBike()->fourValues[j];
-    }
-    OutputFile << std::endl;
+  QString dir = QFileDialog::getSaveFileName(this, tr("Save data"),
+      QDir::currentPath(), tr("Text file (*)"));
+  for (unsigned int i = 0; i < qbikes->size(); i++) {
+    if (qbikes->at(i)->getDoUpright()) {
+      qbikes->at(i)->printUprightData(dir);
+    } // if
   } // for i
-
-  // Close files and free memory
-  OutputFile.close();
-*/
 } // saveEigDataSlot()
 
 void MyQUprightTab::calcIntersections(void) {
@@ -236,3 +220,75 @@ void MyQUprightTab::calcIntersections(void) {
   // draw in the corresponding lines
   // Jason emailed Chris some useful files for doing this.
 }
+
+/*
+def sort_modes(evals, evecs):
+    '''Sort eigenvalues and eigenvectors into weave, capsize, caster modes.
+
+    Parameters
+    ----------
+    evals : ndarray, shape (n, 4)
+        eigenvalues
+    evecs : ndarray, shape (n, 4, 4)
+        eigenvectors
+
+    Returns
+    -------
+    weave['evals'] : ndarray, shape (n, 2)
+        The eigen value pair associated with the weave mode.
+    weave['evecs'] : ndarray, shape (n, 4, 2)
+        The associated eigenvectors of the weave mode.
+    capsize['evals'] : ndarray, shape (n,)
+        The real eigenvalue associated with the capsize mode.
+    capsize['evecs'] : ndarray, shape(n, 4, 1)
+        The associated eigenvectors of the capsize mode.
+    caster['evals'] : ndarray, shape (n,)
+        The real eigenvalue associated with the caster mode.
+    caster['evecs'] : ndarray, shape(n, 4, 1)
+        The associated eigenvectors of the caster mode.
+
+    This only works on the standard bicycle eigenvalues, not necessarily on any
+    general eigenvalues for the bike model (e.g. there isn't always a distinct weave,
+    capsize and caster). Some type of check unsing the derivative of the curves
+    could make it more robust.
+
+    '''
+    evalsorg = np.zeros_like(evals)
+    evecsorg = np.zeros_like(evecs)
+    # set the first row to be the same
+    evalsorg[0] = evals[0]
+    evecsorg[0] = evecs[0]
+    # for each speed
+    for i, speed in enumerate(evals):
+        if i == evals.shape[0] - 1:
+            break
+        # for each current eigenvalue
+        used = []
+        for j, e in enumerate(speed):
+            try:
+                x, y = np.real(evalsorg[i, j].nominal_value), np.imag(evalsorg[i, j].nominal_value)
+            except:
+                x, y = np.real(evalsorg[i, j]), np.imag(evalsorg[i, j])
+            # for each eigenvalue at the next speed
+            dist = np.zeros(4)
+            for k, eignext in enumerate(evals[i + 1]):
+                try:
+                    xn, yn = np.real(eignext.nominal_value), np.imag(eignext.nominal_value)
+                except:
+                    xn, yn = np.real(eignext), np.imag(eignext)
+                # distance between points in the real/imag plane
+                dist[k] = np.abs(((xn - x)**2 + (yn - y)**2)**0.5)
+            if np.argmin(dist) in used:
+                # set the already used indice higher
+                dist[np.argmin(dist)] = np.max(dist) + 1.
+            else:
+                pass
+            evalsorg[i + 1, j] = evals[i + 1, np.argmin(dist)]
+            evecsorg[i + 1, :, j] = evecs[i + 1, :, np.argmin(dist)]
+            # keep track of the indices we've used
+            used.append(np.argmin(dist))
+    weave = {'evals' : evalsorg[:, 2:], 'evecs' : evecsorg[:, :, 2:]}
+    capsize = {'evals' : evalsorg[:, 1], 'evecs' : evecsorg[:, :, 1]}
+    caster = {'evals' : evalsorg[:, 0], 'evecs' : evecsorg[:, :, 0]}
+    return weave, capsize, caster
+    */

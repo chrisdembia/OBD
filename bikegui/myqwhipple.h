@@ -90,6 +90,8 @@ class MyQWhipple {
 
     void setDoUpright(bool);
     bool getDoUpright();
+    
+    void printUprightData(QString fname);
 
   private:
     std::string name;

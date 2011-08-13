@@ -34,7 +34,7 @@ WhippleParameter::WhippleParameter(std::vector<MyQWhipple*>* qb, QWidget
   mjwp = new MJWhippleParams; // Meijaard whipple parameters
   mjwptemp = new MJWhippleParams;
 
-  wasGyroSelectedBefore = false; 
+  wasGyroSelectedBefore = false;
   wasMeijSelectedBefore = false;
 
   layout = new QGridLayout(this);
@@ -42,32 +42,34 @@ WhippleParameter::WhippleParameter(std::vector<MyQWhipple*>* qb, QWidget
 
 
   initBikeBox();
-  
+
   paramTypeBox = new QGroupBox( tr("Choose parameter type"), this);
   paramTypeLayout = new QVBoxLayout(paramTypeBox);
   paramTypeBox->setLayout(paramTypeLayout);
   paramComboBox = new QComboBox(this);
   paramTypeLayout->addWidget(paramComboBox);
-  layout->addWidget(paramTypeBox,0,1,1,1);
+  layout->addWidget(paramTypeBox, 0, 1, 1, 1);
 
   paramComboBox->addItem(tr("Gyrostat parameters"));
-//  paramComboBox->addItem(tr("Franke parameters"));
+  //  paramComboBox->addItem(tr("Franke parameters"));
   paramComboBox->addItem(tr("Meijaard parameters"));
 
 
   initParamBox();
   drawGyroParamBox();
-  
+
   connect(paramComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(
         paramBoxSlot(int)) );
-  
+
   initQDrawBox();
-}
+
+  initCheckBox();
+} // WhippleParameter()
 
 void WhippleParameter::initBikeBox() {
 //  bikeComboBox = new QComboBox(
   bikeBox = new QGroupBox( tr("Bicycle list"), this);
-  layout->addWidget(bikeBox,0,0,2,1);
+  layout->addWidget(bikeBox, 0, 0, 2, 1);
 
   bikeLayout = new QGridLayout(bikeBox);
   bikeBox->setLayout(bikeLayout);
@@ -75,18 +77,18 @@ void WhippleParameter::initBikeBox() {
   bikeListView = new QListView(this);
   for (unsigned int i = 0; i < qbikes->size(); i++) {
     bikeList << qbikes->at(i)->getName().c_str();
-  }
+  } // for i
   bikeListModel = new QStringListModel(bikeList);
   bikeListView->setModel(bikeListModel);
 
   bikeListSelection = bikeListView->selectionModel();
   /*
-  connect(bikeListSelection,SIGNAL(selectionChanged(const QItemSelection&
+  connect(bikeListSelection, SIGNAL(selectionChanged(const QItemSelection&
           selected, const QItemSelection& deselected)), this,
       SLOT(bikeListSelectionSlot(const QItemSelection& selected, const
           QItemSelection& deselected)));
           */
-  connect(bikeListSelection,SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(bikeListCurrentSlot(const QModelIndex&, const QModelIndex&)));
+  connect(bikeListSelection, SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(bikeListCurrentSlot(const QModelIndex&, const QModelIndex&)));
 
   addBikeButton = new QToolButton(bikeBox);
   addBikeButton->setText( tr("Add bike"));
@@ -95,10 +97,10 @@ void WhippleParameter::initBikeBox() {
   removeBikeButton->setText( tr("Remove bike"));
   connect(removeBikeButton, SIGNAL(clicked()), this, SLOT(removeBikeSlot()));
 
-  bikeLayout->addWidget(bikeListView,0,0,1,2);
-  bikeLayout->addWidget(addBikeButton,1,0);
-  bikeLayout->addWidget(removeBikeButton,1,1);
-}
+  bikeLayout->addWidget(bikeListView, 0, 0, 1, 2);
+  bikeLayout->addWidget(addBikeButton, 1, 0);
+  bikeLayout->addWidget(removeBikeButton, 1, 1);
+} // initBikeBox()
 
 void WhippleParameter::addBikeSlot() {
   // prevent suggesting duplicate filenames
@@ -112,9 +114,9 @@ void WhippleParameter::addBikeSlot() {
     for (unsigned int i = 0; i < qbikes->size(); i++) {
       if (!bikename.compare( bikeList.at(i) )) {
         isunique = false;
-      }
-    }
-  }
+      } // if
+    } // for i
+  } // while
   bool ok;
   QString text = QInputDialog::getText(this, tr("New bicycle"),
       tr("Enter the name for a new bicycle:"), QLineEdit::Normal,
@@ -128,8 +130,8 @@ void WhippleParameter::addBikeSlot() {
 //    bikeListModel->setData(bikeListModel->rowCount(), QVariant(text.toStdString().c_str()));
     bikeListModel->setStringList(bikeList);
 
-  }
-}
+  } // if
+} // addBikeSlot()
 
 void WhippleParameter::removeBikeSlot() {
 
@@ -144,14 +146,14 @@ void WhippleParameter::removeBikeSlot() {
     // update the qlistmodel and the qlistview
     bikeList.removeAt(bikeidx);
     bikeListModel->setStringList(bikeList);
-    //bikeListModel->removeRows(bikeidx,1);
-  } 
-}
+    //bikeListModel->removeRows(bikeidx, 1);
+  } // if
+} // removeBikeSlot()
 
 void WhippleParameter::bikeListSelectionSlot(const QItemSelection& selected, const QItemSelection& deselected) {
   std::cout << "heyyo" << std::endl;
   std::cout << selected.indexes().at(0).column() << std::endl;
-}
+} // bikeListSelectionSlot()
 
 void WhippleParameter::bikeListCurrentSlot(const QModelIndex& current, const QModelIndex& previous) {
   // change the parameters and bike view
@@ -171,13 +173,19 @@ void WhippleParameter::bikeListCurrentSlot(const QModelIndex& current, const QMo
     meijFileLabel->setText(qbikes->at(bidx)->meijFileLabelText);
   } else {
     std::cerr << "error in bikeListCurrentSlot" << std::endl;
-  }
+  } // if
   // set the parameter type correctly
   if (qbikes->at(bidx)->getParamType() != paramComboBox->currentIndex()) {
     paramComboBox->setCurrentIndex(qbikes->at(bidx)->getParamType());
-  } 
+  } // if
   qbikes->at(bidx)->QDraw2D(drawScene);
-}
+
+  if (qbikes->at(bidx)->getDoUpright()) {
+    uprightCheck->setCheckState(Qt::Checked);
+  } else {
+    uprightCheck->setCheckState(Qt::Unchecked);
+  } // if
+} // bikeListCurrentSlot()
 
 /*
 void WhippleParameter::initBikePerBox() {
@@ -187,19 +195,20 @@ void WhippleParameter::initBikePerBox() {
 
 void WhippleParameter::initParamBox() {
   paramBox = new QGroupBox( tr("Set parameter values"), this);
-  paramBox->setMinimumSize(300,600);
-  layout->addWidget(paramBox,1,1,1,1);
-}
+  paramBox->setMinimumSize(300, 600);
+  layout->addWidget(paramBox, 1, 1, 1, 1);
+} // initParamBox()
 
 void WhippleParameter::initDrawBox() {
   drawBox = new QGroupBox( tr("Drawing"), this);
-  layout->addWidget(drawBox,0,2,1,1);
+  layout->addWidget(drawBox, 0, 2, 1, 1);
   QVBoxLayout* drawLayout = new QVBoxLayout(drawBox);
   drawBox->setLayout(drawLayout);
 
   QVTKWidget* qvtkWidget = new QVTKWidget(drawBox);
   qvtkWidget->GetInteractor()->Initialize();
-  vtkSmartPointer<vtkContextView> drawVTKView = vtkSmartPointer<vtkContextView>::New();
+  vtkSmartPointer<vtkContextView> drawVTKView =
+    vtkSmartPointer<vtkContextView>::New();
   drawVTKView->SetInteractor(qvtkWidget->GetInteractor());
   qvtkWidget->SetRenderWindow(drawVTKView->GetRenderWindow());
   qbikes->at(bidx)->Draw2D(drawVTKView->GetContext());
@@ -209,17 +218,17 @@ void WhippleParameter::initDrawBox() {
   qvtkWidget->GetRenderWindow()->Render();
 
   qvtkWidget->GetInteractor()->Start();
-}
+} // initDrawBox()
 
 void WhippleParameter::initQDrawBox() {
   drawBox = new QGroupBox( tr("Drawing"), this);
-  layout->addWidget(drawBox,0,2,2,1);
+  layout->addWidget(drawBox, 0, 2, 2, 1);
   drawLayout = new QVBoxLayout(drawBox);
   drawBox->setLayout(drawLayout);
 
   saveDrawButton = new QToolButton(drawBox);
   saveDrawButton->setText( tr("Save bicycle drawing"));
-  connect(saveDrawButton,SIGNAL(clicked()), this, SLOT(saveDrawSlot()));
+  connect(saveDrawButton, SIGNAL(clicked()), this, SLOT(saveDrawSlot()));
   drawLayout->addWidget(saveDrawButton);
 
   drawView = new QGraphicsView(this);
@@ -229,12 +238,32 @@ void WhippleParameter::initQDrawBox() {
   drawScene->setBackgroundBrush(Qt::white);
   drawView->setScene(drawScene);
   qbikes->at(bidx)->QDraw2D(drawScene);
-  drawView->setMinimumSize(400,200);
-  drawView->fitInView(drawView->sceneRect(),Qt::KeepAspectRatioByExpanding);
-  //drawView->scale(100,100);
+  drawView->setMinimumSize(400, 200);
+  drawView->fitInView(drawView->sceneRect(), Qt::KeepAspectRatioByExpanding);
+  //drawView->scale(100, 100);
 
 
-}
+} // initQDrawBox()
+
+void WhippleParameter::initCheckBox() {
+  checkBox = new QGroupBox( tr("Choose analyses for this bicycle"), this);
+  checkLayout = new QVBoxLayout(checkBox);
+  checkBox->setLayout(checkLayout);
+  layout->addWidget(checkBox, 0, 3);
+  uprightCheck = new QCheckBox("upright", this);
+  checkLayout->addWidget(uprightCheck);
+  uprightCheck->setCheckState(Qt::Checked);
+  connect(uprightCheck, SIGNAL(stateChanged(int)), this,
+      SLOT(uprightCheckSlot(int)));
+} // initCheckBox()
+
+void WhippleParameter::uprightCheckSlot(int state) {
+  if (state == 1) {
+    qbikes->at(bidx)->setDoUpright(true);
+  } else if (state == 0) {
+    qbikes->at(bidx)->setDoUpright(false);
+  } // if
+} // uprightCheckSlot()
 
 void WhippleParameter::saveDrawSlot() {
   //QString fdirname = QFileDialog::getSaveFileName(this, tr("Save drawing"), QDir::currentPath(), tr("Postscript (*.ps)") );
@@ -246,41 +275,39 @@ void WhippleParameter::saveDrawSlot() {
     QPainter painter(&printer);
     painter.setRenderHint(QPainter::Antialiasing);
     drawScene->render(&painter);
-  }
+  } // if
 
-}
+} // saveDrawSlot()
 
 void WhippleParameter::paramBoxSlot(int index) {
   delete paramBox;
   initParamBox();
-  
+
   if (index == 0) {
     qbikes->at(bidx)->setParamType(index);
-    drawGyroParamBox();  
-  }
-  else if (index == 2) { // Franke parameters
+    drawGyroParamBox();
+  } else if (index == 2) { // Franke parameters
    // QGridLayout * frankeParamLayout = new QGridLayout;
-  //  frankeParamLayout->addWidget(new QLabel( tr("Not available. Bug the developers!") ),0,0);
+  //  frankeParamLayout->addWidget(new QLabel( tr("Not available. Bug the developers!") ), 0, 0);
    // paramBox->setLayout(frankeParamLayout);
-  }
-  else if (index == 1) { // Meijaard parameters
+  } else if (index == 1) { // Meijaard parameters
     qbikes->at(bidx)->setParamType(index);
     drawMeijParamBox();
-  }
+  } // if
   // IMPLEMENT EVERYTHING ELSE.
   // manage deleting objects etc.
-}
+} // paramBoxSlot()
 
 void WhippleParameter::drawGyroParamBox() {
   // putting gyrostat parameter widgets into a QGridLayout
 //  gyroParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
-  
+
   QGroupBox * gyroParamFileBox = 
-    new QGroupBox( tr("File management"),paramBox );
+    new QGroupBox( tr("File management"), paramBox );
   QScrollArea * gyroParamModScroll = new QScrollArea(paramBox);
   QGroupBox * gyroParamModBox = 
     new QGroupBox( tr("Modify parameters"), gyroParamModScroll );
-  
+
   gyroParamFileBox->setMaximumHeight(175);
   // putting benchmark parameter widgets into a QGridLayout
   QVBoxLayout * gyroParamLayout = new QVBoxLayout(paramBox);
@@ -290,84 +317,85 @@ void WhippleParameter::drawGyroParamBox() {
   gyroParamFileBox->setLayout(gyroParamFileLayout);
   gyroParamModBox->setLayout(gyroParamModLayout);
   gyroParamLayout->addWidget(gyroParamFileBox);
-  gyroParamLayout->addWidget(gyroParamModScroll);  
-  
+  gyroParamLayout->addWidget(gyroParamModScroll);
+
   paramBox->setLayout(gyroParamLayout);
 
   defineGyroStrings();
-  
+
   // load parameters label
-  QLabel * gyroLoadLabel = new QLabel("current file:",gyroParamFileBox);
+  QLabel * gyroLoadLabel = new QLabel("current file:", gyroParamFileBox);
 
   // load parameters button
   QToolButton * gyroLoadButton = new QToolButton(gyroParamFileBox);
   gyroLoadButton->setText("Load");
-  connect(gyroLoadButton,SIGNAL(clicked()),this,SLOT(gyroLoadSlot()));
-  
+  connect(gyroLoadButton, SIGNAL(clicked()), this, SLOT(gyroLoadSlot()));
+
   // save parameters button
   QToolButton * gyroSaveButton = new QToolButton(gyroParamFileBox);
   gyroSaveButton->setText("Save");
-  connect(gyroSaveButton,SIGNAL(clicked()),this,SLOT(gyroSaveSlot()));
+  connect(gyroSaveButton, SIGNAL(clicked()), this, SLOT(gyroSaveSlot()));
 
   // save as parameters button
   QToolButton * gyroSaveAsButton = new QToolButton(gyroParamFileBox);
   gyroSaveAsButton->setText("Save As");
-  connect(gyroSaveAsButton,SIGNAL(clicked()),this,SLOT(gyroSaveAsSlot()));
+  connect(gyroSaveAsButton, SIGNAL(clicked()), this, SLOT(gyroSaveAsSlot()));
 
   // line edit to show open file
   gyroFileLabel = new QLabel(gyroParamFileBox);
   gyroFileLabel->setTextFormat(Qt::RichText);
- 
+
   // the value for the file label is set further down 
-  
+
   // use benchmark parameters button
   QToolButton * gyroBenchParamsButton = new QToolButton(gyroParamFileBox);
   gyroBenchParamsButton->setText("Use benchmark parameters");
   connect(gyroBenchParamsButton, SIGNAL(clicked()), this,
       SLOT(setGyroBenchParametersSlot()) );
-  
-  // error message box
-  gyroErrorText = new QTextEdit("Error messages will appear here.",gyroParamFileBox);
 
-  gyroParamFileLayout->addWidget(gyroLoadLabel,0,0);
-  gyroParamFileLayout->addWidget(gyroLoadButton,0,1);
-  gyroParamFileLayout->addWidget(gyroSaveButton,0,2);
-  gyroParamFileLayout->addWidget(gyroSaveAsButton,0,3);
-  gyroParamFileLayout->addWidget(gyroFileLabel,1,0,1,4);
-  gyroParamFileLayout->addWidget(gyroBenchParamsButton,2,0,1,4);
-  gyroParamFileLayout->addWidget(gyroErrorText,4,0,3,4);  
-  
+  // error message box
+  gyroErrorText = new QTextEdit("Error messages will appear here.", gyroParamFileBox);
+
+  gyroParamFileLayout->addWidget(gyroLoadLabel, 0, 0);
+  gyroParamFileLayout->addWidget(gyroLoadButton, 0, 1);
+  gyroParamFileLayout->addWidget(gyroSaveButton, 0, 2);
+  gyroParamFileLayout->addWidget(gyroSaveAsButton, 0, 3);
+  gyroParamFileLayout->addWidget(gyroFileLabel, 1, 0, 1, 4);
+  gyroParamFileLayout->addWidget(gyroBenchParamsButton, 2, 0, 1, 4);
+  gyroParamFileLayout->addWidget(gyroErrorText, 4, 0, 3, 4);
+
   for (int i = 0; i < NgyroParams; i++) {
     gyroParamLabels[i] = new QLabel( gyroParamStrings[i], gyroParamModBox ); // dont need to save these
     gyroParamLabels[i]->setToolTip( tr(gyroParamToolTips[i].c_str() ) );
 
     gyroParamEdits[i] = new QLineEdit( gyroParamModBox);
     gyroParamEdits[i]->setAlignment(Qt::AlignRight);
-    gyroParamEdits[i]->setValidator(new QDoubleValidator(-999.0, 999.0, 5, gyroParamEdits[i]));
+    gyroParamEdits[i]->setValidator(new QDoubleValidator(-999.0, 999.0, 5,
+          gyroParamEdits[i]));
 
-    gyroParamModLayout->addWidget(gyroParamLabels[i],i,0);
-    gyroParamModLayout->addWidget(gyroParamEdits[i],i,1,1,2);
-  }
-  
+    gyroParamModLayout->addWidget(gyroParamLabels[i], i, 0);
+    gyroParamModLayout->addWidget(gyroParamEdits[i], i, 1, 1, 2);
+  } // for i
+
 // initialize parameters to the benchmark bicycle.
   if (!wasGyroSelectedBefore) {
     setGyroBenchParametersSlot();
     wasGyroSelectedBefore = true;
-  }
-  else {
+  } else {
     QFontMetrics what(font());
-    gyroFileLabel->setText(what.elidedText("<b>" + gyrofdirname + "</b>",Qt::ElideLeft,gyroFileLabel->width()));
+    gyroFileLabel->setText(what.elidedText("<b>" + gyrofdirname + "</b>",
+          Qt::ElideLeft, gyroFileLabel->width()));
 
     sendGyroParamToBike();
-  }
+  } // if
 
   for (int i = 0; i < NgyroParams; i++) {
     connect(gyroParamEdits[i],
-        SIGNAL(editingFinished()),this,SLOT(gyroAsteriskSlot()));
-  }
+        SIGNAL(editingFinished()), this, SLOT(gyroAsteriskSlot()));
+  } // for i
 
   gyroParamModScroll->setWidget(gyroParamModBox);
-}
+} // drawGyroParamBox()
 
 void WhippleParameter::updateGyroParamEdits(void) {
   gyroParamValues[0] = gswp->rr;
@@ -394,21 +422,21 @@ void WhippleParameter::updateGyroParamEdits(void) {
   gyroParamValues[21] = gswp->lfx;
   gyroParamValues[22] = gswp->lfz;
   gyroParamValues[23] = gswp->g;
-  
+
   for (int k = 0; k < NgyroParams; k++) {
     gyroParamEdits[k]->setText( QString("%1").arg(gyroParamValues[k]) );
-  }
-  
-}
+  } // for k
+
+} // updateGyroParamEdits()
 
 void WhippleParameter::gyroAsteriskSlot() {
   // add an asterisk to the dialog box
   if ( !gyroFileLabel->text().endsWith("*</b>") ) {
     QString qstr = gyroFileLabel->text();
     gyroFileLabel->setText( qstr.insert( qstr.lastIndexOf("<"), "*") );
-  }
+  } // if
 
-  // revalidate and save the parameters  
+  // revalidate and save the parameters
   gswptemp->rr =    gyroParamEdits[0]->text().toDouble();
   gswptemp->rrt =   gyroParamEdits[1]->text().toDouble();   
   gswptemp->rf =    gyroParamEdits[2]->text().toDouble(); 
@@ -434,8 +462,8 @@ void WhippleParameter::gyroAsteriskSlot() {
   gswptemp->lfz =   gyroParamEdits[22]->text().toDouble();
   gswptemp->g =     gyroParamEdits[23]->text().toDouble();
 
-  sendGyroParamToBike();  
-}
+  sendGyroParamToBike();
+} // gyroAsteriskSlot()
 
 void WhippleParameter::sendGyroParamToBike() {
 
@@ -451,19 +479,19 @@ void WhippleParameter::sendGyroParamToBike() {
   catch (...) {
     std::cerr << "Caught an unknown exception in WhippleParameter::sendGyroParamToBike(). Tried to run bike->setParameters( WhippleParams*, bool ), which should only throw const char *'s." << std::endl;
   }
-  
+
   if (validparameters) {
     *gswp = *gswptemp;
     qbikes->at(bidx)->setGyroParams(gswp);
     gyroErrorText->setTextColor( Qt::darkGreen );
     gyroErrorText->setText( tr("Parameters set.") );
-  }
+  } // if
   updateGyroParamEdits();
   if (wasGyroSelectedBefore) {
     drawScene->clear();
     qbikes->at(bidx)->QDraw2D(drawScene);
-  }
-}
+  } // if
+} // sendGyroParamToBike()
 
 void WhippleParameter::gyroLoadSlot() {
   QString fdirname = QFileDialog::getOpenFileName(this, tr("Load file"), QDir::currentPath() );
@@ -473,31 +501,36 @@ void WhippleParameter::gyroLoadSlot() {
     readWhippleParams(gswptemp, gyrofdirname.toStdString().c_str() );
     sendGyroParamToBike(); 
     QFontMetrics qfm1(font());
-    gyroFileLabel->setText("<b>" + qfm1.elidedText(gyrofdirname,Qt::ElideLeft,int(.9*gyroFileLabel->width())) + "</b>");
-    
-  }
-}
+    gyroFileLabel->setText("<b>" + qfm1.elidedText(gyrofdirname, Qt::ElideLeft,
+          int(.9*gyroFileLabel->width())) + "</b>");
+
+  } // if
+} // gyroLoadSlot()
 
 void WhippleParameter::gyroSaveSlot() {
   if (gyrofdirname.isEmpty()) {
     gyroSaveAsSlot();
-  }
-  else {
-  qbikes->at(bidx)->getBike()->writeParameters( gyrofdirname.toStdString().c_str()
+  } else {
+  qbikes->at(bidx)->getBike()->writeParameters(
+      gyrofdirname.toStdString().c_str()
       );
-  }
-}
+  } // if
+} // gyroSaveSlot()
 
-void WhippleParameter::gyroSaveAsSlot() { QString fdirname = QFileDialog::getSaveFileName(this, tr("Save File"), QDir::currentPath(), tr("Text file (*, *.txt, *.dat,...);;Any file (*)") );
+void WhippleParameter::gyroSaveAsSlot() { 
+  QString fdirname = QFileDialog::getSaveFileName(this, tr("Save File"),
+      QDir::currentPath(), tr("Text file (*, *.txt, *.dat,...);;Any file (*)")
+      );
   // from whippleutils.h
   if (!fdirname.isEmpty()) {
     gyrofdirname = fdirname;
     qbikes->at(bidx)->getBike()->writeParameters(
         gyrofdirname.toStdString().c_str() );
     QFontMetrics qfm1(font());
-    gyroFileLabel->setText("<b>" + qfm1.elidedText(gyrofdirname,Qt::ElideLeft,int(.9*gyroFileLabel->width())) + "</b>");
-  }
-}
+    gyroFileLabel->setText("<b>" + qfm1.elidedText(gyrofdirname, Qt::ElideLeft,
+          int(.9*gyroFileLabel->width())) + "</b>");
+  } // if
+} // gyroSaveAsSlot()
 
 void WhippleParameter::setGyroBenchParametersSlot() {
   // in whippleutils.h
@@ -510,12 +543,12 @@ void WhippleParameter::setGyroBenchParametersSlot() {
 
   gyrofdirname.clear();
   gyroFileLabel->setText("<b>benchmark</b>");
-  
-} 
+
+} // setGyroBenchParametersSlot()
 
 void WhippleParameter::drawMeijParamBox() {
   QGroupBox * meijParamFileBox =
-    new QGroupBox( tr("File management"),paramBox );
+    new QGroupBox( tr("File management"), paramBox );
   QScrollArea * meijParamModScroll = new QScrollArea(paramBox);
   QGroupBox * meijParamModBox =
     new QGroupBox( tr("Modify parameters"), meijParamModScroll);
@@ -528,90 +561,91 @@ void WhippleParameter::drawMeijParamBox() {
   meijParamFileBox->setLayout(meijParamFileLayout);
   meijParamModBox->setLayout(meijParamModLayout);
   meijParamLayout->addWidget(meijParamFileBox);
-  
-  meijParamLayout->addWidget(meijParamModScroll);  
+
+  meijParamLayout->addWidget(meijParamModScroll);
   paramBox->setLayout(meijParamLayout);
 
 //  meijParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
   // DO I NEED THE ABOVE?
- 
+
   defineMeijStrings();
-  
+
   // load parameters label
-  QLabel * meijLoadLabel = new QLabel("current file:",meijParamFileBox);
+  QLabel * meijLoadLabel = new QLabel("current file:", meijParamFileBox);
 
   // load parameters button
   QToolButton * meijLoadButton = new QToolButton(meijParamFileBox);
   meijLoadButton->setText("Load");
-  connect(meijLoadButton,SIGNAL(clicked()),this,SLOT(meijLoadSlot()));
-  
+  connect(meijLoadButton, SIGNAL(clicked()), this, SLOT(meijLoadSlot()));
+
   // save parameters button
   QToolButton * meijSaveButton = new QToolButton(meijParamFileBox);
   meijSaveButton->setText("Save");
-  connect(meijSaveButton,SIGNAL(clicked()),this,SLOT(meijSaveSlot()));
+  connect(meijSaveButton, SIGNAL(clicked()), this, SLOT(meijSaveSlot()));
 
   // save as parameters button
   QToolButton * meijSaveAsButton = new QToolButton(meijParamFileBox);
   meijSaveAsButton->setText("Save As");
-  connect(meijSaveAsButton,SIGNAL(clicked()),this,SLOT(meijSaveAsSlot()));
+  connect(meijSaveAsButton, SIGNAL(clicked()), this, SLOT(meijSaveAsSlot()));
 
   // line edit to show open file
   meijFileLabel = new QLabel(meijParamModBox);
   meijFileLabel->setTextFormat(Qt::RichText);
-  // the value for the file label is set further down 
-  
+  // the value for the file label is set further down
+
   // use benchmark parameters button
   QToolButton * meijBenchParamsButton = new QToolButton(meijParamFileBox);
   meijBenchParamsButton->setText("Use benchmark parameters");
-  connect(meijBenchParamsButton, SIGNAL(clicked()), this, SLOT(setMeijBenchParametersSlot()) );
- 
+  connect(meijBenchParamsButton, SIGNAL(clicked()), this,
+      SLOT(setMeijBenchParametersSlot()) );
+
   // convert Meijaard parameters to Gyrostat parameters
   QToolButton * meijToGyroButton = new QToolButton(meijParamFileBox);
   meijToGyroButton->setText("Convert Meij. to Gyro params");
 
   // error message box
-  meijErrorText = new QTextEdit("Parameters are okay.",meijParamFileBox);
+  meijErrorText = new QTextEdit("Parameters are okay.", meijParamFileBox);
 
- 
-  meijParamFileLayout->addWidget(meijLoadLabel,0,0);
-  meijParamFileLayout->addWidget(meijLoadButton,0,1);
-  meijParamFileLayout->addWidget(meijSaveButton,0,2);
-  meijParamFileLayout->addWidget(meijSaveAsButton,0,3);
-  meijParamFileLayout->addWidget(meijFileLabel,1,0,1,4);
-  meijParamFileLayout->addWidget(meijBenchParamsButton,2,0,1,4);
-  meijParamFileLayout->addWidget(meijToGyroButton,3,0,1,4);
-  meijParamFileLayout->addWidget(meijErrorText,4,0,3,4);  
+
+  meijParamFileLayout->addWidget(meijLoadLabel, 0, 0);
+  meijParamFileLayout->addWidget(meijLoadButton, 0, 1);
+  meijParamFileLayout->addWidget(meijSaveButton, 0, 2);
+  meijParamFileLayout->addWidget(meijSaveAsButton, 0, 3);
+  meijParamFileLayout->addWidget(meijFileLabel, 1, 0, 1, 4);
+  meijParamFileLayout->addWidget(meijBenchParamsButton, 2, 0, 1, 4);
+  meijParamFileLayout->addWidget(meijToGyroButton, 3, 0, 1, 4);
+  meijParamFileLayout->addWidget(meijErrorText, 4, 0, 3, 4);
   for (int i = 0; i < NmeijParams; i++) {
     meijParamLabels[i] =
       new QLabel( meijParamStrings[i], meijParamModBox); // dont need to save these
     meijParamLabels[i]->setToolTip( tr(meijParamToolTips[i].c_str() ) );
-    
+
     meijParamEdits[i] = new QLineEdit(meijParamModBox);
     meijParamEdits[i]->setAlignment(Qt::AlignRight);
     meijParamEdits[i]->setValidator(new QDoubleValidator(-999.0, 999.0, 5, meijParamEdits[i]));
 
-    meijParamModLayout->addWidget(meijParamLabels[i],i,0);
-    meijParamModLayout->addWidget(meijParamEdits[i],i,1,1,2);
-  }
+    meijParamModLayout->addWidget(meijParamLabels[i], i, 0);
+    meijParamModLayout->addWidget(meijParamEdits[i], i, 1, 1, 2);
+  } // for
   meijParamEdits[4]->setReadOnly(true); // forward velocity is not a real parameter
   // initialize parameters to the benchmark bicycle.
   if (!wasMeijSelectedBefore) {
     setMeijBenchParametersSlot();
     wasMeijSelectedBefore = true;
-  }
-  else {
+  } else {
     updateMeijParamEdits();
     QFontMetrics qfm1(font());
-    meijFileLabel->setText("<b>" + qfm1.elidedText(meijfdirname,Qt::ElideLeft,int(.9*meijFileLabel->width())) + "</b>");
-  }
+    meijFileLabel->setText("<b>" + qfm1.elidedText(meijfdirname, Qt::ElideLeft,
+          int(.9*meijFileLabel->width())) + "</b>");
+  } // if
 
   for (int i = 0; i < NmeijParams; i++) {
-    connect(meijParamEdits[i], SIGNAL(editingFinished()),this,SLOT(meijAsteriskSlot()));
-  }
+    connect(meijParamEdits[i], SIGNAL(editingFinished()), this,
+        SLOT(meijAsteriskSlot()));
+  } // for i
 
-  
   meijParamModScroll->setWidget(meijParamModBox);
-}
+} // drawMeijParamBox()
 
 void WhippleParameter::updateMeijParamEdits(void) {
   // BENCHMARK MODEL PARAMETERS
@@ -647,16 +681,16 @@ void WhippleParameter::updateMeijParamEdits(void) {
   // add a horizontal rule
   for (int k = 0; k < NmeijParams; k++) {
     meijParamEdits[k]->setText( QString("%1").arg(meijParamValues[k]) );
-  }
+  } // for k
 
-}
+} // updateMeijParamEdits()
 
 void WhippleParameter::meijAsteriskSlot() {
   // add an asterisk to the dialog box
   if ( !meijFileLabel->text().endsWith("*</b>") ) {
     QString qstr = meijFileLabel->text();
     meijFileLabel->setText( qstr.insert( qstr.lastIndexOf("<"), "*") );
-  }
+  } // if
 
   // revalidate and save the parameters  
   mjwptemp->w = meijParamEdits[0]->text().toDouble();
@@ -687,9 +721,9 @@ void WhippleParameter::meijAsteriskSlot() {
   mjwptemp->mf = meijParamEdits[26]->text().toDouble();
   mjwptemp->IFxx = meijParamEdits[27]->text().toDouble();
   mjwptemp->IFyy = meijParamEdits[28]->text().toDouble();
-  
+
   sendMeijParamToBike();
-}
+} // meijAsteriskSlot()
 
 void WhippleParameter::sendMeijParamToBike() {
 
@@ -720,52 +754,57 @@ void WhippleParameter::sendMeijParamToBike() {
     catch (...) {
       meijErrorText->setTextColor( Qt::red );
       meijErrorText->setText( tr("Caught an error after internally converting Meijaard parameters to Gyrostat parameters.") );
-    }
-    
+    } // try
+
     if (validparameters) {
       *mjwp = *mjwptemp;
       qbikes->at(bidx)->setMeijParams(mjwp);
       meijErrorText->setTextColor( Qt::darkGreen );
       meijErrorText->setText( tr("Parameters set.") );
-    }
+    } // if
     delete gswptemptemp;
-  }
+  } // if
   updateMeijParamEdits();
   if (wasMeijSelectedBefore) {
     drawScene->clear();
     qbikes->at(bidx)->QDraw2D(drawScene);
-  }
-}
+  } // if
+} // sendMeijParamToBike()
 
 void WhippleParameter::meijLoadSlot() {
-  QString fdirname = QFileDialog::getOpenFileName(this, tr("Load file"), QDir::currentPath() );
+  QString fdirname = QFileDialog::getOpenFileName(this, tr("Load file"),
+      QDir::currentPath() );
   if (!fdirname.isEmpty()) {
     meijfdirname = fdirname;
     readMJWhippleParams(mjwptemp, meijfdirname.toStdString().c_str() );
     updateMeijParamEdits(); 
     QFontMetrics qfm1(font());
-    meijFileLabel->setText("<b>" + qfm1.elidedText(meijfdirname,Qt::ElideLeft,int(.9*meijFileLabel->width())) + "</b>");
-  }
-}
+    meijFileLabel->setText("<b>" + qfm1.elidedText(meijfdirname, Qt::ElideLeft,
+          int(.9*meijFileLabel->width())) + "</b>");
+  } // if
+} // meijLoadSlot()
 
 void WhippleParameter::meijSaveSlot() {
   if (meijfdirname.isEmpty()) {
     meijSaveAsSlot();
   } else {
     writeMJWhippleParams(mjwp, meijfdirname.toStdString().c_str() );
-  }
-}
+  } // if
+} // meijSaveSlot()
 
 void WhippleParameter::meijSaveAsSlot() {
-  QString fdirname = QFileDialog::getSaveFileName(this, tr("Save File"), QDir::currentPath(), tr("Text file (*, *.txt, *.dat,...);;Any file (*)") );
+  QString fdirname = QFileDialog::getSaveFileName(this, tr("Save File"),
+      QDir::currentPath(), tr("Text file (*, *.txt, *.dat,...);;Any file (*)")
+      );
   // from whippleutils.h
   if (!fdirname.isEmpty()) {
     meijfdirname = fdirname;
     writeMJWhippleParams(mjwp, meijfdirname.toStdString().c_str() );
     QFontMetrics qfm1(font());
-    meijFileLabel->setText("<b>" + qfm1.elidedText(meijfdirname,Qt::ElideLeft,int(.9*meijFileLabel->width())) + "</b>");
-  }
-}
+    meijFileLabel->setText("<b>" + qfm1.elidedText(meijfdirname, Qt::ElideLeft,
+          int(.9*meijFileLabel->width())) + "</b>");
+  } // if
+} // meijSaveAsSlot()
 
 void WhippleParameter::setMeijBenchParametersSlot() {
   // in whippleutils.h
@@ -773,11 +812,11 @@ void WhippleParameter::setMeijBenchParametersSlot() {
 
   // update line edits
   updateMeijParamEdits();
-  
+
   // set the displayed file name appropriately (the data is built in)
   meijfdirname.clear();
   meijFileLabel->setText("<b>benchmark</b>");
-}
+} // setMeijBenchParametersSlot()
 
 void WhippleParameter::defineMeijStrings() {
   // MEIJAARD PARAMETERS
@@ -813,9 +852,9 @@ void WhippleParameter::defineMeijStrings() {
 
   meijParamToolTips[0] = "Wheel base: distance between contact patches of the front and rear wheels.";
   for (int i = 1; i < NmeijParams; i++ ) {
-  meijParamToolTips[i] = "EDIT";
-  }
-} 
+    meijParamToolTips[i] = "EDIT";
+  } // for i
+} // defineMeijStrings()
 
 void WhippleParameter::defineGyroStrings() {
   // GYROSTAT PARAMETERS
@@ -847,5 +886,5 @@ void WhippleParameter::defineGyroStrings() {
   gyroParamToolTips[0] = "rear wheel radius";
   for (int i = 1; i < NgyroParams; i++) {
     gyroParamToolTips[i] = "EDIT";
-  }
-} 
+  } // for i
+} // defineGyroStrings()

@@ -20,17 +20,17 @@ class myvtkTriad
 {
   public:
   myvtkTriad(vtkSmartPointer<vtkRenderer>);
-  void AddOrientation(double,double,double);
-  void SetOrientation(double,double,double);
-  void AddPosition(double,double,double);
-  void SetPosition(double,double,double);
+  void AddOrientation(double, double, double);
+  void SetOrientation(double, double, double);
+  void AddPosition(double, double, double);
+  void SetPosition(double, double, double);
   void AddOrientation(double v[3]);
   void SetOrientation(double v[3]);
   void AddPosition(double v[3]);
   void SetPosition(double v[3]);
-  void SetScale(double,double,double);
+  void SetScale(double, double, double);
   void SetRelScale(int dir, double s);
-  void SetColor(double,double,double);
+  void SetColor(double, double, double);
   void SetVisibility(double);
   private:
   // unit vector arrows

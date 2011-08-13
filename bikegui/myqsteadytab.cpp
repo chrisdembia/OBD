@@ -45,41 +45,41 @@ MyQSteadyTab::MyQSteadyTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
 
   // Sample the function
   sample = vtkSmartPointer<vtkSampleFunction>::New();
-  sample->SetSampleDimensions(100,100,100);
+  sample->SetSampleDimensions(100, 100, 100);
   sample->SetImplicitFunction(holoFunc);
   sample->SetModelBounds(-M_PI/2.0, M_PI/2.0,
       M_PI/10.-M_PI, M_PI/10.+M_PI,
       0.0, M_PI);
- 
+
   // Create the 0 isosurface
   contours = vtkSmartPointer<vtkContourFilter>::New();
   contours->SetInput(sample->GetOutput());
   contours->GenerateValues(1, 0, 0);
- 
+
   // Map the contours to graphical primitives
   contourMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   contourMapper->SetInput(contours->GetOutput());
-//  contourMapper->SetScalarRange(0.0, 1.2);
- 
+  //  contourMapper->SetScalarRange(0.0, 1.2);
+
   // Create an actor for the contours
   contourActor = vtkSmartPointer<vtkActor>::New();
   contourActor->SetMapper(contourMapper);
-//  contourActor->GetProperty()->SetColor(0,0,0);
- 
+  //  contourActor->GetProperty()->SetColor(0, 0, 0);
+
   // -- create a box around the function to indicate the sampling volume --
- 
+
   // Create outline
   outline = vtkSmartPointer<vtkOutlineFilter>::New();
   outline->SetInput(sample->GetOutput());
- 
+
   // Map it to graphics primitives
   outlineMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   outlineMapper->SetInput(outline->GetOutput());
- 
+
   // Create an actor for it
   outlineActor = vtkSmartPointer<vtkActor>::New();
   outlineActor->SetMapper(outlineMapper);
-  outlineActor->GetProperty()->SetColor(0,0,0);
+  outlineActor->GetProperty()->SetColor(0, 0, 0);
  
   // Visualize
   renderer = vtkSmartPointer<vtkRenderer>::New();

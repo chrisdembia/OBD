@@ -61,7 +61,7 @@ MyQWhipple::MyQWhipple(std::string n) {
   initUprightTable();
 
 } // MyQWhipple()
-  
+
 MyQWhipple::~MyQWhipple() {
     delete triad1;
     delete triad2;
@@ -101,7 +101,7 @@ void MyQWhipple::initUprightTable() {
     eigY[i] = vtkSmartPointer<vtkFloatArray>::New();
     eigY[i]->SetName(linename.c_str());
     eigPlotVTKTable->AddColumn(eigY[i]);
-  }
+  } // for i
 } // initUprightTable()
 
 void MyQWhipple::calcUpright(struct uprightOptions upOpts) {
@@ -142,6 +142,19 @@ void MyQWhipple::calcUpright(struct uprightOptions upOpts) {
 vtkSmartPointer<vtkTable> MyQWhipple::GetUprightTable() {
   return eigPlotVTKTable;
 } // GetUprightTable()
+
+void MyQWhipple::printUprightData(QString fname) {
+  int NeigPerBike = 4;
+  fname = fname + QString(name.c_str()) + ".txt";
+  std::ofstream fid(fname.toStdString().c_str());
+  for (int i = 0; i < eigPlotVTKTable->GetNumberOfRows(); i++) {
+    for (int j = 0; j < NeigPerBike + 1; j++) {
+      fid << eigPlotVTKTable->GetValue(i, j) << " ";
+    }
+    fid << std::endl;
+  }
+  fid.close();
+} // printUprightData()
 
 void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   simRenderer = ren;
@@ -682,7 +695,7 @@ void MyQWhipple::writeSim(std::string fname) {
       fid << simTable->GetValue(i, j) << " ";
     }
     fid << endl;
-  }
+  } // for i
   fid.close();
 } // writeSim()
 
@@ -692,21 +705,21 @@ void MyQWhipple::Draw2D(vtkSmartPointer<vtkContext2D> context) {
   context->GetPen()->SetColorF(1, 1, 1);
   context->GetPen()->SetWidth(5);
   double rearrad = bike->rr+bike->rrt;
-context->DrawEllipse(0, rearrad, bike->rr, bike->rr);
-context->DrawEllipse(0, rearrad, rearrad, rearrad);
-double x1 = bike->lr*cos(bike->q2);
-double y1 = rearrad + bike->lr*sin(bike->q2);
-double x2 = x1 + bike->ls*cos(90-bike->q2);
-double y2 = y1 - bike->ls*sin(90-bike->q2);
-double x3 = x2 + bike->lf*cos(bike->q2);
-double y3 = y2 + bike->lf*sin(bike->q2);
-context->DrawLine(0, rearrad, x1, y1);
-context->DrawLine(x1, y1, x2, y2);
-context->DrawLine(x2, y2, x3, y3);
-double frontrad = bike->rf+bike->rft;
-context->DrawEllipse(x3, y3, bike->rf, bike->rf);
-context->DrawEllipse(x3, y3, frontrad, frontrad);
-//draw mass centres
+  context->DrawEllipse(0, rearrad, bike->rr, bike->rr);
+  context->DrawEllipse(0, rearrad, rearrad, rearrad);
+  double x1 = bike->lr*cos(bike->q2);
+  double y1 = rearrad + bike->lr*sin(bike->q2);
+  double x2 = x1 + bike->ls*cos(90-bike->q2);
+  double y2 = y1 - bike->ls*sin(90-bike->q2);
+  double x3 = x2 + bike->lf*cos(bike->q2);
+  double y3 = y2 + bike->lf*sin(bike->q2);
+  context->DrawLine(0, rearrad, x1, y1);
+  context->DrawLine(x1, y1, x2, y2);
+  context->DrawLine(x2, y2, x3, y3);
+  double frontrad = bike->rf+bike->rft;
+  context->DrawEllipse(x3, y3, bike->rf, bike->rf);
+  context->DrawEllipse(x3, y3, frontrad, frontrad);
+  //draw mass centres
 } // Draw2D()
 
 void MyQWhipple::QDraw2D(QGraphicsScene* qscene) {

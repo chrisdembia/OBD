@@ -36,9 +36,9 @@ myvtkTriad::myvtkTriad(vtkSmartPointer<vtkRenderer> renderer)
  // arrow1->SetTipRadius(1);
  // arrow1->SetShaftRadius(2);
 
-  triadActors[0]->GetProperty()->SetColor(1.0,0.0,0.0);
-  triadActors[1]->GetProperty()->SetColor(0.0,1.0,0.0);
-  triadActors[2]->GetProperty()->SetColor(0.0,0.0,1.0);
+  triadActors[0]->GetProperty()->SetColor(1.0, 0.0, 0.0);
+  triadActors[1]->GetProperty()->SetColor(0.0, 1.0, 0.0);
+  triadActors[2]->GetProperty()->SetColor(0.0, 0.0, 1.0);
   triadActors[1]->RotateZ(90);
   triadActors[2]->RotateY(-90);
 }
@@ -47,72 +47,72 @@ myvtkTriad::myvtkTriad(vtkSmartPointer<vtkRenderer> renderer)
 void myvtkTriad::SetOrientation(double vx, double vy, double vz)
 {
   for (int i = 0; i < 3; i++) {
-    triadActors[i]->SetOrientation(vx,vy,vz);
+    triadActors[i]->SetOrientation(vx, vy, vz);
   }
-  triadActors[1]->AddOrientation(0,0,90);
-  triadActors[2]->AddOrientation(0,-90,0);
+  triadActors[1]->AddOrientation(0, 0, 90);
+  triadActors[2]->AddOrientation(0, -90, 0);
 }
 
 void myvtkTriad::SetOrientation(double v[3])
 {
   for (int i = 0; i < 3; i++) {
-    triadActors[i]->SetOrientation(v[0],v[1],v[2]);
+    triadActors[i]->SetOrientation(v[0], v[1], v[2]);
   }
   triadActors[1]->RotateZ(90);
   triadActors[2]->RotateY(-90);
-//  triadActors[1]->AddOrientation(0,0,90);
-//  triadActors[2]->AddOrientation(0,-90,0);
+//  triadActors[1]->AddOrientation(0, 0, 90);
+//  triadActors[2]->AddOrientation(0, -90, 0);
 }
 
 void myvtkTriad::AddOrientation(double vx, double vy, double vz)
 {
   for (int i = 0; i < 3; i++) {
-    triadActors[i]->AddOrientation(vx,vy,vz);
+    triadActors[i]->AddOrientation(vx, vy, vz);
   }
 }
 
 void myvtkTriad::AddOrientation(double v[3])
 {
   for (int i = 0; i < 3; i++) {
-    triadActors[i]->AddOrientation(v[0],v[1],v[2]);
+    triadActors[i]->AddOrientation(v[0], v[1], v[2]);
   }
 }
 
 void myvtkTriad::SetPosition(double px, double py, double pz)
 {
   for (int i = 0; i < 3; i++) {
-    triadActors[i]->SetPosition(px,py,pz);
+    triadActors[i]->SetPosition(px, py, pz);
   }
 }
 
 void myvtkTriad::SetPosition(double p[3])
 {
   for (int i = 0; i < 3; i++) {
-    triadActors[i]->SetPosition(p[0],p[1],p[2]);
+    triadActors[i]->SetPosition(p[0], p[1], p[2]);
   }
 }
 
 void myvtkTriad::AddPosition(double px, double py, double pz)
 {
   for (int i = 0; i < 3; i++) {
-    triadActors[i]->AddPosition(px,py,pz);
+    triadActors[i]->AddPosition(px, py, pz);
   }
 }
 
 void myvtkTriad::AddPosition(double p[3])
 {
   for (int i = 0; i < 3; i++) {
-    triadActors[i]->AddPosition(p[0],p[1],p[2]);
+    triadActors[i]->AddPosition(p[0], p[1], p[2]);
   }
 }
 
-void myvtkTriad::SetScale(double sx,double sy,double sz)
+void myvtkTriad::SetScale(double sx, double sy, double sz)
 {
   scalex = sx;
   scaley = sy;
   scalez = sz;
   for (int i = 0; i < 3; i++) {
-    triadActors[i]->SetScale(sx,sy,sz);
+    triadActors[i]->SetScale(sx, sy, sz);
   }
 }
 
@@ -127,13 +127,13 @@ void myvtkTriad::SetRelScale(int dir, double s)
   if (s < .1) {
     d = s;
   }
-  triadActors[dir]->SetScale(s*scalex,d*scaley,d*scalez);
+  triadActors[dir]->SetScale(s*scalex, d*scaley, d*scalez);
 }
 
-void myvtkTriad::SetColor(double r,double g,double b)
+void myvtkTriad::SetColor(double r, double g, double b)
 {
   for (int i = 0; i < 3; i++) {
-    triadActors[i]->GetProperty()->SetColor(r,g,b);
+    triadActors[i]->GetProperty()->SetColor(r, g, b);
   }
 }
 

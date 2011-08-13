@@ -27,6 +27,8 @@ public:
   WhippleParameter(std::vector<MyQWhipple*>* qb, QWidget *parent = 0);
 
 private slots:
+  void initCheckBox();
+  void uprightCheckSlot(int);
 
   void addBikeSlot();
 
@@ -94,6 +96,10 @@ private slots:
   void setMeijBenchParametersSlot(void);
 
 private:
+  QCheckBox *uprightCheck;
+  QGroupBox *checkBox;
+  QVBoxLayout *checkLayout;
+
   std::vector<MyQWhipple*>* qbikes;
   unsigned int bidx;
   /**

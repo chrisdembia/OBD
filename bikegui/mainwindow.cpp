@@ -41,7 +41,7 @@ MainWindow::MainWindow() {
   initStatusBar();
   initTabs();
 
-  //  QVBoxLayout 
+  // QVBoxLayout
   setCentralWidget(tabWidget);
 } // MainWindow()
 

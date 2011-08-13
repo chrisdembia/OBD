@@ -21,28 +21,36 @@
         -- draw a bike in 2D (lines and mass centres)
         -- selector for which bikes show up in the upright eig plot
         -- tooltip to explain what all the parameters are
-        -- error management if user attempts to have two bicycles with the same name
-        -- if a bike has only gswp params defined, looking at the meij tab will erase the gswp parameters
+        -- error management if user attempts to have two bicycles with the same
+        name
+        -- if a bike has only gswp params defined, looking at the meij tab will
+        erase the gswp parameters
                 -- particularly relevant when switching bikes
-        -- make static the string names (put in cpp file): tried this; issues with private and type
+        -- make static the string names (put in cpp file): tried this; issues
+        with private and type
         -- make qlistview uneditable (can't change names of bikes)
         -- "convert meij to gyro params" not implemented
         -- make sure that qlineedit is being set properly when changing bikes
         -- fix memory issue of deleting a bike from the vector
         -- save qdrawing
-        -- TDO 0810: CLEAN UP EIGENVALUE PLOT, TALK TO THE MAN, LISTEN TO VOICEMAIL!
+        -- TDO 0810: CLEAN UP EIGENVALUE PLOT, TALK TO THE MAN, LISTEN TO
+        VOICEMAIL!
         -- create checkboxes to select which bikes are used in which tabs
     -- upright stability
         -- list of roots/intersections (bifurcation speed) (Meij.2007)
         -- draw vertical lines on the eigplot at intersections
-        -- save image (gl2ps)
-        -- save data
+        -- save image, investigate gl2ps
+        XX save data
         -- reset view; plot keeps overlapping on update! 
         -- help tooltip to show interactor keys
         -- USE JASON'S SORTING ALGORITHM
         -- OR USE DOTS INSTEAD OF LINES, NEGATE THE NEG UNREAL TO BE POS
-        -- get rid of "pitch guess", preferred to have two options: upright bike and upsidedown bike
-        -- the code i added into myqwhipple to make upright stability causes an exception to be thrown when deleting the LAST BIKE; can delete non-last bikes just fine. i think it's because vtkchart is hooked up to the table that is a member of the myqwhipple
+        -- get rid of "pitch guess", preferred to have two options: upright
+        bike and upsidedown bike
+        -- the code i added into myqwhipple to make upright stability causes an
+        exception to be thrown when deleting the LAST BIKE; can delete non-last
+        bikes just fine. i think it's because vtkchart is hooked up to the
+        table that is a member of the myqwhipple
     -- steady turning
         -- precisely determine range of pitch variable; solve for lean pitch is zero, get both
         -- solutions; 
