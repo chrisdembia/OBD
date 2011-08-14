@@ -83,3 +83,4 @@
     -- limit includes: someone else using my class
     -- member variable vtk objects; how often are they used?
     -- } // for i, if
+    -- move pointer to the right

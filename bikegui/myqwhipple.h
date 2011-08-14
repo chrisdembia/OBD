@@ -56,7 +56,7 @@ class MyQWhipple {
   public:
     MyQWhipple(std::string);
     ~MyQWhipple();
-    void SimUpdate();
+    void UpdateSim();
     Whipple* getBike();
     std::string getName();
 
@@ -69,7 +69,7 @@ class MyQWhipple {
     vtkSmartPointer<vtkTable> GetSimTable();
     void SetSimValues(int rowidx);
     void initSim(vtkSmartPointer<vtkRenderer> ren);
-    void writeSim(std::string);
+    void printSimData(std::string);
 
     void Draw2D(vtkSmartPointer<vtkContext2D>);
     void QDraw2D(QGraphicsScene* qscene);

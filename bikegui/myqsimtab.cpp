@@ -52,17 +52,16 @@ MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   qbikes = qb;
   simLSetBox = new QGroupBox("Parameters", this);
   simLSetLayout = new QGridLayout(simLSetBox);
-//  QGroupBox* simRSetBox = new
+  //  QGroupBox* simRSetBox = new
 	simLayout = new QGridLayout(this);
 
   simQVTKW = new QVTKWidget(this);
-//  simQVTKW->resize(256, 256);
+  //  simQVTKW->resize(256, 256);
 
   // initial velocity
   speedLabel = new QLabel( tr("initial speed (m/s)"), simLSetBox); 
   speedEdit = new QLineEdit(simLSetBox);
-// connect here
-  
+
   // simLSetBox
   startsimButton = new QToolButton(simLSetBox);
   startsimButton->setText( tr("Start simulation") );
@@ -80,9 +79,9 @@ MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
 
   writesimButton = new QToolButton(simLSetBox);
   writesimButton->setText( tr("Save simulation data") );
-  connect(writesimButton, SIGNAL(clicked()), this, SLOT(writeSimSlot()));
-  // DELETE THE POINTERS DELEETE THE POINTERS!:w
-  //
+  connect(writesimButton, SIGNAL(clicked()), this, SLOT(printSimSlot()));
+  // DELETE THE POINTERS DELEETE THE POINTERS!
+
   savesimagesButton = new QToolButton(simLSetBox);
   savesimagesButton->setText( tr("Save simulation images") );
   savesimagesButton->setToolTip( tr("Saves each frame of the animation as an image file. You can use a program like ffmpeg to create a video from the images.") );
@@ -118,7 +117,7 @@ MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
  // simPlotCallback->qbikes = qbikes;
  // simPlotQVTKW->GetInteractor()->AddObserver(vtkCommand::TimerEvent,
   //    simPlotCallback);
-  
+
 //  vtkPlot* simPlotVTKLine;
 //  simPlotVTKLines.resize(NMOTIONVARS);
 
@@ -135,12 +134,12 @@ MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   simLSetLayout->addWidget(forceCheck, 3, 0);
   simLSetLayout->addWidget(writesimButton, 4, 0);
   simLSetLayout->addWidget(savesimagesButton, 5, 0);
-  
+
   simLayout->addWidget(simLSetBox, 0, 0);
   simLayout->addWidget(simQVTKW, 0, 1);
   simLayout->addWidget(simPlotQVTKW, 1, 0, 1, 2);
   setLayout(simLayout);
-  
+
 } // startsimSlot()
 
 
@@ -180,11 +179,11 @@ void MyQSimTab::startsimSlot(void) {
   groundActor->GetProperty()->SetColor(0, 0, 0);
   groundActor->GetProperty()->SetOpacity(0.5);
   // draw a bike
-  qbikes->at(0)->SimUpdate();
+  qbikes->at(0)->UpdateSim();
 //  qbikes->at(0)->SetSimValues(0);
   simRenderer->SetBackground(.8, 1,.8);
   simQVTKW->GetInteractor()->Initialize();
- 
+
   simRenderer->AddActor(groundActor);
 
   // camera settings
@@ -257,12 +256,12 @@ void MyQSimTab::forceCheckSlot(int state) {
   } // if
 } // forceCheckSlot()
 
-void MyQSimTab::writeSimSlot(void) {
+void MyQSimTab::printSimSlot(void) {
   QString fname = QFileDialog::getSaveFileName(this, tr("Save File"),
       QDir::currentPath(), tr("Text file (*, *.txt, *.dat,...);;Any file (*)")
       );
-  qbikes->at(0)->writeSim(fname.toStdString());
-} // writeSimSlot()
+  qbikes->at(0)->printSimData(fname.toStdString());
+} // printSimSlot()
 
 void MyQSimTab::saveSimagesSlot(void) {
   QString fname = QFileDialog::getSaveFileName(this, tr("Save File"),

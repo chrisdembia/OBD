@@ -70,7 +70,7 @@ class vtkTimerCallback2 : public vtkCommand {
         else { qbikes->at(0)->getBike()->Ts = 0; }
         qbikes->at(0)->getBike()->evolve(time,state);
       }
-      qbikes->at(0)->SimUpdate();
+      qbikes->at(0)->UpdateSim();
       qbikes->at(0)->SetSimValues(TimerCount);
   //simPlotQVTKW->GetInteractor()->Initialize();
   //simPlotQVTKW->GetInteractor()->Start();
@@ -155,7 +155,7 @@ class MyQSimTab : public QWidget {
   void stopsimSlot(void);
   void updatePlotSlot(void);
   void forceCheckSlot(int);
-  void writeSimSlot(void);
+  void printSimSlot(void);
   void saveSimagesSlot(void);
 
   private:

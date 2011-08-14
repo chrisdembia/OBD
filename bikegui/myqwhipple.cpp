@@ -542,7 +542,7 @@ int MyQWhipple::getParamType() {
   return paramtype;
 } // getParamType()
 
-void MyQWhipple::SimUpdate() {
+void MyQWhipple::UpdateSim() {
   double YAW = bike->q0;
   double LEAN = bike->q1;
   double PITCH = bike->q2;
@@ -640,7 +640,7 @@ void MyQWhipple::SimUpdate() {
 //  simRenderer->GetActiveCamera()->SetViewUp(0, 0, -1);
 //  simRenderer->GetActiveCamera()->Elevation(-95);
 //  simRenderer->GetActiveCamera()->SetFocalPoint(frontFrameAssy->GetPosition());
-} // SimUpdate()
+} // UpdateSim()
 
 void MyQWhipple::SetSimValues(int rowidx) {
    // do some nice memory managemen here to control the size of the array
@@ -687,7 +687,7 @@ vtkSmartPointer<vtkTable> MyQWhipple::GetSimTable() {
   return simTable;
 } // GetSimTable()
 
-void MyQWhipple::writeSim(std::string fname) {
+void MyQWhipple::printSimData(std::string fname) {
   simTable->Update();
   std::ofstream fid(fname.c_str());
   for (int i = 0; i < simTable->GetNumberOfRows(); i++) {
@@ -697,7 +697,7 @@ void MyQWhipple::writeSim(std::string fname) {
     fid << endl;
   } // for i
   fid.close();
-} // writeSim()
+} // printSimData()
 
 // use VTKCONTEXT2D TO DRAW 2D BIKE
 void MyQWhipple::Draw2D(vtkSmartPointer<vtkContext2D> context) {
