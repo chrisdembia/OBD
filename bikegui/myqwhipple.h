@@ -66,6 +66,9 @@ class MyQWhipple {
     vtkSmartPointer<vtkTable> GetUprightTable();
 
     // sim
+    bool simInitialized;
+    bool GetSimInitialized();
+    void initSimTable();
     vtkSmartPointer<vtkTable> GetSimTable();
     void SetSimValues(int rowidx);
     void initSim(vtkSmartPointer<vtkRenderer> ren);

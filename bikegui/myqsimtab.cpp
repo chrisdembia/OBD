@@ -169,8 +169,10 @@ void MyQSimTab::startsimSlot(void) {
     return;
   }*/
 
-  qbikes->at(bidx)->initSim(simRenderer);
-
+  // NEED A FLAG TO SEE IF INIT SIM HAS BEEN CALLED YET
+  if (!qbikes->at(bidx)->GetSimInitialized()) {
+    qbikes->at(bidx)->initSim(simRenderer);
+  }
   // WHIPPLE CODE
 /*
   // MAKE HUD-DISPLAY, TEXTACTOR:w
@@ -260,7 +262,7 @@ void MyQSimTab::stopsimSlot(void) {
   simPlotQVTKW->GetRenderWindow()->Render();
   simPlotQVTKW->GetInteractor()->Start();
 
-  qbikes->at(bidx)->UpdateTrace();
+  //qbikes->at(bidx)->UpdateTrace();
   simRenderWindow->Render();
   //simPlotVTKChart->Paint(simPlotVTKView->GetContext());
 } // stopSimSlot()

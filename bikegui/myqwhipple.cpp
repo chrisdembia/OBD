@@ -49,7 +49,6 @@
 #define NMOTIONVARS 32
 
 MyQWhipple::MyQWhipple(std::string n) {
-
   name = n;
   bike = new Whipple();
   paramtype = 0; // gyrostat
@@ -63,39 +62,9 @@ MyQWhipple::MyQWhipple(std::string n) {
 
   initUprightTable();
 
-  simVarNames.resize(NMOTIONVARS);
-  simVarNames[0] = "t";
-  simVarNames[1] = "q0";
-  simVarNames[2] = "q1";
-  simVarNames[3] = "q2";
-  simVarNames[4] = "q3";
-  simVarNames[5] = "q4";
-  simVarNames[6] = "q5";
-  simVarNames[7] = "q6";
-  simVarNames[8] = "q7";
-  simVarNames[9] = "u0";
-  simVarNames[10] = "u1";
-  simVarNames[11] = "u2";
-  simVarNames[12] = "u3";
-  simVarNames[13] = "u4";
-  simVarNames[14] = "u5";
-  simVarNames[15] = "fnx";
-  simVarNames[16] = "fny";
-  simVarNames[17] = "fnz";
-  simVarNames[18] = "Rx";
-  simVarNames[19] = "Ry";
-  simVarNames[20] = "Rz";
-  simVarNames[21] = "Fx";
-  simVarNames[22] = "Fy";
-  simVarNames[23] = "Fz";
-  simVarNames[24] = "KE";
-  simVarNames[25] = "PE";
-  simVarNames[26] = "fa_yaw";
-  simVarNames[27] = "fa_lean";
-  simVarNames[28] = "fa_pitch";
-  simVarNames[29] = "nh0";
-  simVarNames[30] = "nh1";
-  simVarNames[31] = "nh2";
+  simInitialized = false;
+
+  initSimTable();
 } // MyQWhipple()
 
 MyQWhipple::~MyQWhipple() {
@@ -203,6 +172,8 @@ void MyQWhipple::printUprightData(QString fname) {
 
 void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
 
+  simInitialized = true;
+
   simRenderer = ren;
 
   bike->evalConstants();
@@ -223,257 +194,257 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   double hubhalfwidth = .1;
   // rear cone right
   // source
-  rearConeRightSource = vtkConeSource::New();
+  rearConeRightSource = vtkSmartPointer<vtkConeSource>::New();
   rearConeRightSource->SetHeight(hubhalfwidth);
   rearConeRightSource->SetRadius(bike->rr);
   rearConeRightSource->SetResolution(100);
   rearConeRightSource->Update();
   // transform
-  rearConeRightTransform = vtkTransform::New();
+  rearConeRightTransform = vtkSmartPointer<vtkTransform>::New();
   rearConeRightTransform->Identity();
   rearConeRightTransform->Translate(0, hubhalfwidth/2, 0);
   rearConeRightTransform->RotateZ(90);
   // filter
-  rearConeRightFilter = vtkTransformPolyDataFilter::New();
+  rearConeRightFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   rearConeRightFilter->SetInputConnection(rearConeRightSource->GetOutputPort());
   rearConeRightFilter->SetTransform(rearConeRightTransform);
   // mapper
-  rearConeRightMapper = vtkPolyDataMapper::New();
+  rearConeRightMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   rearConeRightMapper->SetInputConnection(rearConeRightFilter->GetOutputPort());
   // actor
-  rearConeRightActor = vtkActor::New();
+  rearConeRightActor = vtkSmartPointer<vtkActor>::New();
   rearConeRightActor->SetMapper(rearConeRightMapper);
   rearConeRightActor->GetProperty()->SetOpacity(0.7);
 
   // rear cone left
   // source
-  rearConeLeftSource = vtkConeSource::New();
+  rearConeLeftSource = vtkSmartPointer<vtkConeSource>::New();
   rearConeLeftSource->SetHeight(hubhalfwidth);
   rearConeLeftSource->SetRadius(bike->rr);
   rearConeLeftSource->SetResolution(100);
   rearConeLeftSource->Update();
   // transform
-  rearConeLeftTransform = vtkTransform::New();
+  rearConeLeftTransform = vtkSmartPointer<vtkTransform>::New();
   rearConeLeftTransform->Identity();
   rearConeLeftTransform->Translate(0, -hubhalfwidth/2, 0);
   rearConeLeftTransform->RotateZ(-90);
   // filter
-  rearConeLeftFilter = vtkTransformPolyDataFilter::New();
+  rearConeLeftFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   rearConeLeftFilter->SetInputConnection(rearConeLeftSource->GetOutputPort());
   rearConeLeftFilter->SetTransform(rearConeLeftTransform);
   // mapper
-  rearConeLeftMapper = vtkPolyDataMapper::New();
+  rearConeLeftMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   rearConeLeftMapper->SetInputConnection(rearConeLeftFilter->GetOutputPort());
   // actor
-  rearConeLeftActor = vtkActor::New();
+  rearConeLeftActor = vtkSmartPointer<vtkActor>::New();
   rearConeLeftActor->SetMapper(rearConeLeftMapper);
   rearConeLeftActor->GetProperty()->SetOpacity(0.7);
 
   // rear torus
-  rearTorus = vtkParametricTorus::New();
+  rearTorus = vtkSmartPointer<vtkParametricTorus>::New();
   // source
-  rearTorusSource = vtkParametricFunctionSource::New();
+  rearTorusSource = vtkSmartPointer<vtkParametricFunctionSource>::New();
   rearTorusSource->SetParametricFunction(rearTorus);
   rearTorus->SetRingRadius(bike->rr);
   rearTorus->SetCrossSectionRadius(bike->rrt);
   rearTorusSource->Update();
   // transform
-  rearTorusTransform = vtkTransform::New();
+  rearTorusTransform = vtkSmartPointer<vtkTransform>::New();
   rearTorusTransform->Identity();
   rearTorusTransform->RotateX(90);
   // filter
-  rearTorusFilter = vtkTransformPolyDataFilter::New();
+  rearTorusFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   rearTorusFilter->SetInputConnection(rearTorusSource->GetOutputPort());
   rearTorusFilter->SetTransform(rearTorusTransform);
   // mapper
-  rearTorusMapper = vtkPolyDataMapper::New();
+  rearTorusMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   rearTorusMapper->SetInputConnection(rearTorusFilter->GetOutputPort());
   // actor
-  rearTorusActor = vtkActor::New();
+  rearTorusActor = vtkSmartPointer<vtkActor>::New();
   rearTorusActor->SetMapper(rearTorusMapper);
 
   // rear frame: center of mass ball and tube
   // rear center of mass ball
   // source
-  rearCOMSource = vtkSphereSource::New();
+  rearCOMSource = vtkSmartPointer<vtkSphereSource>::New();
   rearCOMSource->SetRadius(0.08);
   rearCOMSource->SetThetaResolution(100);
   rearCOMSource->SetPhiResolution(100);
   rearCOMSource->Update();
   // transform
-  rearCOMTransform = vtkTransform::New();
+  rearCOMTransform = vtkSmartPointer<vtkTransform>::New();
   rearCOMTransform->Identity();
   rearCOMTransform->Translate(bike->lrx, 0, bike->lrz);
   // filter
-  rearCOMFilter = vtkTransformPolyDataFilter::New();
+  rearCOMFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   rearCOMFilter->SetInputConnection(rearCOMSource->GetOutputPort());
   rearCOMFilter->SetTransform(rearCOMTransform);
   // mapper
-  rearCOMMapper = vtkPolyDataMapper::New();
+  rearCOMMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   rearCOMMapper->SetInputConnection(rearCOMFilter->GetOutputPort());
   // actor
-  rearCOMActor = vtkActor::New();
+  rearCOMActor = vtkSmartPointer<vtkActor>::New();
   rearCOMActor->SetMapper(rearCOMMapper);
 
   // rear frame tube
   // source
-  rearTubeSource = vtkCylinderSource::New();
+  rearTubeSource = vtkSmartPointer<vtkCylinderSource>::New();
   rearTubeSource->SetRadius(0.012);
   rearTubeSource->SetHeight(bike->lr);
   // transform
-  rearTubeTransform = vtkTransform::New();
+  rearTubeTransform = vtkSmartPointer<vtkTransform>::New();
   rearTubeTransform->Identity();
   rearTubeTransform->RotateZ(90);
   rearTubeTransform->Translate(0, -bike->lr/2, 0);
   // filter
-  rearTubeFilter = vtkTransformPolyDataFilter::New();
+  rearTubeFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   rearTubeFilter->SetInputConnection(rearTubeSource->GetOutputPort());
   rearTubeFilter->SetTransform(rearTubeTransform);
   // mapper
-  rearTubeMapper = vtkPolyDataMapper::New();
+  rearTubeMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   rearTubeMapper->SetInputConnection(rearTubeFilter->GetOutputPort());
   // actor
-  rearTubeActor = vtkActor::New();
+  rearTubeActor = vtkSmartPointer<vtkActor>::New();
   rearTubeActor->SetMapper(rearTubeMapper);
 
   // front frame
   // front frame tube
   // source
-  frontTubeSource = vtkCylinderSource::New();
+  frontTubeSource = vtkSmartPointer<vtkCylinderSource>::New();
   frontTubeSource->SetRadius(0.012);
   frontTubeSource->SetHeight(bike->ls);
   // transform
-  frontTubeTransform = vtkTransform::New();
+  frontTubeTransform = vtkSmartPointer<vtkTransform>::New();
   frontTubeTransform->Identity();
   frontTubeTransform->RotateZ(90);
   frontTubeTransform->Translate(0, -bike->ls/2, 0);
   // filter
-  frontTubeFilter = vtkTransformPolyDataFilter::New();
+  frontTubeFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   frontTubeFilter->SetInputConnection(frontTubeSource->GetOutputPort());
   frontTubeFilter->SetTransform(frontTubeTransform);
   // mapper
-  frontTubeMapper = vtkPolyDataMapper::New();
+  frontTubeMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   frontTubeMapper->SetInputConnection(frontTubeFilter->GetOutputPort());
   // actor
-  frontTubeActor = vtkActor::New();
+  frontTubeActor = vtkSmartPointer<vtkActor>::New();
   frontTubeActor->SetMapper(frontTubeMapper);
 
   // front frame offset
   // source
-  frontOffsetSource = vtkCylinderSource::New();
+  frontOffsetSource = vtkSmartPointer<vtkCylinderSource>::New();
   frontOffsetSource->SetRadius(0.012);
   frontOffsetSource->SetHeight(bike->lf);
 //  frontOffsetSource->DebugOn();
   // transform
-  frontOffsetTransform = vtkTransform::New();
+  frontOffsetTransform = vtkSmartPointer<vtkTransform>::New();
   frontOffsetTransform->Identity();
   frontOffsetTransform->RotateX(90);
   frontOffsetTransform->Translate(bike->ls, -bike->lf/2, 0);
   // filter
-  frontOffsetFilter = vtkTransformPolyDataFilter::New();
+  frontOffsetFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   frontOffsetFilter->SetInputConnection(frontOffsetSource->GetOutputPort());
   frontOffsetFilter->SetTransform(frontOffsetTransform);
   // mapper
-  frontOffsetMapper = vtkPolyDataMapper::New();
+  frontOffsetMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   frontOffsetMapper->SetInputConnection(frontOffsetFilter->GetOutputPort());
   // actor
-  frontOffsetActor = vtkActor::New();
+  frontOffsetActor = vtkSmartPointer<vtkActor>::New();
   frontOffsetActor->SetMapper(frontOffsetMapper);
 
   // front wheel: two cones and a torus
   // front cone right
   // source
-  frontConeRightSource = vtkConeSource::New();
+  frontConeRightSource = vtkSmartPointer<vtkConeSource>::New();
   frontConeRightSource->SetHeight(hubhalfwidth);
   frontConeRightSource->SetRadius(bike->rf);
   frontConeRightSource->SetResolution(100);
   frontConeRightSource->Update();
   // transform
-  frontConeRightTransform = vtkTransform::New();
+  frontConeRightTransform = vtkSmartPointer<vtkTransform>::New();
   frontConeRightTransform->Identity();
   frontConeRightTransform->Translate(0, hubhalfwidth/2, 0);
   frontConeRightTransform->RotateZ(90);
   // filter
-  frontConeRightFilter = vtkTransformPolyDataFilter::New();
+  frontConeRightFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   frontConeRightFilter->SetInputConnection(frontConeRightSource->GetOutputPort());
   frontConeRightFilter->SetTransform(frontConeRightTransform);
   // mapper
-  frontConeRightMapper = vtkPolyDataMapper::New();
+  frontConeRightMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   frontConeRightMapper->SetInputConnection(frontConeRightFilter->GetOutputPort());
   // actor
-  frontConeRightActor = vtkActor::New();
+  frontConeRightActor = vtkSmartPointer<vtkActor>::New();
   frontConeRightActor->SetMapper(frontConeRightMapper);
   frontConeRightActor->GetProperty()->SetOpacity(0.7);
 
   // front cone left
   // source
-  frontConeLeftSource = vtkConeSource::New();
+  frontConeLeftSource = vtkSmartPointer<vtkConeSource>::New();
   frontConeLeftSource->SetHeight(hubhalfwidth);
   frontConeLeftSource->SetRadius(bike->rf);
   frontConeLeftSource->SetResolution(100);
   frontConeLeftSource->Update();
   // transform
-  frontConeLeftTransform = vtkTransform::New();
+  frontConeLeftTransform = vtkSmartPointer<vtkTransform>::New();
   frontConeLeftTransform->Identity();
   frontConeLeftTransform->Translate(0, -hubhalfwidth/2, 0);
   frontConeLeftTransform->RotateZ(-90);
   // filter
-  frontConeLeftFilter = vtkTransformPolyDataFilter::New();
+  frontConeLeftFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   frontConeLeftFilter->SetInputConnection(frontConeLeftSource->GetOutputPort());
   frontConeLeftFilter->SetTransform(frontConeLeftTransform);
   // mapper
-  frontConeLeftMapper = vtkPolyDataMapper::New();
+  frontConeLeftMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   frontConeLeftMapper->SetInputConnection(frontConeLeftFilter->GetOutputPort());
   // actor
-  frontConeLeftActor = vtkActor::New();
+  frontConeLeftActor = vtkSmartPointer<vtkActor>::New();
   frontConeLeftActor->SetMapper(frontConeLeftMapper);
   frontConeLeftActor->GetProperty()->SetOpacity(0.7);
 
   // front torus
-  frontTorus = vtkParametricTorus::New();
+  frontTorus = vtkSmartPointer<vtkParametricTorus>::New();
   // source
-  frontTorusSource = vtkParametricFunctionSource::New();
+  frontTorusSource = vtkSmartPointer<vtkParametricFunctionSource>::New();
   frontTorusSource->SetParametricFunction(frontTorus);
   frontTorus->SetRingRadius(bike->rf);
   frontTorus->SetCrossSectionRadius(bike->rft);
   frontTorusSource->Update();
   // transform
-  frontTorusTransform = vtkTransform::New();
+  frontTorusTransform = vtkSmartPointer<vtkTransform>::New();
   frontTorusTransform->Identity();
   frontTorusTransform->RotateX(90);
   // filter
-  frontTorusFilter = vtkTransformPolyDataFilter::New();
+  frontTorusFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   frontTorusFilter->SetInputConnection(frontTorusSource->GetOutputPort());
   frontTorusFilter->SetTransform(frontTorusTransform);
   // mapper
-  frontTorusMapper = vtkPolyDataMapper::New();
+  frontTorusMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   frontTorusMapper->SetInputConnection(frontTorusFilter->GetOutputPort());
   // actor
-  frontTorusActor = vtkActor::New();
+  frontTorusActor = vtkSmartPointer<vtkActor>::New();
   frontTorusActor->SetMapper(frontTorusMapper);
 
   // ASSEMBLIES
   // render the actor assemblies
   // rear wheel assembly
-  rearWheelAssy = vtkAssembly::New();
+  rearWheelAssy = vtkSmartPointer<vtkAssembly>::New();
   rearWheelAssy->AddPart(rearConeRightActor);
   rearWheelAssy->AddPart(rearConeLeftActor);
   rearWheelAssy->AddPart(rearTorusActor);
 
   // rear frame assembly
-  rearFrameAssy = vtkAssembly::New();
+  rearFrameAssy = vtkSmartPointer<vtkAssembly>::New();
   rearFrameAssy->AddPart(rearCOMActor);
   rearFrameAssy->AddPart(rearTubeActor);
 
   // front frame assembly
-  frontFrameAssy = vtkAssembly::New();
-  frontFrameTransform = vtkTransform::New();
+  frontFrameAssy = vtkSmartPointer<vtkAssembly>::New();
+  frontFrameTransform = vtkSmartPointer<vtkTransform>::New();
   frontFrameAssy->AddPart(frontTubeActor);
   frontFrameAssy->AddPart(frontOffsetActor);
 
   // front wheel assembly
-  frontWheelAssy = vtkAssembly::New();
-  frontWheelTransform = vtkTransform::New();
+  frontWheelAssy = vtkSmartPointer<vtkAssembly>::New();
+  frontWheelTransform = vtkSmartPointer<vtkTransform>::New();
   frontWheelAssy->AddPart(frontConeRightActor);
   frontWheelAssy->AddPart(frontConeLeftActor);
 
@@ -522,6 +493,46 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   simRenderer->AddActor(frontWheelAssy);
   simRenderer->AddActor(rearPointsActor);
 
+} // initSim()
+
+bool MyQWhipple::GetSimInitialized() {
+  return simInitialized;
+}
+
+void MyQWhipple::initSimTable() {
+  simVarNames.resize(NMOTIONVARS);
+  simVarNames[0] = "t";
+  simVarNames[1] = "q0";
+  simVarNames[2] = "q1";
+  simVarNames[3] = "q2";
+  simVarNames[4] = "q3";
+  simVarNames[5] = "q4";
+  simVarNames[6] = "q5";
+  simVarNames[7] = "q6";
+  simVarNames[8] = "q7";
+  simVarNames[9] = "u0";
+  simVarNames[10] = "u1";
+  simVarNames[11] = "u2";
+  simVarNames[12] = "u3";
+  simVarNames[13] = "u4";
+  simVarNames[14] = "u5";
+  simVarNames[15] = "fnx";
+  simVarNames[16] = "fny";
+  simVarNames[17] = "fnz";
+  simVarNames[18] = "Rx";
+  simVarNames[19] = "Ry";
+  simVarNames[20] = "Rz";
+  simVarNames[21] = "Fx";
+  simVarNames[22] = "Fy";
+  simVarNames[23] = "Fz";
+  simVarNames[24] = "KE";
+  simVarNames[25] = "PE";
+  simVarNames[26] = "fa_yaw";
+  simVarNames[27] = "fa_lean";
+  simVarNames[28] = "fa_pitch";
+  simVarNames[29] = "nh0";
+  simVarNames[30] = "nh1";
+  simVarNames[31] = "nh2";
   // sim data storage
   simTable = vtkSmartPointer<vtkTable>::New();
   // need animation runtime control. max time or add to the array somehow.
@@ -536,7 +547,8 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   simTable->InsertNextBlankRow();
   simTable->InsertNextBlankRow(1);
   //simTable->SetNumberOfRows(100);
-} // initSim()
+
+} // initSimTable()
 
 void MyQWhipple::endSim() {
   /*
@@ -598,25 +610,18 @@ void MyQWhipple::endSim() {
   frontFrameTransform->Delete();
   frontWheelAssy->Delete();
   frontWheelTransform->Delete();
-  triad0 = new myvtkTriad(simRenderer);
-  triad1 = new myvtkTriad(simRenderer);
-  triad2 = new myvtkTriad(simRenderer);
-  triad3 = new myvtkTriad(simRenderer);
-  triad4 = new myvtkTriad(simRenderer);
-  rearReaction = new myvtkTriad(simRenderer);
+  delete triad0;
+  delete triad1;
+  delete triad2;
+  delete triad3;
+  delete triad4;
+  delete rearReaction;
   rearPoints = vtkSmartPointer<vtkPoints>::New();
   rearPointsLine = vtkSmartPointer<vtkPolyLine>::New();
   rearPointsCell = vtkSmartPointer<vtkCellArray>::New();
   rearPointsData = vtkSmartPointer<vtkPolyData>::New();
   rearPointsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   rearPointsActor = vtkSmartPointer<vtkActor>::New();
-  simTable = vtkSmartPointer<vtkTable>::New();
-  // need animation runtime control. max time or add to the array somehow.
-  // maybe set so that the filesize of output jpgs etc is < 1GB.
-
-  for (uint i = 0; i < simArrays.size(); i++) {
-    simArrays[i] = vtkSmartPointer<vtkFloatArray>::New();
-  }
   */
 }
 
