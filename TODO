@@ -74,6 +74,7 @@
         -- crash detection, using tire forces: lateral to normal force ratio)
         -- text showing x,y distance traveled, show 10m lines on the "ground"    
         -- prevent segfault when bike falls over, or when there are too many samples
+        -- allow the user to specify the forcing input
 
 -- Conventions
     -- space after comma

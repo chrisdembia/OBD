@@ -63,13 +63,6 @@ class vtkTimerCallback2 : public vtkCommand {
       std::cout << this->TimerCount << std::endl;
       // UPDATE
       time = (double)TimerCount/(double)qbikes->at(0)->getBike()->fps; 
-      while (qbikes->at(0)->getBike()->t < time) {
-        if (TimerCount > 100 && TimerCount < 110) {
-          qbikes->at(0)->getBike()->Ts = 5;
-        }
-        else { qbikes->at(0)->getBike()->Ts = 0; }
-      }
-      std::cout << "db tc1" << std::endl;  
       qbikes->at(0)->UpdateSim(time);
       qbikes->at(0)->SetSimValues(TimerCount);
   //simPlotQVTKW->GetInteractor()->Initialize();
@@ -83,7 +76,7 @@ class vtkTimerCallback2 : public vtkCommand {
       // render
       vtkRenderWindowInteractor *iren =
         vtkRenderWindowInteractor::SafeDownCast(caller);
-    iren->GetRenderWindow()->Modified();
+//    iren->GetRenderWindow()->Modified();
       iren->GetRenderWindow()->Render();
 //  w2i->SetInput(iren->GetRenderWindow());
 //  writer->SetInput(w2i->GetOutput());

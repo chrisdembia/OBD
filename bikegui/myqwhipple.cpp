@@ -163,23 +163,19 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   bike->evalConstants();
   bike->eoms();
   bike->computeOutputs();
-  std::cout << "db qw1" << std::endl;
   state[0] = bike->q0;
   state[1] = bike->q1;
-  state[2] = bike->q2;
-  state[3] = bike->q3;
-  state[4] = bike->q4;
-  state[5] = bike->q5;
-  state[6] = bike->q6;
-  state[7] = bike->q7;
-  state[8] = bike->u1;
-  state[9] = bike->u3;
-  state[10] = bike->u5;
-  std::cout << "db qw2" << std::endl;
+  state[2] = bike->q3;
+  state[3] = bike->q4;
+  state[4] = bike->q5;
+  state[5] = bike->q6;
+  state[6] = bike->q7;
+  state[7] = bike->u1;
+  state[8] = bike->u3;
+  state[9] = bike->u5;
 
   // rear wheel: two cones and a torus
   double hubhalfwidth = .1;
-  /*
   // rear cone right
   // source
   rearConeRightSource = vtkConeSource::New();
@@ -203,7 +199,6 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   rearConeRightActor = vtkActor::New();
   rearConeRightActor->SetMapper(rearConeRightMapper);
   rearConeRightActor->GetProperty()->SetOpacity(0.7);
-  */
 
   // rear cone left
   // source
@@ -228,9 +223,8 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   rearConeLeftActor = vtkActor::New();
   rearConeLeftActor->SetMapper(rearConeLeftMapper);
   rearConeLeftActor->GetProperty()->SetOpacity(0.7);
-  
+
   // rear torus
-  std::cout << "db qw3" << std::endl;
   rearTorus = vtkParametricTorus::New();
   // source
   rearTorusSource = vtkParametricFunctionSource::New();
@@ -275,7 +269,7 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   // actor
   rearCOMActor = vtkActor::New();
   rearCOMActor->SetMapper(rearCOMMapper);
-  
+
   // rear frame tube
   // source
   rearTubeSource = vtkCylinderSource::New();
@@ -389,8 +383,7 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   frontConeLeftActor = vtkActor::New();
   frontConeLeftActor->SetMapper(frontConeLeftMapper);
   frontConeLeftActor->GetProperty()->SetOpacity(0.7);
-  std::cout << "db qw4" << std::endl;
-  
+
   // front torus
   frontTorus = vtkParametricTorus::New();
   // source
@@ -418,7 +411,7 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   // render the actor assemblies
   // rear wheel assembly
   rearWheelAssy = vtkAssembly::New();
-  //rearWheelAssy->AddPart(rearConeRightActor);
+  rearWheelAssy->AddPart(rearConeRightActor);
   rearWheelAssy->AddPart(rearConeLeftActor);
   rearWheelAssy->AddPart(rearTorusActor);
 
@@ -566,9 +559,15 @@ int MyQWhipple::getParamType() {
 } // getParamType()
 
 void MyQWhipple::UpdateSim(double time) {
-  std::cout << "db qw10" << std::endl;
-  bike->evolve(time, state);
-  std::cout << "db qw11" << std::endl;
+  while (bike->t < time) {
+    /*if (TimerCount > 100 && TimerCount < 110) {
+      bike->Ts = 5;
+    }
+    else {
+      bike->Ts = 0;
+    }*/
+    bike->evolve(time, state);
+  }
 
   double YAW = bike->q0;
   double LEAN = bike->q1;
@@ -591,10 +590,10 @@ void MyQWhipple::UpdateSim(double time) {
   rearReaction->SetRelScale(0, bike->Rx/bike->mr/bike->g);
   rearReaction->SetRelScale(1, bike->Ry/bike->mr/bike->g);
   rearReaction->SetRelScale(2, bike->Rz/bike->mr/bike->g);
-  
+
   rearWheelAssy->RotateX(180/M_PI*LEAN);
   rearWheelAssy->RotateY(180/M_PI*RWSPIN);
-  
+
   triad0->SetPosition(X, Y, 0);
 //  triad0->SetOrientation(rearFrameAssy->GetOrientation());
 
