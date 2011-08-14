@@ -49,6 +49,8 @@
 MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   QWidget(parent) {
 
+  // TEMPORARY
+  bidx = 0;
   qbikes = qb;
   simLSetBox = new QGroupBox("Parameters", this);
   simLSetLayout = new QGridLayout(simLSetBox);
@@ -140,21 +142,33 @@ MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
 } // startsimSlot()
 
 
-void MyQSimTab::startsimSlot(void) {
-
+int MyQSimTab::setBikeIndex() {
   int ndobikes = 0;
   for (unsigned int i = 0; i < qbikes->size(); i++) {
-    if (qbikes->at(i)->getDoSim()) {
+      std::cout << "haiiyo" << std::endl;
+    if (qbikes->at(i)->getDoSim() == true) {
+      std::cout << "haiiyo2" << std::endl;
       bidx = i;
       ndobikes++;
     }
   }
   if (ndobikes == 0) {
     QMessageBox::information(this, tr("No bicycle selected for simulation."), tr("No bicycle selected for simulation. Select one bicycle from the Bicycle Library tab."));
+    return -1;
   }
   if (ndobikes > 1) {
     QMessageBox::information(this, tr("More than one bicycle selected for simulation."), tr("More than one bicycle is selected for simulation. Select only one bicycle from the Bicycle Library tab."));
+    return -1;
   }
+  return 0;
+} // setBikeIndex()
+
+void MyQSimTab::startsimSlot(void) {
+
+  /*if (setBikeIndex() == -1) {
+    return;
+  }*/
+
   qbikes->at(bidx)->initSim(simRenderer);
 
   // WHIPPLE CODE
@@ -217,9 +231,11 @@ void MyQSimTab::startsimSlot(void) {
 }
 
 void MyQSimTab::stopsimSlot(void) {
+  // cannot change bike indexes while animation is running
   simQVTKW->GetInteractor()->DestroyTimer();
 
   // delete everything initialized by MyQWhipple::initSim()
+  qbikes->at(bidx)->endSim();
 
   simPlotVTKView = vtkSmartPointer<vtkContextView>::New();
   simPlotVTKView->SetInteractor(simPlotQVTKW->GetInteractor());
@@ -254,6 +270,11 @@ void MyQSimTab::updatePlotSlot(void) {
 
 // CAN'T HIT START ANIMATION TWICE!!
 void MyQSimTab::forceCheckSlot(int state) {
+
+  /*if (setBikeIndex() == -1) {
+    return;
+  }*/
+  
   if (state == Qt::Checked) {
     qbikes->at(bidx)->TurnOnReactionTriads();
   } else if (state == Qt::Unchecked) {
@@ -262,6 +283,11 @@ void MyQSimTab::forceCheckSlot(int state) {
 } // forceCheckSlot()
 
 void MyQSimTab::printSimSlot(void) {
+
+  /*if (setBikeIndex() == -1) {
+    return;
+  }*/
+
   QString fname = QFileDialog::getSaveFileName(this, tr("Save File"),
       QDir::currentPath(), tr("Text file (*, *.txt, *.dat,...);;Any file (*)")
       );
@@ -269,6 +295,11 @@ void MyQSimTab::printSimSlot(void) {
 } // printSimSlot()
 
 void MyQSimTab::saveSimagesSlot(void) {
+
+  /*if (setBikeIndex() == -1) {
+    return;
+  }*/
+
   QString fname = QFileDialog::getSaveFileName(this, tr("Save File"),
       QDir::currentPath(), tr("PNG file (*.png)"));
 // page 247 of vtkusermanual: OffScreenRenderingOn(), and RenderLargeImage,

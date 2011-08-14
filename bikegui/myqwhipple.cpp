@@ -62,6 +62,39 @@ MyQWhipple::MyQWhipple(std::string n) {
 
   initUprightTable();
 
+  simVarNames.resize(NMOTIONVARS);
+  simVarNames[0] = "t";
+  simVarNames[1] = "q0";
+  simVarNames[2] = "q1";
+  simVarNames[3] = "q2";
+  simVarNames[4] = "q3";
+  simVarNames[5] = "q4";
+  simVarNames[6] = "q5";
+  simVarNames[7] = "q6";
+  simVarNames[8] = "q7";
+  simVarNames[9] = "u0";
+  simVarNames[10] = "u1";
+  simVarNames[11] = "u2";
+  simVarNames[12] = "u3";
+  simVarNames[13] = "u4";
+  simVarNames[14] = "u5";
+  simVarNames[15] = "fnx";
+  simVarNames[16] = "fny";
+  simVarNames[17] = "fnz";
+  simVarNames[18] = "Rx";
+  simVarNames[19] = "Ry";
+  simVarNames[20] = "Rz";
+  simVarNames[21] = "Fx";
+  simVarNames[22] = "Fy";
+  simVarNames[23] = "Fz";
+  simVarNames[24] = "KE";
+  simVarNames[25] = "PE";
+  simVarNames[26] = "fa_yaw";
+  simVarNames[27] = "fa_lean";
+  simVarNames[28] = "fa_pitch";
+  simVarNames[29] = "nh0";
+  simVarNames[30] = "nh1";
+  simVarNames[31] = "nh2";
 } // MyQWhipple()
 
 MyQWhipple::~MyQWhipple() {
@@ -84,6 +117,7 @@ void MyQWhipple::setDoSim(bool b) {
 } // setDoSim()
 
 bool MyQWhipple::getDoSim() {
+  std::cout << "getdosim " << doSim << std::endl;
   return doSim;
 } // getDoSim()
 
@@ -488,39 +522,6 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   simRenderer->AddActor(rearPointsActor);
 
   // sim data storage
-  simVarNames.resize(NMOTIONVARS);
-  simVarNames[0] = "t";
-  simVarNames[1] = "q0";
-  simVarNames[2] = "q1";
-  simVarNames[3] = "q2";
-  simVarNames[4] = "q3";
-  simVarNames[5] = "q4";
-  simVarNames[6] = "q5";
-  simVarNames[7] = "q6";
-  simVarNames[8] = "q7";
-  simVarNames[9] = "u0";
-  simVarNames[10] = "u1";
-  simVarNames[11] = "u2";
-  simVarNames[12] = "u3";
-  simVarNames[13] = "u4";
-  simVarNames[14] = "u5";
-  simVarNames[15] = "fnx";
-  simVarNames[16] = "fny";
-  simVarNames[17] = "fnz";
-  simVarNames[18] = "Rx";
-  simVarNames[19] = "Ry";
-  simVarNames[20] = "Rz";
-  simVarNames[21] = "Fx";
-  simVarNames[22] = "Fy";
-  simVarNames[23] = "Fz";
-  simVarNames[24] = "KE";
-  simVarNames[25] = "PE";
-  simVarNames[26] = "fa_yaw";
-  simVarNames[27] = "fa_lean";
-  simVarNames[28] = "fa_pitch";
-  simVarNames[29] = "nh0";
-  simVarNames[30] = "nh1";
-  simVarNames[31] = "nh2";
   simTable = vtkSmartPointer<vtkTable>::New();
   // need animation runtime control. max time or add to the array somehow.
   // maybe set so that the filesize of output jpgs etc is < 1GB.
@@ -536,9 +537,86 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   //simTable->SetNumberOfRows(100);
 } // initSim()
 
-void MyQWhipple::endSim()
-{
+void MyQWhipple::endSim() {
+  /*
+  rearConeRightSource->Delete();
+  rearConeRightTransform->Delete();
+  rearConeRightFilter->Delete();
+  rearConeRightMapper->Delete();
+  rearConeRightActor->Delete();
+  rearConeLeftSource->Delete();
+  rearConeLeftTransform->Delete();
+  rearConeLeftFilter->Delete();
+  rearConeLeftMapper->Delete();
+  rearConeLeftActor->Delete();
+  rearTorus->Delete();
+  rearTorusSource->Delete();
+  rearTorusTransform->Delete();
+  rearTorusFilter->Delete();
+  rearTorusMapper->Delete();
+  rearTorusActor->Delete();
+  rearCOMSource->Delete();
+  rearCOMTransform->Delete();
+  rearCOMFilter->Delete();
+  rearCOMMapper->Delete();
+  rearCOMActor->Delete();
+  rearTubeSource->Delete();
+  rearTubeTransform->Delete();
+  rearTubeFilter->Delete();
+  rearTubeMapper->Delete();
+  rearTubeActor->Delete();
+  frontTubeSource->Delete();
+  frontTubeTransform->Delete();
+  frontTubeFilter->Delete();
+  frontTubeMapper->Delete();
+  frontTubeActor->Delete();
+  frontOffsetSource->Delete();
+  frontOffsetTransform->Delete();
+  frontOffsetFilter->Delete();
+  frontOffsetMapper->Delete();
+  frontOffsetActor->Delete();
+  frontConeRightSource->Delete();
+  frontConeRightTransform->Delete();
+  frontConeRightFilter->Delete();
+  frontConeRightMapper->Delete();
+  frontConeRightActor->Delete();
+  frontConeLeftSource->Delete();
+  frontConeLeftTransform->Delete();
+  frontConeLeftFilter->Delete();
+  frontConeLeftMapper->Delete();
+  frontConeLeftActor->Delete();
+  frontTorus->Delete();
+  frontTorusSource->Delete();
+  frontTorusTransform->Delete();
+  frontTorusFilter->Delete();
+  frontTorusMapper->Delete();
+  frontTorusActor->Delete();
+  rearWheelAssy->Delete();
+  rearFrameAssy->Delete();
+  frontFrameAssy->Delete();
+  frontFrameTransform->Delete();
+  frontWheelAssy->Delete();
+  frontWheelTransform->Delete();
+  triad0 = new myvtkTriad(simRenderer);
+  triad1 = new myvtkTriad(simRenderer);
+  triad2 = new myvtkTriad(simRenderer);
+  triad3 = new myvtkTriad(simRenderer);
+  triad4 = new myvtkTriad(simRenderer);
+  rearReaction = new myvtkTriad(simRenderer);
+  rearPoints = vtkSmartPointer<vtkPoints>::New();
+  rearPointsLine = vtkSmartPointer<vtkPolyLine>::New();
+  rearPointsCell = vtkSmartPointer<vtkCellArray>::New();
+  rearPointsData = vtkSmartPointer<vtkPolyData>::New();
+  rearPointsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  rearPointsActor = vtkSmartPointer<vtkActor>::New();
+  simTable = vtkSmartPointer<vtkTable>::New();
+  // need animation runtime control. max time or add to the array somehow.
+  // maybe set so that the filesize of output jpgs etc is < 1GB.
 
+  for (uint i = 0; i < simArrays.size(); i++) {
+    simArrays[i] = vtkSmartPointer<vtkFloatArray>::New();
+  }
+  */
 }
 
 Whipple* MyQWhipple::getBike() {

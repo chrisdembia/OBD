@@ -146,8 +146,10 @@ class MyQSimTab : public QWidget {
     void saveSimagesSlot(void);
 
   private:
+    int setBikeIndex();
+
     std::vector<MyQWhipple*>* qbikes;
-    int bidx = 0;
+    int bidx;
   
     QGroupBox *simLSetBox;
     QGridLayout *simLSetLayout;

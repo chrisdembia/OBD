@@ -262,9 +262,9 @@ void WhippleParameter::initCheckBox() {
   connect(uprightCheck, SIGNAL(stateChanged(int)), this,
       SLOT(uprightCheckSlot(int)));
 
-  simCheck = new QCheckBox("upright", this);
+  simCheck = new QCheckBox("simulation", this);
   checkLayout->addWidget(simCheck);
-  simCheck->setCheckState(Qt::Checked);
+  simCheck->setCheckState(Qt::Unchecked);
   connect(simCheck, SIGNAL(stateChanged(int)), this,
       SLOT(simCheckSlot(int)));
 
@@ -284,6 +284,7 @@ void WhippleParameter::simCheckSlot(int state) {
   } else if (state == 0) {
     qbikes->at(bidx)->setDoSim(false);
   } // if
+  std::cout << "simcheckslot " << qbikes->at(bidx)->getDoSim() << std::endl;
 } // simCheckSlot()
 
 void WhippleParameter::saveDrawSlot() {
