@@ -59,7 +59,7 @@ private:
   QTabWidget *tabWidget;
 
   // Tabs
-  MyQUprightTab* uprightTab;
+  MyQUprightTab *uprightTab;
   MyQSteadyTab *steadyTab;
   MyQSimTab *simTab;
 

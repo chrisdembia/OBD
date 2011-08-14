@@ -17,7 +17,7 @@
 #include "myqsteadytab.h"
 #include "myqsimtab.h"
 
-std::ostream &operator<<(std::ostream &outfile, const Whipple * discs);
+std::ostream &operator<<(std::ostream &outfile, const Whipple *discs);
 // constructor
 MainWindow::MainWindow() {
   // Set MainWindow parameterss
@@ -156,7 +156,7 @@ void MainWindow::initTabs(void) {
   tableConverter->SetInput(sphereSource->GetOutput());
   tableConverter->SetFieldType(vtkDataObjectToTable::POINT_DATA);
   tableConverter->Update();
-  vtkTable* pointTable = tableConverter->GetOutput();
+  vtkTable *pointTable = tableConverter->GetOutput();
 
   // Create a line chart view
   vtkSmartPointer<vtkQtLineChartView> chartView = 
@@ -170,10 +170,10 @@ void MainWindow::initTabs(void) {
   chartView->SetTitle("Sphere Normals");
 
   // Add the table to the view
-  vtkDataRepresentation* dataRep = chartView->AddRepresentationFromInput(pointTable);
+  vtkDataRepresentation *dataRep = chartView->AddRepresentationFromInput(pointTable);
 
   // You can downcast to get the chart representation:
-  vtkQtChartRepresentation* chartRep =
+  vtkQtChartRepresentation *chartRep =
     vtkQtChartRepresentation::SafeDownCast(dataRep);
   if (!chartRep) {
     std::cerr << "Failed to get chart table representation." << std::endl;
@@ -190,7 +190,7 @@ void MainWindow::initTabs(void) {
   // eigScroll->setWidget(eigPlot); 
 */
 
-//     QLabel * eigPlot = new QLabel("HELLO");
+//     QLabel *eigPlot = new QLabel("HELLO");
 //  QImage image("human.png");
 //  eigPlot->setPixmap(QPixmap::fromImage(image));
 //         eigPlot->setMinimumSize(200, 200);

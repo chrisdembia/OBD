@@ -107,21 +107,21 @@ private:
    * */
   QGridLayout *layout;
 
-  QGroupBox* bikeBox;
-  QGridLayout* bikeLayout;
-  QListView* bikeListView;
+  QGroupBox *bikeBox;
+  QGridLayout *bikeLayout;
+  QListView *bikeListView;
   QStringList bikeList;
-  QStringListModel* bikeListModel;
+  QStringListModel *bikeListModel;
   QItemSelectionModel *bikeListSelection;
 
-  QToolButton* addBikeButton;
-  QToolButton* removeBikeButton;
+  QToolButton *addBikeButton;
+  QToolButton *removeBikeButton;
 
-  QGroupBox* drawBox;
-  QVBoxLayout* drawLayout;
-  QGraphicsView* drawView;
-  QGraphicsScene* drawScene;
-  QToolButton* saveDrawButton;
+  QGroupBox *drawBox;
+  QVBoxLayout *drawLayout;
+  QGraphicsView *drawView;
+  QGraphicsScene *drawScene;
+  QToolButton *saveDrawButton;
 
 
   /**
@@ -144,9 +144,9 @@ private:
    * */
   QGroupBox *paramBox;
 
-  QVBoxLayout* paramTypeLayout;
+  QVBoxLayout *paramTypeLayout;
 
-  QGroupBox* paramTypeBox;
+  QGroupBox *paramTypeBox;
 
   /**
    *
@@ -170,8 +170,8 @@ private:
   /**
    * Structure, declared in Whipple.h, to hold the default (Gyrostat) parameters for Whipple objects.
    * */
-  WhippleParams * gswp;
-  WhippleParams * gswptemp;
+  WhippleParams *gswp;
+  WhippleParams *gswptemp;
 
   /**
    *
@@ -196,7 +196,7 @@ private:
   /**
    *
    * */
-  QLabel * gyroFileLabel;
+  QLabel *gyroFileLabel;
   
   /**
    *
@@ -211,12 +211,12 @@ private:
   /**
    *
    * */
-  QLabel * gyroParamLabels[NGYROPARAMS];
+  QLabel *gyroParamLabels[NGYROPARAMS];
 
   /**
    *
    * */
-  QLineEdit * gyroParamEdits[NGYROPARAMS];
+  QLineEdit *gyroParamEdits[NGYROPARAMS];
 
   /**
    *
@@ -266,7 +266,7 @@ private:
   /**
    * 
    * */
-  QLabel * meijFileLabel;
+  QLabel *meijFileLabel;
 
   /**
    *
@@ -277,8 +277,8 @@ private:
    * Structure, declared in Whipple.h, to hold the input parameters if Meijaard parmeters are selected from the QtComboBox.
 zo
    * */
-  MJWhippleParams * mjwp;
-  MJWhippleParams * mjwptemp;
+  MJWhippleParams *mjwp;
+  MJWhippleParams *mjwptemp;
 
   /**
    * The number of Meijaard parameters.
@@ -289,12 +289,12 @@ zo
   /**
    * Holds the QLabel objects used for the GUI input of Meijaard parameters.
    * */
-  QLabel * meijParamLabels[NMEIJPARAMS];
+  QLabel *meijParamLabels[NMEIJPARAMS];
 
   /**
    * Holds the QLineEdit objects used for the GUI input of Meijaard parameters.
    * */
-  QLineEdit * meijParamEdits[NMEIJPARAMS];
+  QLineEdit *meijParamEdits[NMEIJPARAMS];
   
   /**
    * Holds the string names for use with QLabel objects for the GUI input of Meijaard parameters.
@@ -314,6 +314,6 @@ zo
   /**
    *
    * */
-  QTextEdit * meijErrorText;
+  QTextEdit *meijErrorText;
 };
 #endif

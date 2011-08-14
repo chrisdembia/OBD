@@ -42,8 +42,8 @@ class MyQSteadyTab : public QWidget {
   private:
   std::vector<MyQWhipple*>* qbikes;
 
-  QGridLayout* steadyLayout;
-  QVTKWidget* steadyQVTKW;
+  QGridLayout *steadyLayout;
+  QVTKWidget *steadyQVTKW;
 
 
   vtkSmartPointer<myvtkHolonomic> holoFunc;

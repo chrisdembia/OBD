@@ -14,7 +14,7 @@ class VTK_FILTERING_EXPORT myvtkHolonomic : public vtkImplicitFunction
 {
     public:
         vtkTypeMacro(myvtkHolonomic,vtkImplicitFunction);
-        static myvtkHolonomic* New();
+        static myvtkHolonomic *New();
 
         double EvaluateFunction(double x[3]);
         void EvaluateGradient(double x[3], double n[3]);

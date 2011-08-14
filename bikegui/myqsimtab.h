@@ -56,7 +56,7 @@ class vtkTimerCallback2 : public vtkCommand {
     }
  
     virtual void Execute(vtkObject *caller, unsigned long eventId,
-                         void * vtkNotUsed(callData)) {
+                         void *vtkNotUsed(callData)) {
       if (vtkCommand::TimerEvent == eventId) {
         ++this->TimerCount;
       }
@@ -89,7 +89,7 @@ class vtkTimerCallback2 : public vtkCommand {
     vtkSmartPointer<vtkPostScriptWriter> writer;
     vtkSmartPointer<vtkWindowToImageFilter> w2i;
   //  vtkSmartPointer<vtkRenderWindow> plotrenwin;
-   // QVTKWidget* simPlotQVTKW;
+   // QVTKWidget *simPlotQVTKW;
    // vtkSmartPointer<vtkChartXY> simPlotVTKChart;
    // vtkSmartPointer<vtkContextView> simPlotVTKView;
   private:
@@ -106,7 +106,7 @@ class vtkTimerCallback3 : public vtkCommand {
     }
  
     virtual void Execute(vtkObject *caller, unsigned long eventId,
-                         void * vtkNotUsed(callData)) {
+                         void *vtkNotUsed(callData)) {
       if (vtkCommand::TimerEvent == eventId) {
         ++this->TimerCount;
       }
@@ -125,7 +125,7 @@ class vtkTimerCallback3 : public vtkCommand {
   public:
     std::vector<MyQWhipple*>* qbikes;
     vtkSmartPointer<vtkRenderWindow> plotrenwin;
-    QVTKWidget* simPlotQVTKW;
+    QVTKWidget *simPlotQVTKW;
   private:
     int TimerCount;
     double time;
@@ -150,17 +150,17 @@ class MyQSimTab : public QWidget {
 
   QGroupBox *simLSetBox;
   QGridLayout *simLSetLayout;
-//  QGroupBox* simRSetBox = new
+//  QGroupBox *simRSetBox = new
 	QGridLayout *simLayout;
 
   // simLSetBox
   QLabel *speedLabel;
   QLineEdit *speedEdit;
-  QToolButton* startsimButton;
-  QToolButton* stopsimButton;
-  QCheckBox* forceCheck;
-  QToolButton* writesimButton;
-  QToolButton* savesimagesButton;
+  QToolButton *startsimButton;
+  QToolButton *stopsimButton;
+  QCheckBox *forceCheck;
+  QToolButton *writesimButton;
+  QToolButton *savesimagesButton;
 
   // animation
   QVTKWidget *simQVTKW; 

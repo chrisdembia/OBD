@@ -69,9 +69,9 @@ class MyQUprightTab : public QWidget {
   QLineEdit *firstSpeedEdit;
   QLineEdit *lastSpeedEdit;
 
-  QToolButton * saveEigPlotButton;
-  QToolButton * saveEigDataButton;
-  QToolButton * updateEigButton;
+  QToolButton *saveEigPlotButton;
+  QToolButton *saveEigDataButton;
+  QToolButton *updateEigButton;
 
   QVTKWidget *eigPlotQVTKW; 
 

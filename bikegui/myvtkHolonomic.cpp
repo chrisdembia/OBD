@@ -12,7 +12,7 @@ vtkStandardNewMacro(myvtkHolonomic);
 
 myvtkHolonomic::myvtkHolonomic() {};
 
-void myvtkHolonomic::SetBike(Whipple* bike)
+void myvtkHolonomic::SetBike(Whipple *bike)
 {
   rft = bike->rft;
   rr = bike->rr;

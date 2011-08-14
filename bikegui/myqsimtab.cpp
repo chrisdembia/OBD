@@ -52,7 +52,7 @@ MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   qbikes = qb;
   simLSetBox = new QGroupBox("Parameters", this);
   simLSetLayout = new QGridLayout(simLSetBox);
-  //  QGroupBox* simRSetBox = new
+  //  QGroupBox *simRSetBox = new
 	simLayout = new QGridLayout(this);
 
   simQVTKW = new QVTKWidget(this);
@@ -116,7 +116,7 @@ MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
  // simPlotQVTKW->GetInteractor()->AddObserver(vtkCommand::TimerEvent,
   //    simPlotCallback);
 
-//  vtkPlot* simPlotVTKLine;
+//  vtkPlot *simPlotVTKLine;
 //  simPlotVTKLines.resize(NMOTIONVARS);
 
 //  simPlotVTKChart->Paint(simPlotVTKView->GetContext());

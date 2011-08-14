@@ -201,10 +201,10 @@ void WhippleParameter::initParamBox() {
 void WhippleParameter::initDrawBox() {
   drawBox = new QGroupBox( tr("Drawing"), this);
   layout->addWidget(drawBox, 0, 2, 1, 1);
-  QVBoxLayout* drawLayout = new QVBoxLayout(drawBox);
+  QVBoxLayout *drawLayout = new QVBoxLayout(drawBox);
   drawBox->setLayout(drawLayout);
 
-  QVTKWidget* qvtkWidget = new QVTKWidget(drawBox);
+  QVTKWidget *qvtkWidget = new QVTKWidget(drawBox);
   qvtkWidget->GetInteractor()->Initialize();
   vtkSmartPointer<vtkContextView> drawVTKView =
     vtkSmartPointer<vtkContextView>::New();
@@ -286,7 +286,7 @@ void WhippleParameter::paramBoxSlot(int index) {
     qbikes->at(bidx)->setParamType(index);
     drawGyroParamBox();
   } else if (index == 2) { // Franke parameters
-   // QGridLayout * frankeParamLayout = new QGridLayout;
+   // QGridLayout *frankeParamLayout = new QGridLayout;
   //  frankeParamLayout->addWidget(new QLabel( tr("Not available. Bug the developers!") ), 0, 0);
    // paramBox->setLayout(frankeParamLayout);
   } else if (index == 1) { // Meijaard parameters
@@ -301,17 +301,17 @@ void WhippleParameter::drawGyroParamBox() {
   // putting gyrostat parameter widgets into a QGridLayout
 //  gyroParamLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
 
-  QGroupBox * gyroParamFileBox = 
+  QGroupBox *gyroParamFileBox = 
     new QGroupBox( tr("File management"), paramBox );
-  QScrollArea * gyroParamModScroll = new QScrollArea(paramBox);
-  QGroupBox * gyroParamModBox = 
+  QScrollArea *gyroParamModScroll = new QScrollArea(paramBox);
+  QGroupBox *gyroParamModBox = 
     new QGroupBox( tr("Modify parameters"), gyroParamModScroll );
 
   gyroParamFileBox->setMaximumHeight(175);
   // putting benchmark parameter widgets into a QGridLayout
-  QVBoxLayout * gyroParamLayout = new QVBoxLayout(paramBox);
-  QGridLayout * gyroParamFileLayout = new QGridLayout(gyroParamFileBox);
-  QGridLayout * gyroParamModLayout = new QGridLayout(gyroParamModBox);
+  QVBoxLayout *gyroParamLayout = new QVBoxLayout(paramBox);
+  QGridLayout *gyroParamFileLayout = new QGridLayout(gyroParamFileBox);
+  QGridLayout *gyroParamModLayout = new QGridLayout(gyroParamModBox);
 
   gyroParamFileBox->setLayout(gyroParamFileLayout);
   gyroParamModBox->setLayout(gyroParamModLayout);
@@ -323,20 +323,20 @@ void WhippleParameter::drawGyroParamBox() {
   defineGyroStrings();
 
   // load parameters label
-  QLabel * gyroLoadLabel = new QLabel("current file:", gyroParamFileBox);
+  QLabel *gyroLoadLabel = new QLabel("current file:", gyroParamFileBox);
 
   // load parameters button
-  QToolButton * gyroLoadButton = new QToolButton(gyroParamFileBox);
+  QToolButton *gyroLoadButton = new QToolButton(gyroParamFileBox);
   gyroLoadButton->setText("Load");
   connect(gyroLoadButton, SIGNAL(clicked()), this, SLOT(gyroLoadSlot()));
 
   // save parameters button
-  QToolButton * gyroSaveButton = new QToolButton(gyroParamFileBox);
+  QToolButton *gyroSaveButton = new QToolButton(gyroParamFileBox);
   gyroSaveButton->setText("Save");
   connect(gyroSaveButton, SIGNAL(clicked()), this, SLOT(gyroSaveSlot()));
 
   // save as parameters button
-  QToolButton * gyroSaveAsButton = new QToolButton(gyroParamFileBox);
+  QToolButton *gyroSaveAsButton = new QToolButton(gyroParamFileBox);
   gyroSaveAsButton->setText("Save As");
   connect(gyroSaveAsButton, SIGNAL(clicked()), this, SLOT(gyroSaveAsSlot()));
 
@@ -347,7 +347,7 @@ void WhippleParameter::drawGyroParamBox() {
   // the value for the file label is set further down 
 
   // use benchmark parameters button
-  QToolButton * gyroBenchParamsButton = new QToolButton(gyroParamFileBox);
+  QToolButton *gyroBenchParamsButton = new QToolButton(gyroParamFileBox);
   gyroBenchParamsButton->setText("Use benchmark parameters");
   connect(gyroBenchParamsButton, SIGNAL(clicked()), this,
       SLOT(setGyroBenchParametersSlot()) );
@@ -471,7 +471,7 @@ void WhippleParameter::sendGyroParamToBike() {
   try {  // NOTE: QT WILL NOT CATCH EXCEPTIONS FOR US, SO ALL EXCEPTION-THROWING CODE MUST BE IN MY OWN TRY..CATCH
     validparameters = qbikes->at(bidx)->getBike()->setParameters( gswptemp, true);
   }
-  catch (const char * errmsg) {
+  catch (const char *errmsg) {
     gyroErrorText->setTextColor( Qt::red );
     gyroErrorText->setText( tr(errmsg) );
   }
@@ -546,16 +546,16 @@ void WhippleParameter::setGyroBenchParametersSlot() {
 } // setGyroBenchParametersSlot()
 
 void WhippleParameter::drawMeijParamBox() {
-  QGroupBox * meijParamFileBox =
+  QGroupBox *meijParamFileBox =
     new QGroupBox( tr("File management"), paramBox );
-  QScrollArea * meijParamModScroll = new QScrollArea(paramBox);
-  QGroupBox * meijParamModBox =
+  QScrollArea *meijParamModScroll = new QScrollArea(paramBox);
+  QGroupBox *meijParamModBox =
     new QGroupBox( tr("Modify parameters"), meijParamModScroll);
   meijParamFileBox->setMaximumHeight(175);
   // putting benchmark parameter widgets into a QGridLayout
-  QVBoxLayout * meijParamLayout = new QVBoxLayout(paramBox);
-  QGridLayout * meijParamFileLayout = new QGridLayout(meijParamFileBox);
-  QGridLayout * meijParamModLayout = new QGridLayout(meijParamModBox);
+  QVBoxLayout *meijParamLayout = new QVBoxLayout(paramBox);
+  QGridLayout *meijParamFileLayout = new QGridLayout(meijParamFileBox);
+  QGridLayout *meijParamModLayout = new QGridLayout(meijParamModBox);
 
   meijParamFileBox->setLayout(meijParamFileLayout);
   meijParamModBox->setLayout(meijParamModLayout);
@@ -570,20 +570,20 @@ void WhippleParameter::drawMeijParamBox() {
   defineMeijStrings();
 
   // load parameters label
-  QLabel * meijLoadLabel = new QLabel("current file:", meijParamFileBox);
+  QLabel *meijLoadLabel = new QLabel("current file:", meijParamFileBox);
 
   // load parameters button
-  QToolButton * meijLoadButton = new QToolButton(meijParamFileBox);
+  QToolButton *meijLoadButton = new QToolButton(meijParamFileBox);
   meijLoadButton->setText("Load");
   connect(meijLoadButton, SIGNAL(clicked()), this, SLOT(meijLoadSlot()));
 
   // save parameters button
-  QToolButton * meijSaveButton = new QToolButton(meijParamFileBox);
+  QToolButton *meijSaveButton = new QToolButton(meijParamFileBox);
   meijSaveButton->setText("Save");
   connect(meijSaveButton, SIGNAL(clicked()), this, SLOT(meijSaveSlot()));
 
   // save as parameters button
-  QToolButton * meijSaveAsButton = new QToolButton(meijParamFileBox);
+  QToolButton *meijSaveAsButton = new QToolButton(meijParamFileBox);
   meijSaveAsButton->setText("Save As");
   connect(meijSaveAsButton, SIGNAL(clicked()), this, SLOT(meijSaveAsSlot()));
 
@@ -593,13 +593,13 @@ void WhippleParameter::drawMeijParamBox() {
   // the value for the file label is set further down
 
   // use benchmark parameters button
-  QToolButton * meijBenchParamsButton = new QToolButton(meijParamFileBox);
+  QToolButton *meijBenchParamsButton = new QToolButton(meijParamFileBox);
   meijBenchParamsButton->setText("Use benchmark parameters");
   connect(meijBenchParamsButton, SIGNAL(clicked()), this,
       SLOT(setMeijBenchParametersSlot()) );
 
   // convert Meijaard parameters to Gyrostat parameters
-  QToolButton * meijToGyroButton = new QToolButton(meijParamFileBox);
+  QToolButton *meijToGyroButton = new QToolButton(meijParamFileBox);
   meijToGyroButton->setText("Convert Meij. to Gyro params");
 
   // error message box
@@ -735,7 +735,7 @@ void WhippleParameter::sendMeijParamToBike() {
    // MAY TRY TO IMPLEMENT TRYCATCH INTO CONVERTPARAMETERS INSTEAD. NOTE THAT THERE ARE ERRORS BEING CAUGHT BY GYROSTAT SET THAT ARE NOT BEING CAUGHT BY WHIPPLE SET
     validparameters = validateMJParameters( mjwptemp, true);
   }
-  catch (const char* errmsg) {
+  catch (const char *errmsg) {
     meijErrorText->setTextColor( Qt::red );
     meijErrorText->setText( tr(errmsg) );
   }
