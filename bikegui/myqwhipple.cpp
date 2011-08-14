@@ -49,6 +49,7 @@
 #define NMOTIONVARS 32
 
 MyQWhipple::MyQWhipple(std::string n) {
+
   name = n;
   bike = new Whipple();
   paramtype = 0; // gyrostat
