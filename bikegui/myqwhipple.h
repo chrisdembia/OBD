@@ -56,7 +56,7 @@ class MyQWhipple {
   public:
     MyQWhipple(std::string);
     ~MyQWhipple();
-    void UpdateSim();
+    void UpdateSim(double time);
     Whipple* getBike();
     std::string getName();
 
@@ -106,9 +106,9 @@ class MyQWhipple {
     vtkSmartPointer<vtkTable> eigPlotVTKTable;
     vtkSmartPointer<vtkFloatArray> eigX;
     std::vector< vtkSmartPointer<vtkFloatArray> > eigY;
-     
     
     // SIM
+    double state[10];
     // rear wheel: two cones and a torus
     // rear cone right
     // source

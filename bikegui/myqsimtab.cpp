@@ -48,6 +48,7 @@
 
 MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   QWidget(parent) {
+  std::cout << "db qs0" << std::endl;
 
   qbikes = qb;
   simLSetBox = new QGroupBox("Parameters", this);
@@ -59,7 +60,7 @@ MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   //  simQVTKW->resize(256, 256);
 
   // initial velocity
-  speedLabel = new QLabel( tr("initial speed (m/s)"), simLSetBox); 
+  speedLabel = new QLabel( tr("initial speed (m/s)"), simLSetBox);
   speedEdit = new QLineEdit(simLSetBox);
 
   // simLSetBox
@@ -94,7 +95,9 @@ MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   simRenderWindow->AddRenderer(simRenderer);
   simQVTKW->SetRenderWindow(simRenderWindow);
   // USE CMAKE TO IDENTIFY TYPE OF COMPUTER? FOR VIDEO AVI OUTPUT
+  std::cout << "db qs02" << std::endl;
   qbikes->at(0)->initSim(simRenderer);
+  std::cout << "db qs03" << std::endl;
 
   simCallback = vtkSmartPointer<vtkTimerCallback2>::New();
   simCallback->qbikes = qbikes;
@@ -105,6 +108,7 @@ MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
 //  simRenderWindow->SetAAFrames(2);
   // Sign up to receive TimerEvent
  // VTK_CREATE(vtkTimerCallback2, callback);
+  std::cout << "db qs04" << std::endl;
 
   // plot
 
@@ -139,21 +143,14 @@ MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   simLayout->addWidget(simQVTKW, 0, 1);
   simLayout->addWidget(simPlotQVTKW, 1, 0, 1, 2);
   setLayout(simLayout);
+  std::cout << "db qs05" << std::endl;
 
 } // startsimSlot()
 
 
 void MyQSimTab::startsimSlot(void) {
+  std::cout << "db qs1" << std::endl;
   // WHIPPLE CODE
-  qbikes->at(0)->getBike()->evalConstants();
-  qbikes->at(0)->getBike()->eoms();
-  qbikes->at(0)->getBike()->computeOutputs();
-  double state[10] = {qbikes->at(0)->getBike()->q0,
-    qbikes->at(0)->getBike()->q1, qbikes->at(0)->getBike()->q3,
-    qbikes->at(0)->getBike()->q4, qbikes->at(0)->getBike()->q5,
-    qbikes->at(0)->getBike()->q6, qbikes->at(0)->getBike()->q7,
-    qbikes->at(0)->getBike()->u1, qbikes->at(0)->getBike()->u3,
-    qbikes->at(0)->getBike()->u5};
 /*
   // MAKE HUD-DISPLAY, TEXTACTOR:w
   VTK_CREATE(vtkTextProperty, text1Propr);
@@ -179,7 +176,7 @@ void MyQSimTab::startsimSlot(void) {
   groundActor->GetProperty()->SetColor(0, 0, 0);
   groundActor->GetProperty()->SetOpacity(0.5);
   // draw a bike
-  qbikes->at(0)->UpdateSim();
+  qbikes->at(0)->UpdateSim(0);
 //  qbikes->at(0)->SetSimValues(0);
   simRenderer->SetBackground(.8, 1,.8);
   simQVTKW->GetInteractor()->Initialize();
@@ -193,15 +190,14 @@ void MyQSimTab::startsimSlot(void) {
 //  simRenderer->GetActiveCamera()->Elevation(-95);
   // Render and interact
   //simQVTKW->GetRenderWindow()->Render();
- 
-  simCallback->SetState(state);
+
 //  simCallback->writer = writer;
 //  simCallback->w2i = w2i;
- 
+
   int timerId = simQVTKW->GetInteractor()->
       CreateRepeatingTimer(1000/qbikes->at(0)->getBike()->fps);
   std::cout << "timerId: " << timerId << std::endl;
- 
+
   // Start the interaction and timer
   simQVTKW->GetInteractor()->Start();
 //  delete qbikes->at(0);
@@ -209,9 +205,10 @@ void MyQSimTab::startsimSlot(void) {
   int timerId3 = simPlotQVTKW->GetInteractor()->
       CreateRepeatingTimer(1000/qbikes->at(0)->getBike()->fps);
   std::cout << "timerId3: " << timerId3 << std::endl;
- 
+
   // Start the interaction and timer*/
   //simPlotQVTKW->GetInteractor()->Start();
+  std::cout << "db qs2" << std::endl;
 }
 
 void MyQSimTab::stopsimSlot(void) {

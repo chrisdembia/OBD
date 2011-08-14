@@ -157,9 +157,29 @@ void MyQWhipple::printUprightData(QString fname) {
 } // printUprightData()
 
 void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
+
   simRenderer = ren;
+
+  bike->evalConstants();
+  bike->eoms();
+  bike->computeOutputs();
+  std::cout << "db qw1" << std::endl;
+  state[0] = bike->q0;
+  state[1] = bike->q1;
+  state[2] = bike->q2;
+  state[3] = bike->q3;
+  state[4] = bike->q4;
+  state[5] = bike->q5;
+  state[6] = bike->q6;
+  state[7] = bike->q7;
+  state[8] = bike->u1;
+  state[9] = bike->u3;
+  state[10] = bike->u5;
+  std::cout << "db qw2" << std::endl;
+
   // rear wheel: two cones and a torus
   double hubhalfwidth = .1;
+  /*
   // rear cone right
   // source
   rearConeRightSource = vtkConeSource::New();
@@ -183,6 +203,7 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   rearConeRightActor = vtkActor::New();
   rearConeRightActor->SetMapper(rearConeRightMapper);
   rearConeRightActor->GetProperty()->SetOpacity(0.7);
+  */
 
   // rear cone left
   // source
@@ -209,6 +230,7 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   rearConeLeftActor->GetProperty()->SetOpacity(0.7);
   
   // rear torus
+  std::cout << "db qw3" << std::endl;
   rearTorus = vtkParametricTorus::New();
   // source
   rearTorusSource = vtkParametricFunctionSource::New();
@@ -367,6 +389,7 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   frontConeLeftActor = vtkActor::New();
   frontConeLeftActor->SetMapper(frontConeLeftMapper);
   frontConeLeftActor->GetProperty()->SetOpacity(0.7);
+  std::cout << "db qw4" << std::endl;
   
   // front torus
   frontTorus = vtkParametricTorus::New();
@@ -395,7 +418,7 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   // render the actor assemblies
   // rear wheel assembly
   rearWheelAssy = vtkAssembly::New();
-  rearWheelAssy->AddPart(rearConeRightActor);
+  //rearWheelAssy->AddPart(rearConeRightActor);
   rearWheelAssy->AddPart(rearConeLeftActor);
   rearWheelAssy->AddPart(rearTorusActor);
 
@@ -542,7 +565,11 @@ int MyQWhipple::getParamType() {
   return paramtype;
 } // getParamType()
 
-void MyQWhipple::UpdateSim() {
+void MyQWhipple::UpdateSim(double time) {
+  std::cout << "db qw10" << std::endl;
+  bike->evolve(time, state);
+  std::cout << "db qw11" << std::endl;
+
   double YAW = bike->q0;
   double LEAN = bike->q1;
   double PITCH = bike->q2;

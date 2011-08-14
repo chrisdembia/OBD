@@ -40,7 +40,6 @@ WhippleParameter::WhippleParameter(std::vector<MyQWhipple*>* qb, QWidget
   layout = new QGridLayout(this);
   setLayout(layout);
 
-
   initBikeBox();
 
   paramTypeBox = new QGroupBox( tr("Choose parameter type"), this);

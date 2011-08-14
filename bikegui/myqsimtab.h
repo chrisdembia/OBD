@@ -68,9 +68,9 @@ class vtkTimerCallback2 : public vtkCommand {
           qbikes->at(0)->getBike()->Ts = 5;
         }
         else { qbikes->at(0)->getBike()->Ts = 0; }
-        qbikes->at(0)->getBike()->evolve(time,state);
       }
-      qbikes->at(0)->UpdateSim();
+      std::cout << "db tc1" << std::endl;  
+      qbikes->at(0)->UpdateSim(time);
       qbikes->at(0)->SetSimValues(TimerCount);
   //simPlotQVTKW->GetInteractor()->Initialize();
   //simPlotQVTKW->GetInteractor()->Start();
@@ -93,11 +93,6 @@ class vtkTimerCallback2 : public vtkCommand {
  
   public:
     std::vector<MyQWhipple*>* qbikes;
-    void SetState(double s[10]) {
-      for (int i = 0; i < 10; i++) {
-        state[i] = s[i];
-      }
-    }
     vtkSmartPointer<vtkPostScriptWriter> writer;
     vtkSmartPointer<vtkWindowToImageFilter> w2i;
   //  vtkSmartPointer<vtkRenderWindow> plotrenwin;
@@ -107,7 +102,6 @@ class vtkTimerCallback2 : public vtkCommand {
   private:
     int TimerCount;
     double time;
-    double state[10];
 }; // vtkTimerCallback2
 
 class vtkTimerCallback3 : public vtkCommand {

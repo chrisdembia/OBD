@@ -84,3 +84,6 @@
     -- member variable vtk objects; how often are they used?
     -- } // for i, if
     -- move pointer to the right
+
+-- tdo 0814
+    -- make simulation speak multiple bikes
