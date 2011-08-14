@@ -58,6 +58,8 @@ MyQWhipple::MyQWhipple(std::string n) {
   convertParameters( gswp, mjwp);
 
   doUpright = true;
+  doSim = false;
+
   initUprightTable();
 
 } // MyQWhipple()
@@ -76,6 +78,14 @@ void MyQWhipple::setDoUpright(bool b) {
 bool MyQWhipple::getDoUpright() {
   return doUpright;
 } // getDoUpright()
+
+void MyQWhipple::setDoSim(bool b) {
+  doSim = b;
+} // setDoSim()
+
+bool MyQWhipple::getDoSim() {
+  return doSim;
+} // getDoSim()
 
 void MyQWhipple::initUprightTable() {
 
@@ -525,6 +535,11 @@ void MyQWhipple::initSim(vtkSmartPointer<vtkRenderer> ren) {
   simTable->InsertNextBlankRow(1);
   //simTable->SetNumberOfRows(100);
 } // initSim()
+
+void MyQWhipple::endSim()
+{
+
+}
 
 Whipple* MyQWhipple::getBike() {
   return bike;

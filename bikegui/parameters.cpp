@@ -184,6 +184,12 @@ void WhippleParameter::bikeListCurrentSlot(const QModelIndex& current, const QMo
   } else {
     uprightCheck->setCheckState(Qt::Unchecked);
   } // if
+
+  if (qbikes->at(bidx)->getDoSim()) {
+    simCheck->setCheckState(Qt::Checked);
+  } else {
+    simCheck->setCheckState(Qt::Unchecked);
+  } // if
 } // bikeListCurrentSlot()
 
 /*
@@ -249,11 +255,19 @@ void WhippleParameter::initCheckBox() {
   checkLayout = new QVBoxLayout(checkBox);
   checkBox->setLayout(checkLayout);
   layout->addWidget(checkBox, 0, 3);
+
   uprightCheck = new QCheckBox("upright", this);
   checkLayout->addWidget(uprightCheck);
   uprightCheck->setCheckState(Qt::Checked);
   connect(uprightCheck, SIGNAL(stateChanged(int)), this,
       SLOT(uprightCheckSlot(int)));
+
+  simCheck = new QCheckBox("upright", this);
+  checkLayout->addWidget(simCheck);
+  simCheck->setCheckState(Qt::Checked);
+  connect(simCheck, SIGNAL(stateChanged(int)), this,
+      SLOT(simCheckSlot(int)));
+
 } // initCheckBox()
 
 void WhippleParameter::uprightCheckSlot(int state) {
@@ -263,6 +277,14 @@ void WhippleParameter::uprightCheckSlot(int state) {
     qbikes->at(bidx)->setDoUpright(false);
   } // if
 } // uprightCheckSlot()
+
+void WhippleParameter::simCheckSlot(int state) {
+  if (state == 1) {
+    qbikes->at(bidx)->setDoSim(true);
+  } else if (state == 0) {
+    qbikes->at(bidx)->setDoSim(false);
+  } // if
+} // simCheckSlot()
 
 void WhippleParameter::saveDrawSlot() {
   //QString fdirname = QFileDialog::getSaveFileName(this, tr("Save drawing"), QDir::currentPath(), tr("Postscript (*.ps)") );

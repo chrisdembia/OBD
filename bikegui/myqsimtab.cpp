@@ -94,7 +94,6 @@ MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
   simRenderWindow->AddRenderer(simRenderer);
   simQVTKW->SetRenderWindow(simRenderWindow);
   // USE CMAKE TO IDENTIFY TYPE OF COMPUTER? FOR VIDEO AVI OUTPUT
-  qbikes->at(0)->initSim(simRenderer);
 
   simCallback = vtkSmartPointer<vtkTimerCallback2>::New();
   simCallback->qbikes = qbikes;
@@ -142,6 +141,22 @@ MyQSimTab::MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget *parent) :
 
 
 void MyQSimTab::startsimSlot(void) {
+
+  int ndobikes = 0;
+  for (unsigned int i = 0; i < qbikes->size(); i++) {
+    if (qbikes->at(i)->getDoSim()) {
+      bidx = i;
+      ndobikes++;
+    }
+  }
+  if (ndobikes == 0) {
+    QMessageBox::information(this, tr("No bicycle selected for simulation."), tr("No bicycle selected for simulation. Select one bicycle from the Bicycle Library tab."));
+  }
+  if (ndobikes > 1) {
+    QMessageBox::information(this, tr("More than one bicycle selected for simulation."), tr("More than one bicycle is selected for simulation. Select only one bicycle from the Bicycle Library tab."));
+  }
+  qbikes->at(bidx)->initSim(simRenderer);
+
   // WHIPPLE CODE
 /*
   // MAKE HUD-DISPLAY, TEXTACTOR:w
@@ -168,8 +183,8 @@ void MyQSimTab::startsimSlot(void) {
   groundActor->GetProperty()->SetColor(0, 0, 0);
   groundActor->GetProperty()->SetOpacity(0.5);
   // draw a bike
-  qbikes->at(0)->UpdateSim(0);
-//  qbikes->at(0)->SetSimValues(0);
+  qbikes->at(bidx)->UpdateSim(0);
+//  qbikes->at(bidx)->SetSimValues(0);
   simRenderer->SetBackground(.8, 1,.8);
   simQVTKW->GetInteractor()->Initialize();
 
@@ -187,14 +202,14 @@ void MyQSimTab::startsimSlot(void) {
 //  simCallback->w2i = w2i;
 
   int timerId = simQVTKW->GetInteractor()->
-      CreateRepeatingTimer(1000/qbikes->at(0)->getBike()->fps);
+      CreateRepeatingTimer(1000/qbikes->at(bidx)->getBike()->fps);
   std::cout << "timerId: " << timerId << std::endl;
 
   // Start the interaction and timer
   simQVTKW->GetInteractor()->Start();
 /*
   int timerId3 = simPlotQVTKW->GetInteractor()->
-      CreateRepeatingTimer(1000/qbikes->at(0)->getBike()->fps);
+      CreateRepeatingTimer(1000/qbikes->at(bidx)->getBike()->fps);
   std::cout << "timerId3: " << timerId3 << std::endl;
 
   // Start the interaction and timer*/
@@ -203,30 +218,33 @@ void MyQSimTab::startsimSlot(void) {
 
 void MyQSimTab::stopsimSlot(void) {
   simQVTKW->GetInteractor()->DestroyTimer();
+
+  // delete everything initialized by MyQWhipple::initSim()
+
   simPlotVTKView = vtkSmartPointer<vtkContextView>::New();
   simPlotVTKView->SetInteractor(simPlotQVTKW->GetInteractor());
   simPlotQVTKW->SetRenderWindow(simPlotVTKView->GetRenderWindow());
   simPlotVTKChart = vtkSmartPointer<vtkChartXY>::New();
   simPlotVTKView->GetScene()->AddItem(simPlotVTKChart);
   simPlotVTKChart->ClearPlots();
-  qbikes->at(0)->GetSimTable()->RemoveRow(qbikes->at(0)->GetSimTable()->GetNumberOfRows());
+  qbikes->at(bidx)->GetSimTable()->RemoveRow(qbikes->at(bidx)->GetSimTable()->GetNumberOfRows());
   for (int i = 1; i < NMOTIONVARS; i++) {
 /*    simPlotVTKLine = simPlotVTKChart->AddPlot(vtkChart::LINE);
-    simPlotVTKLine->SetInput(qbikes->at(0)->GetSimTable(), 0, i);
+    simPlotVTKLine->SetInput(qbikes->at(bidx)->GetSimTable(), 0, i);
     simPlotVTKLine->SetColor(255, 0, 0, 255);*/
     // ideally, create 32 vtkPlot simPlotVTKLines
     simPlotVTKChart->AddPlot(vtkChart::LINE);
-    simPlotVTKChart->GetPlot(i-1)->SetInput(qbikes->at(0)->GetSimTable(), 0, i);
+    simPlotVTKChart->GetPlot(i-1)->SetInput(qbikes->at(bidx)->GetSimTable(), 0, i);
     simPlotVTKChart->GetPlot(i-1)->SetColor(255, 0, 0, 255);
   } // for i
 
-  qbikes->at(0)->GetSimTable()->Update();
+  qbikes->at(bidx)->GetSimTable()->Update();
   simPlotVTKChart->Update();
   simPlotQVTKW->GetInteractor()->Initialize();
   simPlotQVTKW->GetRenderWindow()->Render();
   simPlotQVTKW->GetInteractor()->Start();
 
-  qbikes->at(0)->UpdateTrace();
+  qbikes->at(bidx)->UpdateTrace();
   simRenderWindow->Render();
   //simPlotVTKChart->Paint(simPlotVTKView->GetContext());
 } // stopSimSlot()
@@ -237,9 +255,9 @@ void MyQSimTab::updatePlotSlot(void) {
 // CAN'T HIT START ANIMATION TWICE!!
 void MyQSimTab::forceCheckSlot(int state) {
   if (state == Qt::Checked) {
-    qbikes->at(0)->TurnOnReactionTriads();
+    qbikes->at(bidx)->TurnOnReactionTriads();
   } else if (state == Qt::Unchecked) {
-    qbikes->at(0)->TurnOffReactionTriads();
+    qbikes->at(bidx)->TurnOffReactionTriads();
   } // if
 } // forceCheckSlot()
 
@@ -247,7 +265,7 @@ void MyQSimTab::printSimSlot(void) {
   QString fname = QFileDialog::getSaveFileName(this, tr("Save File"),
       QDir::currentPath(), tr("Text file (*, *.txt, *.dat,...);;Any file (*)")
       );
-  qbikes->at(0)->printSimData(fname.toStdString());
+  qbikes->at(bidx)->printSimData(fname.toStdString());
 } // printSimSlot()
 
 void MyQSimTab::saveSimagesSlot(void) {

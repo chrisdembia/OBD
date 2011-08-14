@@ -69,6 +69,7 @@ class MyQWhipple {
     vtkSmartPointer<vtkTable> GetSimTable();
     void SetSimValues(int rowidx);
     void initSim(vtkSmartPointer<vtkRenderer> ren);
+    void endSim();
     void printSimData(std::string);
 
     void Draw2D(vtkSmartPointer<vtkContext2D>);
@@ -90,6 +91,8 @@ class MyQWhipple {
 
     void setDoUpright(bool);
     bool getDoUpright();
+    void setDoSim(bool);
+    bool getDoSim();
     
     void printUprightData(QString fname);
 
@@ -108,6 +111,7 @@ class MyQWhipple {
     std::vector< vtkSmartPointer<vtkFloatArray> > eigY;
     
     // SIM
+    bool doSim;
     double state[10];
     // rear wheel: two cones and a torus
     // rear cone right

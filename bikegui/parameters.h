@@ -29,6 +29,7 @@ public:
 private slots:
   void initCheckBox();
   void uprightCheckSlot(int);
+  void simCheckSlot(int);
 
   void addBikeSlot();
 
@@ -97,6 +98,7 @@ private slots:
 
 private:
   QCheckBox *uprightCheck;
+  QCheckBox *simCheck;
   QGroupBox *checkBox;
   QVBoxLayout *checkLayout;
 

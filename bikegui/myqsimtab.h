@@ -135,45 +135,46 @@ class MyQSimTab : public QWidget {
   Q_OBJECT;
 
   public:
-  MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget*parent = 0);
+    MyQSimTab(std::vector<MyQWhipple*>* qb, QWidget*parent = 0);
 
   private slots:
-  void startsimSlot(void);
-  void stopsimSlot(void);
-  void updatePlotSlot(void);
-  void forceCheckSlot(int);
-  void printSimSlot(void);
-  void saveSimagesSlot(void);
+    void startsimSlot(void);
+    void stopsimSlot(void);
+    void updatePlotSlot(void);
+    void forceCheckSlot(int);
+    void printSimSlot(void);
+    void saveSimagesSlot(void);
 
   private:
-  std::vector<MyQWhipple*>* qbikes;
-
-  QGroupBox *simLSetBox;
-  QGridLayout *simLSetLayout;
-//  QGroupBox *simRSetBox = new
-	QGridLayout *simLayout;
-
-  // simLSetBox
-  QLabel *speedLabel;
-  QLineEdit *speedEdit;
-  QToolButton *startsimButton;
-  QToolButton *stopsimButton;
-  QCheckBox *forceCheck;
-  QToolButton *writesimButton;
-  QToolButton *savesimagesButton;
-
-  // animation
-  QVTKWidget *simQVTKW; 
-  vtkSmartPointer<vtkRenderer> simRenderer;
-  vtkSmartPointer<vtkRenderWindow> simRenderWindow;
-  vtkSmartPointer<vtkTimerCallback2> simCallback;
-  vtkSmartPointer<vtkTimerCallback3> simPlotCallback;
-
-  // plot
-  QVTKWidget *simPlotQVTKW; 
-  vtkSmartPointer<vtkContextView> simPlotVTKView; 
-  vtkSmartPointer<vtkChartXY> simPlotVTKChart;
-//  std::vector<vtkSmartPointer<vtkPlot> > simPlotVTKLines;
+    std::vector<MyQWhipple*>* qbikes;
+    int bidx = 0;
+  
+    QGroupBox *simLSetBox;
+    QGridLayout *simLSetLayout;
+    //QGroupBox *simRSetBox = new
+  	QGridLayout *simLayout;
+  
+    // simLSetBox
+    QLabel *speedLabel;
+    QLineEdit *speedEdit;
+    QToolButton *startsimButton;
+    QToolButton *stopsimButton;
+    QCheckBox *forceCheck;
+    QToolButton *writesimButton;
+    QToolButton *savesimagesButton;
+  
+    // animation
+    QVTKWidget *simQVTKW; 
+    vtkSmartPointer<vtkRenderer> simRenderer;
+    vtkSmartPointer<vtkRenderWindow> simRenderWindow;
+    vtkSmartPointer<vtkTimerCallback2> simCallback;
+    vtkSmartPointer<vtkTimerCallback3> simPlotCallback;
+  
+    // plot
+    QVTKWidget *simPlotQVTKW; 
+    vtkSmartPointer<vtkContextView> simPlotVTKView; 
+    vtkSmartPointer<vtkChartXY> simPlotVTKChart;
+    //std::vector<vtkSmartPointer<vtkPlot> > simPlotVTKLines;
   
 }; // MyQSimTab
 
